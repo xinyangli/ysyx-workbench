@@ -15,7 +15,7 @@
             flex
             ncurses
             readline
-            llvmPackages_15.libllvm
+            libllvm
           ];
 
           shellHook = ''
