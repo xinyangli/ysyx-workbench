@@ -16,6 +16,10 @@
             ncurses
             readline
             libllvm
+
+            # TODO: Pin 5.008?
+            verilator 
+            gtkwave
           ];
 
           shellHook = ''
