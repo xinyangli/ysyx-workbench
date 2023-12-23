@@ -8,7 +8,7 @@ int main(int argc, char **argv, char **env) {
     Verilated::commandArgs(argc, argv);
     Vexample *top = new Vexample;
     int round = 100;
-    while (1) {
+    while (round--) {
         int a = rand() & 1;
         int b = rand() & 1;
         top->a = a;
