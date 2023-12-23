@@ -1,24 +1,24 @@
-VERILATOR := verilator
-
 VSRC := $(wildcard vsrc/*.v)
 CPPSRC := $(wildcard csrc/*.cpp)
-PREFIX ?= ./build
+PREFIX ?= .
 OBJDIR := $(PREFIX)/obj
 
 all: $(OBJDIR)
-	$(MAKE) -C $(OBJDIR) -f Vexample.mk
+	$(MAKE) -j -C $(OBJDIR) -f Vexample.mk Vexample
 
-sim: $(OBJDIR)
+sim: all
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	@echo "Write this Makefile by your self."
+	$(OBJDIR)/Vexample
+	
 
 $(OBJDIR): $(VSRC) $(CPPSRC)
 	mkdir -p $(OBJDIR)
-	$(VERILATOR) $(VSRC:%=--cc %) $(CPPSRC:%=--exe %) --Mdir $(OBJDIR)
+	verilator --cc --exe --Mdir $(PWD)/$(OBJDIR) $(VSRC) $(CPPSRC)
 
 include ../Makefile
 
-.phony: clean 
+.PHONY: clean 
 
 clean: 
 	$(RM) -r $(OBJDIR)
