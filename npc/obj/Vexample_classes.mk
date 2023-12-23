@@ -30,6 +30,7 @@ VM_CLASSES_FAST += \
 # Generated module classes, non-fast-path, compile with low/medium optimization
 VM_CLASSES_SLOW += \
 	Vexample___024root__Slow \
+	Vexample___024root__DepSet_h625e39dc__0__Slow \
 	Vexample___024root__DepSet_hcb5acca5__0__Slow \
 
 # Generated support classes, fast-path, compile with highest optimization

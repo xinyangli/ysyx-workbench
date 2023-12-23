@@ -1,3 +1,7 @@
-module our;
-     initial begin $display("Hello World"); $finish; end
+module top(
+  input a,
+  input b,
+  output f
+);
+  assign f = a ^ b;
 endmodule
