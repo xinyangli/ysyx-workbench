@@ -9,6 +9,8 @@ int main(int argc, char **argv, char **env) {
     int round = 100;
     Verilated::commandArgs(argc, argv);
     Vexample *top = new Vexample;
+
+    Verilated::traceEverOn(true);
     VerilatedVcdC *m_trace = new VerilatedVcdC; 
     top->trace(m_trace, 5);
     m_trace->open("waveform.vcd");
