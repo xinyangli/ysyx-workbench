@@ -4,27 +4,19 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, ... }@inputs: with inputs; 
+  outputs = { self, ... }@inputs: with inputs;
     flake-utils.lib.eachDefaultSystem (system:
      let pkgs = nixpkgs.legacyPackages.${system}; in
       {
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
-            gnumake
-            bison
-            flex
-            ncurses
-            readline
-            libllvm
-
-            # TODO: Pin 5.008?
-            verilator 
+            verilator
             gtkwave
+            gcc
+            bear
           ];
-
           shellHook = ''
             export NEMU_HOME=/home/xin/repo/ysyx-workbench/nemu
-            export AM_HOME=/home/xin/repo/ysyx-workbench/abstract-machine
           '';
         };
       }
