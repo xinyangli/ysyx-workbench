@@ -8,7 +8,7 @@ VERILATOR_FLAGS := --cc --exe
 all: sim
 
 sim: VERILATOR_FLAGS += --trace
-sim: $(VSRC) $(CPPSRC) $(SUBMAKE)
+sim: $(VSRC) $(CPPSRC) $(OBJDIR)/Vexample
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	@echo "Running" $(OBJDIR)/Vexample "..."
 	@echo "================================"
