@@ -2,6 +2,8 @@ VERILATOR := verilator
 
 VSRC := $(wildcard vsrc/*.v)
 CPPSRC := $(wildcard csrc/*.cpp)
+PREFIX ?= .
+OBJDIR := $(PREFIX)/obj
 
 all:
 	@echo "Write this Makefile by your self."
@@ -11,6 +13,6 @@ sim: obj_dir
 	@echo "Write this Makefile by your self."
 
 obj_dir: $(VSRC) $(CPPSRC)
-	$(VERILATOR) $(VSRC:%=--cc %) $(CPPSRC:%=--exe %) --Mdir $@
+	$(VERILATOR) $(VSRC:%=--cc %) $(CPPSRC:%=--exe %) --Mdir $(OBJDIR)
 
 include ../Makefile
