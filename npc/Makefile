@@ -14,6 +14,9 @@ sim: $(VSRC) $(CPPSRC) $(SUBMAKE)
 	@echo "================================"
 	@$(OBJDIR)/Vexample
 	
+$(OBJDIR)/Vexample: $(SUBMAKE)
+	make -C $(OBJDIR) -f $(notdir $(SUBMAKE)) Vexample
+	
 $(SUBMAKE): $(VSRC) $(CPPSRC) $(OBJDIR)
 	verilator $(VERILATOR_FLAGS) --Mdir $(PWD)/$(OBJDIR) $(VSRC) $(CPPSRC)
 
