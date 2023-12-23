@@ -10,6 +10,10 @@ sim: all
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	@echo "Running" $(OBJDIR)/Vexample "..."
 	@echo "================================"
+	@$(OBJDIR)/Vexample +trace off
+
+trace: all
+	$(call git_commit, "trace RTL") # DO NOT REMOVE THIS LINE!!!
 	@$(OBJDIR)/Vexample
 	
 
