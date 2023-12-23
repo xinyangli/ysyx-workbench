@@ -8,7 +8,8 @@ all: $(OBJDIR)
 
 sim: all
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
-	@echo "Running" $(OBJDIR)/Vexample
+	@echo "Running" $(OBJDIR)/Vexample "..."
+	@echo "================================"
 	$(OBJDIR)/Vexample
 	
 
