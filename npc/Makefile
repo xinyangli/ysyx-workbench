@@ -17,3 +17,8 @@ $(OBJDIR): $(VSRC) $(CPPSRC)
 	$(VERILATOR) $(VSRC:%=--cc %) $(CPPSRC:%=--exe %) --Mdir $(OBJDIR)
 
 include ../Makefile
+
+.phony: clean 
+
+clean: 
+	$(RM) -r $(OBJDIR)
