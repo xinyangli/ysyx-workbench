@@ -1,6 +1,6 @@
 VSRC := $(wildcard vsrc/*.v)
-CPPSRC := $(wildcard csrc/*.cpp)
-PREFIX ?= .
+CPPSRC := $(addprefix $(PWD)/,$(wildcard csrc/*.cpp))
+PREFIX ?= build
 OBJDIR := $(PREFIX)/obj
 
 all: $(OBJDIR)
@@ -8,7 +8,7 @@ all: $(OBJDIR)
 
 sim: all
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
-	@echo "Write this Makefile by your self."
+	@echo "Running" $(OBJDIR)/Vexample
 	$(OBJDIR)/Vexample
 	
 
