@@ -1,13 +1,17 @@
 #include <cstdlib>
 #include <cassert>
 #include <cstdlib>
+#include <verilated.h>
+#include <verilated_vcd_c.h>
 #include "Vexample.h"
-#include "verilated.h"
 
 int main(int argc, char **argv, char **env) {
+    int round = 100;
     Verilated::commandArgs(argc, argv);
     Vexample *top = new Vexample;
-    int round = 100;
+    VerilatedVcdC *m_trace = new VerilatedVcdC; 
+    top->trace(m_trace, 5);
+    m_trace->open("waveform.vcd");
     while (round--) {
         int a = rand() & 1;
         int b = rand() & 1;
@@ -17,5 +21,7 @@ int main(int argc, char **argv, char **env) {
         printf("a = %d, b = %d, f = %d\n", a, b, top->f);
         assert(top->f == (a ^ b));
     }
-    exit(0);
+    m_trace->close();
+    delete top;
+    exit(EXIT_SUCCESS);
 }
