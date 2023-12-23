@@ -7,14 +7,14 @@ VERILATOR_FLAGS := --cc --exe
 all: $(OBJDIR)
 	$(MAKE) -j -C $(OBJDIR) -f Vexample.mk Vexample
 
-sim: all
+sim: $(OBJDIR) $(VSRC) $(CPPSRC)
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	@echo "Running" $(OBJDIR)/Vexample "..."
 	@echo "================================"
 	@$(OBJDIR)/Vexample +tracing_off
 
 trace: VERILATOR_FLAGS += --trace
-trace: all
+trace: $(OBJDIR) $(VSRC) $(CPPSRC)
 	$(call git_commit, "trace RTL") # DO NOT REMOVE THIS LINE!!!
 	@$(OBJDIR)/Vexample
 	
