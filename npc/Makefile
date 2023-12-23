@@ -10,12 +10,12 @@ sim: all
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	@echo "Running" $(OBJDIR)/Vexample "..."
 	@echo "================================"
-	$(OBJDIR)/Vexample
+	@$(OBJDIR)/Vexample
 	
 
 $(OBJDIR): $(VSRC) $(CPPSRC)
 	mkdir -p $(OBJDIR)
-	verilator --cc --exe --Mdir $(PWD)/$(OBJDIR) $(VSRC) $(CPPSRC)
+	verilator --trace --cc --exe --Mdir $(PWD)/$(OBJDIR) $(VSRC) $(CPPSRC)
 
 include ../Makefile
 
