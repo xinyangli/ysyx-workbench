@@ -21,9 +21,11 @@ sim: $(VSRC) $(CPPSRCS) $(OBJDIR)/Vexample git_trace
 $(OBJDIR)/Vexample: $(SUBMAKE)
 	$(MAKE) -C $(OBJDIR) -f $(notdir $(SUBMAKE)) Vexample
 
-$(SUBMAKE): $(VSRC) $(CPPSRCS)
-	mkdir -p $(OBJDIR)
+$(SUBMAKE): $(VSRC) $(CPPSRCS) $(OBJDIR)
 	verilator $(VERILATOR_FLAGS) $(addprefix -CFLAGS , $(CXXFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS)) --Mdir $(abspath $(OBJDIR)) $(VSRC) $(CPPSRCS)
+
+$(OBJDIR):
+	mkdir -p $(OBJDIR)
 
 ifneq (,$(wildcard ../Makefile))
 include ../Makefile
@@ -51,8 +53,8 @@ nvboard: CXXFLAGS += -I$(NVBOARD_HOME)/include $(shell sdl2-config --cflags) -g
 nvboard: $(VSRC) $(CPPSRCS) $(SUBMAKE) $(SRC_AUTO_BIND) $(OBJDIR)/Vexample 
 	@NVBOARD_HOME=$(NVBOARD_HOME) $(OBJDIR)/Vexample
 
-compile_commands.json: clean
-	bear -- $(MAKE) -i all
+compile_commands.json: clean nvboard
+	bear -- $(MAKE) -i all > 
 	bear -- $(MAKE) -i nvboard
 
 clean: 
