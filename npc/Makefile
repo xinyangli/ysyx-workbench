@@ -35,7 +35,7 @@ endif
 git_trace: 
 	$(call git_commit, "sim RTL")
 
-.PHONY: clean nvboard
+.PHONY: clean nvboard compile_commands.json
 
 SRC_AUTO_BIND := $(abspath $(PREFIX)/auto_bind.cpp)
 NXDC_FILES := $(abspath constr/top.nxdc)
@@ -50,6 +50,10 @@ nvboard: CXXFLAGS += -I$(NVBOARD_HOME)/include $(shell sdl2-config --cflags) -g
 
 nvboard: $(VSRC) $(CPPSRCS) $(SUBMAKE) $(SRC_AUTO_BIND) $(OBJDIR)/Vexample 
 	@NVBOARD_HOME=$(NVBOARD_HOME) $(OBJDIR)/Vexample
+
+compile_commands.json:
+	bear -- $(MAKE) --dryall
+	bear -- $()
 
 clean: 
 	$(RM) -r $(PREFIX)
