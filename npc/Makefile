@@ -12,8 +12,10 @@ LDFLAGS += $(shell sdl2-config --libs) -lSDL2_image
 
 all: sim
 
-sim: VERILATOR_FLAGS += --trace 
-sim: $(VSRC) $(CPPSRCS) $(OBJDIR)/Vexample git_trace
+sim-bin: VERILATOR_FLAGS += --trace 
+sim-bin: $(VSRC) $(CPPSRCS) $(OBJDIR)/Vexample git_trace
+
+sim: sim-bin
 	@echo "Running" $(OBJDIR)/Vexample "..."
 	@echo "================================"
 	@$(OBJDIR)/Vexample
@@ -44,18 +46,21 @@ NXDC_FILES := $(abspath constr/top.nxdc)
 $(SRC_AUTO_BIND): $(NXDC_FILES)
 	NVBOARD_HOME=$(NVBOARD_HOME) python3 $(NVBOARD_HOME)/scripts/auto_pin_bind.py $< $@
 
-nvboard: OBJDIR := $(PREFIX)/nvobj
-nvboard: SUBMAKE := $(OBJDIR)/Vexample.mk
+nvboard-bin: OBJDIR := $(PREFIX)/nvobj
+nvboard-bin: SUBMAKE := $(OBJDIR)/Vexample.mk
 # TODO: fix this awkward way to find nvboard.a
-nvboard: CPPSRCS := $(addprefix $(PWD)/,$(wildcard csrc_nvboard/*.cpp)) $(SRC_AUTO_BIND) $(NVBOARD_HOME)/build/nvboard.a
-nvboard: CXXFLAGS += -I$(NVBOARD_HOME)/include $(shell sdl2-config --cflags) -g
+nvboard-bin: CPPSRCS := $(addprefix $(PWD)/,$(wildcard csrc_nvboard/*.cpp)) $(SRC_AUTO_BIND) $(NVBOARD_HOME)/build/nvboard.a
+nvboard-bin: CXXFLAGS += -I$(NVBOARD_HOME)/include $(shell sdl2-config --cflags) -g
 
-nvboard: $(VSRC) $(CPPSRCS) $(SUBMAKE) $(SRC_AUTO_BIND) $(OBJDIR)/Vexample 
+nvboard-bin: $(VSRC) $(CPPSRCS) $(SUBMAKE) $(SRC_AUTO_BIND) $(OBJDIR)/Vexample 
+
+nvboard: nvboard-bin
 	@NVBOARD_HOME=$(NVBOARD_HOME) $(OBJDIR)/Vexample
 
+
 compile_commands.json: clean
-	bear --output nvboard.json -- $(MAKE) -i nvboard
-	bear --output all.json -- $(MAKE) -i all
+	bear --output nvboard.json -- $(MAKE) nvboard-bin
+	bear --output all.json -- $(MAKE) sim-bin
 	jq -s ".[0] + .[1]"  all.json nvboard.json > compile_commands.json
 	$(RM) all.json nvboard.json
 
