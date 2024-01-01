@@ -10,15 +10,7 @@ SUBMAKE := $(OBJDIR)/Vexample.mk
 VERILATOR_FLAGS := --cc --exe
 LDFLAGS += $(shell sdl2-config --libs) -lSDL2_image
 
-all: sim
-
-sim-bin: VERILATOR_FLAGS += --trace 
-sim-bin: $(VSRC) $(CPPSRCS) $(OBJDIR)/Vexample git_trace
-
-sim: sim-bin
-	@echo "Running" $(OBJDIR)/Vexample "..."
-	@echo "================================"
-	@$(OBJDIR)/Vexample
+all: sim-bin nvboard-bin
 	
 $(OBJDIR)/Vexample: $(SUBMAKE)
 	$(MAKE) -C $(OBJDIR) -f $(notdir $(SUBMAKE)) Vexample
@@ -29,17 +21,8 @@ $(SUBMAKE): $(VSRC) $(CPPSRCS) $(OBJDIR)
 $(OBJDIR):
 	mkdir -p $(OBJDIR)
 
-ifneq (,$(wildcard ../Makefile))
-include ../Makefile
-else
-define git_commit	# not in ICS subfolder, no tracing
-endef
-endif
-
-git_trace: 
-	$(call git_commit, "sim RTL")
-
-.PHONY: clean nvboard compile_commands.json
+sim-bin: VERILATOR_FLAGS += --trace 
+sim-bin: $(VSRC) $(CPPSRCS) $(OBJDIR)/Vexample
 
 SRC_AUTO_BIND := $(abspath $(PREFIX)/auto_bind.cpp)
 NXDC_FILES := $(abspath constr/top.nxdc)
@@ -54,8 +37,29 @@ nvboard-bin: CXXFLAGS += -I$(NVBOARD_HOME)/include $(shell sdl2-config --cflags)
 
 nvboard-bin: $(VSRC) $(CPPSRCS) $(SUBMAKE) $(SRC_AUTO_BIND) $(OBJDIR)/Vexample 
 
-nvboard: nvboard-bin
+
+ifneq (,$(wildcard ../Makefile))
+include ../Makefile
+else
+define git_commit	# not in ICS subfolder, no tracing
+endef
+endif
+
+git_trace_sim: 
+	$(call git_commit, "sim RTL")
+
+git_trace_nvboard: 
+	$(call git_commit, "nvboard")
+
+.PHONY: clean nvboard sim compile_commands.json 
+
+nvboard: nvboard-bin git_trace_nvboard
 	@NVBOARD_HOME=$(NVBOARD_HOME) $(OBJDIR)/Vexample
+
+sim: sim-bin git_trace_sim
+	@echo "Running" $(OBJDIR)/Vexample "..."
+	@echo "================================"
+	@$(OBJDIR)/Vexample
 
 
 compile_commands.json: clean
