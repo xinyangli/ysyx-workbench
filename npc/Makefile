@@ -53,9 +53,11 @@ nvboard: CXXFLAGS += -I$(NVBOARD_HOME)/include $(shell sdl2-config --cflags) -g
 nvboard: $(VSRC) $(CPPSRCS) $(SUBMAKE) $(SRC_AUTO_BIND) $(OBJDIR)/Vexample 
 	@NVBOARD_HOME=$(NVBOARD_HOME) $(OBJDIR)/Vexample
 
-compile_commands.json: clean nvboard
-	bear -- $(MAKE) -i all > 
-	bear -- $(MAKE) -i nvboard
+compile_commands.json: clean
+	bear --output all.json -- $(MAKE) -i all
+	bear --output nvboard.json -- $(MAKE) -i nvboard
+	jq -s ".[0] + .[1]"  all.json nvboard.json > compile_commands.json
+	$(RM) all.json nvboard.json
 
 clean: 
 	$(RM) -r $(PREFIX)

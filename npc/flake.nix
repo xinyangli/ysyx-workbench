@@ -14,6 +14,7 @@
             gtkwave
             gcc
             gdb
+            jq
             bear
             clang-tools
             rnix-lsp
