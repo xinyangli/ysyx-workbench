@@ -54,8 +54,8 @@ nvboard: $(VSRC) $(CPPSRCS) $(SUBMAKE) $(SRC_AUTO_BIND) $(OBJDIR)/Vexample
 	@NVBOARD_HOME=$(NVBOARD_HOME) $(OBJDIR)/Vexample
 
 compile_commands.json: clean
-	bear --output all.json -- $(MAKE) -i all
 	bear --output nvboard.json -- $(MAKE) -i nvboard
+	bear --output all.json -- $(MAKE) -i all
 	jq -s ".[0] + .[1]"  all.json nvboard.json > compile_commands.json
 	$(RM) all.json nvboard.json
 
