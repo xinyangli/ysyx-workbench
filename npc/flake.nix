@@ -14,7 +14,14 @@
             gtkwave
             gcc
             bear
+            clang-tools
+            rnix-lsp
           ];
+
+          nativeBuildInputs = with pkgs; [
+            python3
+          ];
+
           shellHook = ''
             export NEMU_HOME=/home/xin/repo/ysyx-workbench/nemu
           '';
