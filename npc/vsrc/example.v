@@ -1,7 +1,6 @@
 module top(
-  input a,
-  input b,
-  output f
+  input [1:0] sw,
+  output ledr
 );
-  assign f = a ^ b;
+  assign ledr = sw[1] ^ sw[0];
 endmodule

@@ -13,8 +13,22 @@
             verilator
             gtkwave
             gcc
+            gdb
+            jq
             bear
+            clang-tools
+            rnix-lsp
           ];
+
+          nativeBuildInputs = with pkgs; [
+            python3
+          ];
+
+          buildInputs = with pkgs; [
+            SDL2
+            SDL2_image
+          ];
+
           shellHook = ''
             export NEMU_HOME=/home/xin/repo/ysyx-workbench/nemu
           '';
