@@ -9,7 +9,7 @@ SUBMAKE := $(OBJDIR)/Vexample.mk
 VERILATOR_FLAGS := --cc --exe
 NVBOARD_HOME ?= $(abspath ../nvboard)
 
-all: sim
+all: sim $(SRC_AUTO_BIND)
 
 sim: VERILATOR_FLAGS += --trace
 sim: $(VSRC) $(CPPSRC) $(OBJDIR)/Vexample
