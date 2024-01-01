@@ -13,12 +13,15 @@
             verilator
             gtkwave
             gcc
+            gdb
             bear
             clang-tools
             rnix-lsp
           ];
 
           nativeBuildInputs = with pkgs; [
+            SDL2
+            SDL2_image
             python3
           ];
 
