@@ -5,8 +5,6 @@ OBJDIR := $(PREFIX)/obj
 VSRC := $(wildcard vsrc/*.v)
 SRC_AUTO_BIND := $(abspath $(PREFIX)/auto_bind.cpp)
 CPPSRCS := $(addprefix $(PWD)/,$(wildcard csrc/*.cpp))
-# TODO: fix this awkward way to find nvboard.a
-CPPSRCS += $(SRC_AUTO_BIND) $(NVBOARD_HOME)/build/nvboard.a
 NXDC_FILES = $(abspath constr/top.nxdc)
 SUBMAKE := $(OBJDIR)/Vexample.mk
 
@@ -47,6 +45,7 @@ git_trace:
 .PHONY: clean nvboard
 
 nvboard: OBJDIR := $(PREFIX)/nvobj
+# TODO: fix this awkward way to find nvboard.a
 nvboard: CPPSRCS := $(addprefix $(PWD)/,$(wildcard csrc_nvboard/*.cpp)) $(SRC_AUTO_BIND) $(NVBOARD_HOME)/build/nvboard.a
 nvboard: CXXFLAGS += -I$(NVBOARD_HOME)/include $(shell sdl2-config --cflags) -g
 nvboard: $(VSRC) $(CPPSRCS) $(OBJDIR)/Vexample
