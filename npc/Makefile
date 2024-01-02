@@ -53,6 +53,7 @@ git_trace_nvboard:
 
 .PHONY: clean nvboard sim compile_commands.json 
 
+nvboard: OBJDIR := $(PREFIX)/nvobj
 nvboard: nvboard-bin git_trace_nvboard
 	@NVBOARD_HOME=$(NVBOARD_HOME) $(OBJDIR)/Vexample
 
