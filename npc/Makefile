@@ -61,7 +61,6 @@ sim: sim-bin git_trace_sim
 	@echo "================================"
 	@$(OBJDIR)/Vexample
 
-
 compile_commands.json: clean
 	bear --output nvboard.json -- $(MAKE) nvboard-bin
 	bear --output all.json -- $(MAKE) sim-bin
