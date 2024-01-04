@@ -1,6 +1,6 @@
 NVBOARD_HOME ?= $(abspath ../nvboard)
 PREFIX ?= build
-OBJDIR := $(PREFIX)/obj
+OBJDIR = $(PREFIX)/obj
 CHISEL_VDIR := $(PREFIX)/chisel
 
 CPPSRCS := $(addprefix $(PWD)/,$(wildcard csrc/*.cpp))
@@ -12,7 +12,7 @@ CHISEL_TOP_PACKAGE := learning
 CHISEL_TOP_MODULE := Main
 CHISEL_TARGET := verilog
 
-SUBMAKE := $(OBJDIR)/V$(CHISEL_TOP_MODULE).mk
+SUBMAKE = $(OBJDIR)/V$(CHISEL_TOP_MODULE).mk
 
 # Pretty printing
 MAKEFLAGS += --no-print-directory
