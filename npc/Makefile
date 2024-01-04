@@ -52,11 +52,11 @@ compile_commands.json: clean
 
 .PHONY: clean nvboard sim nvboard-bin sim-bin git_trace_sim git_trace_nvboard
 
-nvboard-bin: OBJDIR = $(PREFIX)/nvobj
-nvboard-bin: SUBMAKE = $(OBJDIR)/V$(CHISEL_TOP_MODULE).mk
-# TODO: fix this awkward way to find nvboard.a
-nvboard-bin: CPPSRCS := $(addprefix $(PWD)/,$(wildcard csrc_nvboard/*.cpp)) $(SRC_AUTO_BIND) $(NVBOARD_HOME)/build/nvboard.a
-nvboard-bin: CXXFLAGS += -I$(NVBOARD_HOME)/include $(shell sdl2-config --cflags)
+OBJDIR = $(PREFIX)/nvobj
+SUBMAKE = $(OBJDIR)/V$(CHISEL_TOP_MODULE).mk
+#his awkward way to find nvboard.a
+CPPSRCS := $(addprefix $(PWD)/,$(wildcard csrc_nvboard/*.cpp)) $(SRC_AUTO_BIND) $(NVBOARD_HOME)/build/nvboard.a
+CXXFLAGS += -I$(NVBOARD_HOME)/include $(shell sdl2-config --cflags)
 nvboard-bin: $(CPPSRCS) $(SUBMAKE) $(SRC_AUTO_BIND) $(OBJDIR)/V$(CHISEL_TOP_MODULE)
 	@echo $(OBJDIR)
 
