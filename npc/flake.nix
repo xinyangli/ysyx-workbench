@@ -2,17 +2,23 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
+    nur-xin = {
+      url = "git+https://git.xinyang.life/xin/nur.git";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { self, ... }@inputs: with inputs;
     flake-utils.lib.eachDefaultSystem (system:
-      let pkgs = nixpkgs.legacyPackages.${system}; in
+      let
+        pkgs = nixpkgs.legacyPackages.${system} //
+          { nur.xin = nur-xin.legacyPackages.${system}; };
+      in
       {
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
             gtkwave
             gdb
-            jq
             bear
             clang-tools
             rnix-lsp
@@ -20,16 +26,14 @@
           ];
 
           nativeBuildInputs = with pkgs; [
+            cmake
             verilator
-            gcc
-            python3
             scala
+            nur.xin.nvboard
             self.packages.${system}.circt
           ];
 
           buildInputs = with pkgs; [
-            SDL2
-            SDL2_image
             jre
           ];
 

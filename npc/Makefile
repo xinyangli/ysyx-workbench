@@ -1,6 +1,5 @@
 NVBOARD_HOME ?= $(abspath ../nvboard)
 PREFIX ?= build
-OBJDIR = $(PREFIX)/obj
 CHISEL_VDIR := $(PREFIX)/chisel
 
 CPPSRCS := $(addprefix $(PWD)/,$(wildcard csrc/*.cpp))
@@ -12,7 +11,10 @@ CHISEL_TOP_PACKAGE := learning
 CHISEL_TOP_MODULE := Main
 CHISEL_TARGET := verilog
 
-SUBMAKE = $(OBJDIR)/V$(CHISEL_TOP_MODULE).mk
+SUBDIRS := obj nvobj
+SUBDIRS := $(addprefix $(PREFIX),$(SUBDIRS))
+
+SUBMAKE := $(OBJDIR)/V$(CHISEL_TOP_MODULE).mk
 
 # Pretty printing
 MAKEFLAGS += --no-print-directory
@@ -24,21 +26,19 @@ endef
 
 all: sim-bin nvboard-bin
 
-SRC_AUTO_BIND := $(abspath $(PREFIX)/auto_bind.cpp)
-NXDC_FILES := $(abspath constr/top.nxdc)
-$(SRC_AUTO_BIND): $(NXDC_FILES)
-	NVBOARD_HOME=$(NVBOARD_HOME) python3 $(NVBOARD_HOME)/scripts/auto_pin_bind.py $< $@
+$(SUBDIRS):%: %/V$(CHISEL_TOP_MODULE).mk
+	verilator $(VERILATOR_FLAGS) $(addprefix -CFLAGS , $(CXXFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS)) --Mdir $(abspath $(OBJDIR)) $(CHISEL_VSRC) $(CPPSRCS)
 	
 $(OBJDIR)/V$(CHISEL_TOP_MODULE): $(SUBMAKE)
 	@$(call colorize,"SUBMAKE",$^)
-	$(MAKE) -s -C $(OBJDIR) -f $(notdir $(SUBMAKE)) V$(CHISEL_TOP_MODULE)
+	$(MAKE) -s -C $(dir $@) -f $< $(notdir $@)
 
 $(SUBMAKE): $(CPPSRCS) $(OBJDIR) chisel-src
-	@$(call colorize,"VERILATOR",$^)
+	@$(call colorize,"VERILATOR",$@)
 	verilator $(VERILATOR_FLAGS) $(addprefix -CFLAGS , $(CXXFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS)) --Mdir $(abspath $(OBJDIR)) $(CHISEL_VSRC) $(CPPSRCS)
 
 $(OBJDIR):
-	mkdir -p $(OBJDIR)
+	mkdir -p $@
 
 $(CHISEL_VDIR)/filelist.f: $(wildcard src/main/scala/*.scala)
 	@$(call colorize,"CIRCT",$^)
@@ -52,14 +52,18 @@ compile_commands.json: clean
 
 .PHONY: clean nvboard sim nvboard-bin sim-bin git_trace_sim git_trace_nvboard
 
-OBJDIR = $(PREFIX)/nvobj
-SUBMAKE = $(OBJDIR)/V$(CHISEL_TOP_MODULE).mk
-#his awkward way to find nvboard.a
-CPPSRCS := $(addprefix $(PWD)/,$(wildcard csrc_nvboard/*.cpp)) $(SRC_AUTO_BIND) $(NVBOARD_HOME)/build/nvboard.a
-CXXFLAGS += -I$(NVBOARD_HOME)/include $(shell sdl2-config --cflags)
-nvboard-bin: $(CPPSRCS) $(SUBMAKE) $(SRC_AUTO_BIND) $(OBJDIR)/V$(CHISEL_TOP_MODULE)
-	@echo $(OBJDIR)
+SRC_AUTO_BIND := $(abspath $(PREFIX)/auto_bind.cpp)
+NXDC_FILES := $(abspath constr/top.nxdc)
+$(SRC_AUTO_BIND): $(NXDC_FILES)
+	NVBOARD_HOME=$(NVBOARD_HOME) python3 $(NVBOARD_HOME)/scripts/auto_pin_bind.py $< $@
 
+nvboard-bin: OBJDIR := $(PREFIX)/nvobj
+nvboard-bin: SUBMAKE := $(OBJDIR)/V$(CHISEL_TOP_MODULE).mk
+# TODO: fix this awkward way to find nvboard.a
+nvboard-bin: CPPSRCS := $(addprefix $(PWD)/,$(wildcard csrc_nvboard/*.cpp)) $(SRC_AUTO_BIND) $(NVBOARD_HOME)/build/nvboard.a
+nvboard-bin: CXXFLAGS += -I$(NVBOARD_HOME)/include $(shell sdl2-config --cflags)
+nvboard-bin: $(CPPSRCS) $(SUBMAKE) $(SRC_AUTO_BIND) $(OBJDIR)/V$(CHISEL_TOP_MODULE)
+	@echo $(SUBMAKE) $(OBJDIR)
 
 sim-bin: VERILATOR_FLAGS += --trace 
 sim-bin: $(CPPSRCS) $(OBJDIR)/V$(CHISEL_TOP_MODULE)
