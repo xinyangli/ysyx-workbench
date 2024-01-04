@@ -16,8 +16,8 @@ SUBMAKE := $(OBJDIR)/V$(CHISEL_TOP_MODULE).mk
 
 # Pretty printing
 MAKEFLAGS += --no-print-directory
-GREEN=\e[32m
-NC=\e[0m
+GREEN := \e[32m
+NC := \e[0m
 define colorize
 	printf '$(GREEN)'$(1)'$(NC) $(2)\n'
 endef
