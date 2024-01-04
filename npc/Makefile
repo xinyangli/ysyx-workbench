@@ -58,7 +58,7 @@ nvboard-bin: SUBMAKE := $(OBJDIR)/V$(CHISEL_TOP_MODULE).mk
 nvboard-bin: CPPSRCS := $(addprefix $(PWD)/,$(wildcard csrc_nvboard/*.cpp)) $(SRC_AUTO_BIND) $(NVBOARD_HOME)/build/nvboard.a
 nvboard-bin: CXXFLAGS += -I$(NVBOARD_HOME)/include $(shell sdl2-config --cflags)
 nvboard-bin: $(CPPSRCS) $(SUBMAKE) $(SRC_AUTO_BIND) $(OBJDIR)/V$(CHISEL_TOP_MODULE)
-	@echo "test"
+	@echo $(OBJDIR)
 
 
 sim-bin: VERILATOR_FLAGS += --trace 
