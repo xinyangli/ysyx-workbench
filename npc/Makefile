@@ -4,7 +4,6 @@ OBJDIR := $(PREFIX)/obj
 CHISEL_VDIR := $(PREFIX)/chisel
 
 CPPSRCS := $(addprefix $(PWD)/,$(wildcard csrc/*.cpp))
-SUBMAKE = $(OBJDIR)/V$(CHISEL_TOP_MODULE).mk
 
 VERILATOR_FLAGS := --cc --exe
 LDFLAGS += $(shell sdl2-config --libs) -lSDL2_image
@@ -12,6 +11,8 @@ LDFLAGS += $(shell sdl2-config --libs) -lSDL2_image
 CHISEL_TOP_PACKAGE := learning
 CHISEL_TOP_MODULE := Main
 CHISEL_TARGET := verilog
+
+SUBMAKE := $(OBJDIR)/V$(CHISEL_TOP_MODULE).mk
 
 # Pretty printing
 MAKEFLAGS += --no-print-directory
@@ -27,14 +28,6 @@ SRC_AUTO_BIND := $(abspath $(PREFIX)/auto_bind.cpp)
 NXDC_FILES := $(abspath constr/top.nxdc)
 $(SRC_AUTO_BIND): $(NXDC_FILES)
 	NVBOARD_HOME=$(NVBOARD_HOME) python3 $(NVBOARD_HOME)/scripts/auto_pin_bind.py $< $@
-
-nvboard-bin: OBJDIR = $(PREFIX)/nvobj
-nvboard-bin: SUBMAKE = $(OBJDIR)/V$(CHISEL_TOP_MODULE).mk
-# TODO: fix this awkward way to find nvboard.a
-nvboard-bin: CPPSRCS = $(addprefix $(PWD)/,$(wildcard csrc_nvboard/*.cpp)) $(SRC_AUTO_BIND) $(NVBOARD_HOME)/build/nvboard.a
-nvboard-bin: CXXFLAGS += -I$(NVBOARD_HOME)/include $(shell sdl2-config --cflags) -g
-
-nvboard-bin: $(CPPSRCS) $(SUBMAKE) $(SRC_AUTO_BIND) $(OBJDIR)/V$(CHISEL_TOP_MODULE)
 	
 $(OBJDIR)/V$(CHISEL_TOP_MODULE): $(SUBMAKE)
 	@$(call colorize,"SUBMAKE",$^)
@@ -58,6 +51,14 @@ compile_commands.json: clean
 	bear --append -- $(MAKE) sim-bin
 
 .PHONY: clean nvboard sim nvboard-bin sim-bin git_trace_sim git_trace_nvboard
+
+nvboard-bin: OBJDIR := $(PREFIX)/nvobj
+nvboard-bin: SUBMAKE := $(OBJDIR)/V$(CHISEL_TOP_MODULE).mk
+# TODO: fix this awkward way to find nvboard.a
+nvboard-bin: CPPSRCS := $(addprefix $(PWD)/,$(wildcard csrc_nvboard/*.cpp)) $(SRC_AUTO_BIND) $(NVBOARD_HOME)/build/nvboard.a
+nvboard-bin: CXXFLAGS += -I$(NVBOARD_HOME)/include $(shell sdl2-config --cflags) -g
+
+nvboard-bin: $(CPPSRCS) $(SUBMAKE) $(SRC_AUTO_BIND) $(OBJDIR)/V$(CHISEL_TOP_MODULE)
 
 sim-bin: VERILATOR_FLAGS += --trace 
 sim-bin: $(CPPSRCS) $(OBJDIR)/V$(CHISEL_TOP_MODULE)
