@@ -1,42 +1,70 @@
 NVBOARD_HOME ?= $(abspath ../nvboard)
 PREFIX ?= build
 OBJDIR := $(PREFIX)/obj
-TARGET := $(OBJDIR)/Vexample
+CHISEL_VDIR := $(PREFIX)/chisel
 
-VSRC := $(wildcard vsrc/*.v)
 CPPSRCS := $(addprefix $(PWD)/,$(wildcard csrc/*.cpp))
-SUBMAKE := $(OBJDIR)/Vexample.mk
+SUBMAKE = $(OBJDIR)/V$(CHISEL_TOP_MODULE).mk
 
 VERILATOR_FLAGS := --cc --exe
 LDFLAGS += $(shell sdl2-config --libs) -lSDL2_image
 
+CHISEL_TOP_PACKAGE := learning
+CHISEL_TOP_MODULE := Main
+CHISEL_TARGET := verilog
+
+# Pretty printing
+MAKEFLAGS += --no-print-directory
+GREEN=\e[32m
+NC=\e[0m
+define colorize
+	printf '$(GREEN)'$(1)'$(NC) $(2)\n'
+endef
+
 all: sim-bin nvboard-bin
 	
-$(OBJDIR)/Vexample: $(SUBMAKE)
-	$(MAKE) -C $(OBJDIR) -f $(notdir $(SUBMAKE)) Vexample
+$(OBJDIR)/V$(CHISEL_TOP_MODULE): $(SUBMAKE)
+	@$(call colorize,"SUBMAKE",$^)
+	$(MAKE) -s -C $(OBJDIR) -f $(notdir $(SUBMAKE)) V$(CHISEL_TOP_MODULE)
 
-$(SUBMAKE): $(VSRC) $(CPPSRCS) $(OBJDIR)
-	verilator $(VERILATOR_FLAGS) $(addprefix -CFLAGS , $(CXXFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS)) --Mdir $(abspath $(OBJDIR)) $(VSRC) $(CPPSRCS)
+$(SUBMAKE): $(CPPSRCS) $(OBJDIR) chisel-src
+	@$(call colorize,"VERILATOR",$^)
+	verilator $(VERILATOR_FLAGS) $(addprefix -CFLAGS , $(CXXFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS)) --Mdir $(abspath $(OBJDIR)) $(CHISEL_VSRC) $(CPPSRCS)
 
 $(OBJDIR):
 	mkdir -p $(OBJDIR)
 
-sim-bin: VERILATOR_FLAGS += --trace 
-sim-bin: $(VSRC) $(CPPSRCS) $(OBJDIR)/Vexample
+$(CHISEL_VDIR)/filelist.f: $(wildcard src/main/scala/*.scala)
+	@$(call colorize,"CIRCT",$^)
+	sbt --error "runMain circt.stage.ChiselMain --module $(CHISEL_TOP_PACKAGE).$(CHISEL_TOP_MODULE) --split-verilog --target $(CHISEL_TARGET) -td $(CHISEL_VDIR)"
 
 SRC_AUTO_BIND := $(abspath $(PREFIX)/auto_bind.cpp)
 NXDC_FILES := $(abspath constr/top.nxdc)
 $(SRC_AUTO_BIND): $(NXDC_FILES)
 	NVBOARD_HOME=$(NVBOARD_HOME) python3 $(NVBOARD_HOME)/scripts/auto_pin_bind.py $< $@
 
+compile_commands.json: clean
+	$(MAKE) $(CHISEL_VDIR)/filelist.f
+	$(RM) compile_commands.json
+	bear --append -- $(MAKE) nvboard-bin
+	bear --append -- $(MAKE) sim-bin
+
+.PHONY: clean nvboard sim nvboard-bin sim-bin git_trace_sim git_trace_nvboard
+
+sim-bin: VERILATOR_FLAGS += --trace 
+sim-bin: $(CPPSRCS) $(OBJDIR)/V$(CHISEL_TOP_MODULE)
+
 nvboard-bin: OBJDIR := $(PREFIX)/nvobj
-nvboard-bin: SUBMAKE := $(OBJDIR)/Vexample.mk
+nvboard-bin: SUBMAKE := $(OBJDIR)/V$(CHISEL_TOP_MODULE).mk
 # TODO: fix this awkward way to find nvboard.a
 nvboard-bin: CPPSRCS := $(addprefix $(PWD)/,$(wildcard csrc_nvboard/*.cpp)) $(SRC_AUTO_BIND) $(NVBOARD_HOME)/build/nvboard.a
 nvboard-bin: CXXFLAGS += -I$(NVBOARD_HOME)/include $(shell sdl2-config --cflags) -g
 
-nvboard-bin: $(VSRC) $(CPPSRCS) $(SUBMAKE) $(SRC_AUTO_BIND) $(OBJDIR)/Vexample 
+nvboard-bin: $(CPPSRCS) $(SUBMAKE) $(SRC_AUTO_BIND) $(OBJDIR)/V$(CHISEL_TOP_MODULE)
 
+chisel-src: $(CHISEL_VDIR)/filelist.f
+	$(eval CHISEL_VSRC := $(wildcard $(CHISEL_VDIR)/*.sv))
+	@echo "GENERATED: $(CHISEL_VSRC)"
 
 ifneq (,$(wildcard ../Makefile))
 include ../Makefile
@@ -51,22 +79,16 @@ git_trace_sim:
 git_trace_nvboard: 
 	$(call git_commit, "nvboard")
 
-.PHONY: clean nvboard sim compile_commands.json 
-
 nvboard: OBJDIR := $(PREFIX)/nvobj
 nvboard: nvboard-bin git_trace_nvboard
-	@NVBOARD_HOME=$(NVBOARD_HOME) $(OBJDIR)/Vexample
+	@NVBOARD_HOME=$(NVBOARD_HOME) $(OBJDIR)/V$(CHISEL_TOP_MODULE)
 
 sim: sim-bin git_trace_sim
-	@echo "Running" $(OBJDIR)/Vexample "..."
+	@echo "Running verilator sim ..."
 	@echo "================================"
-	@$(OBJDIR)/Vexample
-
-compile_commands.json: clean
-	bear --output nvboard.json -- $(MAKE) nvboard-bin
-	bear --output all.json -- $(MAKE) sim-bin
-	jq -s ".[0] + .[1]"  all.json nvboard.json > compile_commands.json
-	$(RM) all.json nvboard.json
+	@$(OBJDIR)/V$(CHISEL_TOP_MODULE)
 
 clean: 
 	$(RM) -r $(PREFIX)
+
+$(V).SILENT:
