@@ -5,8 +5,8 @@ set (CMAKE_CXX_STANDARD 11)
 cmake_policy(SET CMP0144 NEW)
 
 execute_process(
-  COMMAND ${CMAKE_SOURCE_DIR}/../git_commit.sh "configure\ npc"
-  WORKING_DIRECTORY ../
+  COMMAND ${CMAKE_SOURCE_DIR}/../git_commit.sh "configure npc"
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/..
 )
 
 find_package(SDL2 REQUIRED)
