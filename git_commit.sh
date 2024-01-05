@@ -10,12 +10,11 @@ STUNAME=李心杨
 TRACER=tracer-ysyx
 GITFLAGS="-q --author=$TRACER<tracer@ysyx.org> --no-verify --allow-empty"
 
-YSYX_HOME=$NEMU_HOME/..
 WORK_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-WORK_INDEX=$YSYX_HOME/.git/index.${WORK_BRANCH}
+WORK_INDEX=.git/index.${WORK_BRANCH}
 TRACER_BRANCH=$TRACER
 
-LOCK_DIR=$YSYX_HOME/.git/
+LOCK_DIR=.git/
 
 git_soft_checkout () {
     git checkout --detach -q && git reset --soft $1 -q -- && git checkout $1 -q -- ;
