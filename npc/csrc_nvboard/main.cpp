@@ -12,7 +12,6 @@ void nvboard_bind_all_pins(VSwitch* top);
 
 int main(int argc, char **argv, char **env) {
     VSwitch *top = new VSwitch;
-
     nvboard_bind_all_pins(top);
     nvboard_init();
     while (true) {
