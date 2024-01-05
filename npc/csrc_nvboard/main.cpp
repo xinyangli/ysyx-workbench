@@ -2,15 +2,16 @@
 #include <cassert>
 #include <cstdlib>
 #include <verilated.h>
-#include <VMain.h>
+#include <verilated_vcd_c.h>
 #include <nvboard.h>
+#include <VSwitch.h>
 
 const int MAX_SIM_TIME=100;
 
-void nvboard_bind_all_pins(VMain* top);
+void nvboard_bind_all_pins(VSwitch* top);
 
 int main(int argc, char **argv, char **env) {
-    VMain* top = new VMain;
+    VSwitch *top = new VSwitch;
 
     nvboard_bind_all_pins(top);
     nvboard_init();

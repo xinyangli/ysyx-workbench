@@ -1,17 +1,11 @@
-!Makefile
-!*.mk
-!*.[cSh]
-!*.v
-!*.cc
-!*.cpp
-!.gitignore
-!README.md
 build/
+**/project/
+**/target/
 
 *.class
 *.log
 .cache/
-.bsp/
+**/.bsp/
 .bloop/
 .metals/
 

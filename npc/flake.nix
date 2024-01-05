@@ -15,31 +15,32 @@
           { nur.xin = nur-xin.legacyPackages.${system}; };
       in
       {
-        devShells.default = pkgs.mkShell {
-          packages = with pkgs; [
-            gtkwave
-            gdb
-            bear
+        devShells.default = with pkgs; mkShell {
+          packages = [
             clang-tools
             rnix-lsp
-            sbt
-          ];
-
-          nativeBuildInputs = with pkgs; [
-            cmake
-            verilator
-            scala
-            nur.xin.nvboard
-            self.packages.${system}.circt
-          ];
-
-          buildInputs = with pkgs; [
+            gdb
             jre
           ];
 
-          shellHook = ''
-            export NEMU_HOME=/home/xin/repo/ysyx-workbench/nemu
-          '';
+          inputsFrom = [ self.packages.${system}.default ];
+        };
+        packages.default = with pkgs; clangStdenv.mkDerivation {
+          name = "npc";
+          version = "0.0.1";
+          src = ./.;
+          nativeBuildInputs = [
+            cmake
+            sbt
+            nur.xin.nvboard
+            self.packages.${system}.circt
+          ];
+          buildInputs = [
+            verilator
+            nur.xin.nvboard
+          ];
+
+          NEMU_HOME="/home/xin/repo/ysyx-workbench/nemu";
         };
         
         # This version (1.43.0) of circt does not exist in nixpkgs
