@@ -4,6 +4,11 @@ project(npc)
 set (CMAKE_CXX_STANDARD 11)
 cmake_policy(SET CMP0144 NEW)
 
+execute_process(
+  COMMAND ${CMAKE_SOURCE_DIR}/../git_commit.sh "configure(npc)"
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/..
+)
+
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 
@@ -70,3 +75,16 @@ add_dependencies(V${TOPMODULE} ChiselBuild)
 
 enable_testing()
 add_test(NAME V${TOPMODULE} COMMAND V${TOPMODULE})
+
+# -- Add build tracking
+add_custom_command(
+    TARGET V${TOPMODULE}_nvboard PRE_BUILD
+    COMMAND ${CMAKE_SOURCE_DIR}/../git_commit.sh "build_${CMAKE_PROJECT_NAME}_V${TOPMODULE}_nvboard"
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/..
+)
+
+add_custom_command(
+    TARGET V${TOPMODULE} PRE_BUILD
+    COMMAND ${CMAKE_SOURCE_DIR}/../git_commit.sh "build_${CMAKE_PROJECT_NAME}_V${TOPMODULE}"
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/..
+)
