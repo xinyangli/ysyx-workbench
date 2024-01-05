@@ -1,8 +1,4 @@
 #/usr/bin/env bash
-#
-# Environment Variables:
-#   NEMU_HOME
-set -x
 
 STUID=ysyx_22040000
 STUNAME=李心杨
@@ -36,4 +32,10 @@ git_commit () {
 }
 
 git_commit $1
+
+if [ $? -eq 0 ]; then
+    echo "[OK] Git commit track"
+else
+    echo "[FAIL] Git commit track" && false
+fi
 
