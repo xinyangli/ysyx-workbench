@@ -79,12 +79,12 @@ add_test(NAME V${TOPMODULE} COMMAND V${TOPMODULE})
 # -- Add build tracking
 add_custom_command(
     TARGET V${TOPMODULE}_nvboard
-    COMMAND ${CMAKE_SOURCE_DIR}/../git_commit.sh "build(V${TOPMODULE}_nvboard)"
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/../
+    COMMAND ${CMAKE_SOURCE_DIR}/../git_commit.sh "build_V${TOPMODULE}_nvboard"
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/..
 )
 
 add_custom_command(
     TARGET V${TOPMODULE}
-    COMMAND ${CMAKE_SOURCE_DIR}/../git_commit.sh "build(V${TOPMODULE})"
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/../
+    COMMAND ${CMAKE_SOURCE_DIR}/../git_commit.sh "build_V${TOPMODULE}"
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/..
 )
