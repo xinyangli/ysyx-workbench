@@ -35,7 +35,7 @@ class ALUGenerator(width: Int) extends Module {
     val out = Output(UInt(width.W))
   })
 
-  val adder_b = io.op(0) ^ io.b  // take (-b) if sub
+  val adder_b = (Fill(width, io.op(0)) ^ io.b) + io.op(0)  // take (-b) if sub
   val add = io.a + adder_b
   val and = io.a & io.b
   val not = ~io.a
@@ -44,7 +44,7 @@ class ALUGenerator(width: Int) extends Module {
   val slt = io.a < io.b
   val eq = io.a === io.b
 
-  io.out := MuxLookup(io.op, 0.U) Map(
+  io.out := MuxLookup(io.op, 0.U)(Seq(
     0.U -> add,
     1.U -> add, // add with b reversed
     2.U -> not,
@@ -53,7 +53,7 @@ class ALUGenerator(width: Int) extends Module {
     5.U -> xor,
     6.U -> slt,
     7.U -> eq,
-  )
+  ))
 }
 
 class MuxGenerator(width: Int, nInput: Int) extends Module {
