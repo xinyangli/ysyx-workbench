@@ -4,7 +4,7 @@ ThisBuild / version          := "0.1.0"
 
 val chiselVersion = "5.1.0"
 
-lazy val root = (project in file("."))
+lazy val root = (project in file("./core"))
   .settings(
     name := "ChiselLearning",
     libraryDependencies ++= Seq(
