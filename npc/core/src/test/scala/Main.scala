@@ -68,12 +68,12 @@ class ALUGeneratorSpec extends AnyFreeSpec with ChiselScalatestTester {
       }
     }
     "not should work" in {
-      // test(new ALUGenerator(32)) { c =>
-      //   c.io.op.poke(2.U)
-      //   c.io.a.poke(5.U)
-      //   c.io.b.poke(3.U)
-      //   c.io.out.expect(((1 << 32) - 1 - 5).U)
-      // }
+      test(new ALUGenerator(32)) { c =>
+        c.io.op.poke(2.U)
+        c.io.a.poke(5.U)
+        c.io.b.poke(3.U)
+        c.io.out.expect(BigInt("FFFFFFFA", 16))
+      }
     }
     "and should work" in {
       test(new ALUGenerator(32)) { c =>
