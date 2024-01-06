@@ -1,7 +1,7 @@
 package npc
 
 import chisel3._
-import chisel3.utils.{MuxLookup}
+import chisel3.util.{MuxLookup, Fill}
 import chisel3.stage.ChiselOption
 
 class RegisterFile(readPorts: Int) extends Module {
