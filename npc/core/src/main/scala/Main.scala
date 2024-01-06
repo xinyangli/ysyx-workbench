@@ -44,7 +44,7 @@ class ALUGenerator(width: Int) extends Module {
   val slt = io.a < io.b
   val eq = io.a === io.b
 
-  io.out := MuxLookup(0.U, io.op, Seq(
+  io.out := MuxLookup(io.op, 0.U) Map(
     0.U -> add,
     1.U -> add, // add with b reversed
     2.U -> not,
@@ -53,7 +53,7 @@ class ALUGenerator(width: Int) extends Module {
     5.U -> xor,
     6.U -> slt,
     7.U -> eq,
-  ))
+  )
 }
 
 class MuxGenerator(width: Int, nInput: Int) extends Module {
