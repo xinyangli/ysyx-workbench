@@ -35,7 +35,7 @@ class ALUGenerator(width: Int) extends Module {
     val out = Output(UInt(width.W))
   })
 
-  val adder_b = Fill(width)(io.op(0)) ^ io.b  // take (-b) if sub
+  val adder_b = Fill(io.op(0), width) ^ io.b  // take (-b) if sub
   val add = io.a + adder_b
   val and = io.a & io.b
   val not = ~io.a
