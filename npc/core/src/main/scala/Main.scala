@@ -1,7 +1,7 @@
 package npc
 
 import chisel3._
-import chisel3.util.{MuxLookup, Fill}
+import chisel3.util.{MuxLookup, Fill, Decoupled, Counter, Queue, Reverse}
 import chisel3.stage.ChiselOption
 
 class RegisterFile(readPorts: Int) extends Module {
@@ -56,20 +56,6 @@ class ALUGenerator(width: Int) extends Module {
   ))
 }
 
-class MuxGenerator(width: Int, nInput: Int) extends Module {
-  require(width >= 0)
-  require(nInput >= 1)
-  require(nInput.toBinaryString.map(_ - '0').sum == 1)
-  
-  val io = IO(new Bundle {
-    val in = Input(Vec(nInput, UInt(width.W)))
-    val sel = Input(UInt(nInput.toBinaryString.reverse.indexOf('1').W))
-    val out = Output(UInt(width.W))
-  })
-
-  io.out := io.in(io.sel)
-}
-
 class Test extends Module {
   val io = IO(new Bundle {
     val in = Input(UInt(32.W))
@@ -92,4 +78,21 @@ class Switch extends Module {
   })
 
   io.out := io.sw(0) ^ io.sw(1)
+}
+
+import npc.keyboard._
+
+class Keyboard extends Module {
+  val io = IO(new Bundle {
+    val ps2 = PS2Port()
+    val segs = Output(Vec(6, UInt(4.W)))
+  })
+
+  val keyboard_controller = new KeyboardController
+  val seg_handler = new SegHandler(6)
+
+  seg_handler.io.keycode <> keyboard_controller.io.out
+
+  io <> keyboard_controller.io
+  io <> seg_handler.io
 }

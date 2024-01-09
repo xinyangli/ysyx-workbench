@@ -19,8 +19,11 @@
           packages = [
             clang-tools
             rnix-lsp
+
             gdb
             jre
+
+            gtkwave
           ];
 
           inputsFrom = [ self.packages.${system}.default ];
