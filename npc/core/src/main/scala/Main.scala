@@ -85,14 +85,14 @@ import npc.keyboard._
 class Keyboard extends Module {
   val io = IO(new Bundle {
     val ps2 = PS2Port()
-    val segs = Output(Vec(6, UInt(4.W)))
+    val segs = Output(Vec(3, UInt(8.W)))
   })
 
-  val keyboard_controller = Module(new KeyboardController)
   val seg_handler = Module(new SegHandler(6))
+  val keyboard_controller = Module(new KeyboardController)
 
   seg_handler.io.keycode <> keyboard_controller.io.out
 
-  io <> keyboard_controller.io
-  io <> seg_handler.io
+  keyboard_controller.io.ps2 := io.ps2
+  io.segs := seg_handler.io.segs
 }

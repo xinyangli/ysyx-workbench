@@ -63,7 +63,7 @@ class SegHandler(seg_count: Int) extends Module {
   })
 
 
-  val seg_regs = RegInit(VecInit(Seq.fill(seg_count)(0.U(4.W))))
+  val seg_regs = RegInit(VecInit(Seq.fill(seg_count / 2)(0.U(8.W))))
   val last_keycode = RegInit(0.U(8.W))
   val counter = Counter(0xFF)
   val digit_to_seg = Seq(

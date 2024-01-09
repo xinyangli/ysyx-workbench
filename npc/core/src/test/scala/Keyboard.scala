@@ -57,6 +57,7 @@ class KeyboardControllerSpec extends AnyFreeSpec with ChiselScalatestTester {
       })
     }
   }
+  import npc.Keyboard
   "Keyboard Simulation" in {
     test(new Keyboard) { c => 
     }
