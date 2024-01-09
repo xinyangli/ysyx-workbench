@@ -59,7 +59,7 @@ class KeyboardController extends Module {
 class SegHandler(seg_count: Int) extends Module {
   val io = IO(new Bundle {
     val keycode = Flipped(Decoupled(UInt(8.W)))
-    val segs = Output(Vec(seg_count, UInt(4.W)))
+    val segs = Output(Vec(seg_count / 2, UInt(8.W)))
   })
 
 
