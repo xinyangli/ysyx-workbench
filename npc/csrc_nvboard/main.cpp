@@ -4,14 +4,14 @@
 #include <verilated.h>
 #include <verilated_vcd_c.h>
 #include <nvboard.h>
-#include <VSwitch.h>
+#include <VKeyboard.h>
 
 const int MAX_SIM_TIME=100;
 
-void nvboard_bind_all_pins(VSwitch* top);
+void nvboard_bind_all_pins(VKeyboard* top);
 
 int main(int argc, char **argv, char **env) {
-    VSwitch *top = new VSwitch;
+    VKeyboard *top = new VKeyboard;
 
     nvboard_bind_all_pins(top);
     nvboard_init();
