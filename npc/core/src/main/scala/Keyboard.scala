@@ -59,11 +59,11 @@ class KeyboardController extends Module {
 class SegHandler(seg_count: Int) extends Module {
   val io = IO(new Bundle {
     val keycode = Flipped(Decoupled(UInt(8.W)))
-    val segs = Output(Vec(seg_count / 2, UInt(8.W)))
+    val segs = Output(Vec(seg_count / 2, UInt(16.W)))
   })
 
 
-  val seg_regs = RegInit(VecInit(Seq.fill(seg_count / 2)(0.U(8.W))))
+  val seg_regs = RegInit(VecInit(Seq.fill(seg_count / 2)(0.U(16.W))))
   val last_keycode = RegInit(0.U(8.W))
   val counter = Counter(0xFF)
   val digit_to_seg = Seq(
@@ -103,7 +103,7 @@ class SegHandler(seg_count: Int) extends Module {
   }
   
   seg_regs := Seq(counter.value, last_keycode, last_keycode).map(d => {
-    MuxLookup(d & 0xF.U, 0.U)(digit_to_seg) | (MuxLookup((d >> 4.U) & 0xF.U, 0.U)(digit_to_seg) << 4.U)
+    MuxLookup(d & 0xF.U, 0.U)(digit_to_seg) | (MuxLookup((d >> 4.U) & 0xF.U, 0.U)(digit_to_seg) << 8.U)
   })
 }
 
