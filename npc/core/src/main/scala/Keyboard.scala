@@ -62,8 +62,6 @@ class SegGenerator(seg_count: Int) extends Module {
     val keycode = Flipped(Decoupled(UInt(8.W)))
     val segs = Output(Vec(seg_count, UInt(8.W)))
   })
-  val counter = Counter(0xFF)
-
   io.keycode.ready := false.B
   when(io.keycode.valid) {
     io.keycode.ready := true.B
@@ -94,7 +92,8 @@ class SegGenerator(seg_count: Int) extends Module {
   val ascii = MuxLookup(keycode, 0.U)(keycode_to_ascii)
   val ascii_digits = VecInit(ascii(3,0)) ++ VecInit(ascii(6,4))
   val ascii_seg = ascii_digits.map(MuxLookup(_, 0xFF.U)(digit_to_seg))
-  val count_digits = VecInit(counter.value(3,0)) ++ VecInit(counter.value(7,4))
+  val (counter, _) = Counter(io.keycode.valid && io.keycode.ready && io.keycode.bits =/= keycode, 0xFF)
+  val count_digits = VecInit(counter(3,0)) ++ VecInit(counter(7,4))
   val count_seg = count_digits.map(MuxLookup(_, 0xFF.U)(digit_to_seg))
 
   seg_regs := keycode_seg ++ ascii_seg ++ count_seg ++ Seq(0xFF.U, 0xFF.U)
