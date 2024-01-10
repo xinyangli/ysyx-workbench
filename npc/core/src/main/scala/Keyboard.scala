@@ -71,24 +71,28 @@ class SegGenerator(seg_count: Int) extends Module {
     "b00000010".U, "b10011110".U, "b00100100".U, "b00001100".U,
     "b10011000".U, "b01001000".U, "b01000000".U, "b00011110".U,
     "b00000000".U, "b00001000".U, "b00010000".U, "b11000000".U,
-    "b01100010".U, "b10000100".U, "b01100000".U, "b01110000".U
+    "b01100010".U, "b10000100".U, "b01100000".U, "b01110000".U,
   ))
 
   val keycode_to_ascii = (((0x41 to 0x5A) ++ (0x30 to 0x39)).map(_.U)).zip(Seq(
-    "0x1C".U, "0x32".U, "0x21".U, "0x23".U, "0x24".U, "0x2B".U,
-    "0x34".U, "0x33".U, "0x43".U, "0x3B".U, "0x42".U, "0x4B".U,
-    "0x3A".U, "0x31".U, "0x44".U, "0x4D".U, "0x15".U, "0x2D".U,
-    "0x1B".U, "0x2C".U, "0x3C".U, "0x2A".U, "0x1D".U, "0x22".U,
-    "0x35".U, "0x1A".U, "0x45".U, "0x16".U, "0x1E".U, "0x26".U,
-    "0x25".U, "0x2E".U, "0x36".U, "0x3D".U, "0x3E".U, "0x46".U,
+    0x1C.U, 0x32.U, 0x21.U, 0x23.U, 0x24.U, 0x2B.U,
+    0x34.U, 0x33.U, 0x43.U, 0x3B.U, 0x42.U, 0x4B.U,
+    0x3A.U, 0x31.U, 0x44.U, 0x4D.U, 0x15.U, 0x2D.U,
+    0x1B.U, 0x2C.U, 0x3C.U, 0x2A.U, 0x1D.U, 0x22.U,
+    0x35.U, 0x1A.U, 0x45.U, 0x16.U, 0x1E.U, 0x26.U,
+    0x25.U, 0x2E.U, 0x36.U, 0x3D.U, 0x3E.U, 0x46.U,
   ))
 
-  println(keycode_to_ascii)
-
-  val keycode_digits = VecInit(io.keycode.bits(3,0)) ++ VecInit(io.keycode.bits(7,4))
+  val keycode = io.keycode.bits
+  val keycode_digits = VecInit(keycode(3,0)) ++ VecInit(keycode(7,4))
   val keycode_seg = keycode_digits.map(MuxLookup(_, 0.U)(digit_to_seg))
+  val ascii = MuxLookup(keycode, 0.U)(keycode_to_ascii)
+  val ascii_digits = VecInit(ascii(3,0)) ++ VecInit(ascii(6,4))
+  val ascii_seg = ascii_digits.map(MuxLookup(_, 0.U)(digit_to_seg))
+  val count_digits = VecInit(counter.value(3,0)) ++ VecInit(counter.value(7,4))
+  val count_seg = count_digits.map(MuxLookup(_, 0.U)(digit_to_seg))
 
-  seg_regs := keycode_seg ++ keycode_seg ++ keycode_seg ++ keycode_seg
+  seg_regs := Seq(0.U, 0.U) ++ count_seg ++ ascii_seg ++ keycode_seg
 
   io.segs := seg_regs
 }
