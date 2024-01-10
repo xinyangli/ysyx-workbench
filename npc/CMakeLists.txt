@@ -52,7 +52,9 @@ foreach(TOPMODULE IN LISTS TOPMODULES)
     DEPENDS ${CMAKE_SOURCE_DIR}/constr/${TOPMODULE}.nxdc 
   )
 
-  add_executable(V${TOPMODULE}_nvboard csrc_nvboard/${TOPMODULE}/main.cpp ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/auto_bind.cpp)
+  unset(SOURCES)
+  file(GLOB_RECURSE SOURCES csrc_nvboard/${TOPMODULE}/*.cpp)
+  add_executable(V${TOPMODULE}_nvboard ${SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/auto_bind.cpp)
 
   verilate(V${TOPMODULE}_nvboard TRACE COVERAGE THREADS
     TOP_MODULE ${TOPMODULE}
@@ -67,7 +69,9 @@ foreach(TOPMODULE IN LISTS TOPMODULES)
 
   # -- Build Verilator executable and add to test
 
-  add_executable(V${TOPMODULE} csrc/main.cpp)
+  unset(SOURCES)
+  file(GLOB_RECURSE SOURCES csrc/${TOPMODULE}/*.cpp)
+  add_executable(V${TOPMODULE} ${SOURCES})
 
   verilate(V${TOPMODULE} TRACE COVERAGE THREADS
     TOP_MODULE ${TOPMODULE}
