@@ -3,6 +3,7 @@ package npc
 import chisel3._
 import chisel3.util.{MuxLookup, Fill, Decoupled, Counter, Queue, Reverse}
 import chisel3.stage.ChiselOption
+import npc.util.KeyboardSegController
 
 class Switch extends Module {
   val io = IO(new Bundle {
@@ -13,7 +14,7 @@ class Switch extends Module {
   io.out := io.sw(0) ^ io.sw(1)
 }
 
-import npc.util.{PS2Port, KeyboardController, SegGenerator}
+import npc.util.{PS2Port, KeyboardController, SegControllerGenerator}
 
 class Keyboard extends Module {
   val io = IO(new Bundle {
@@ -21,7 +22,7 @@ class Keyboard extends Module {
     val segs = Output(Vec(8, UInt(8.W)))
   })
 
-  val seg_handler = Module(new SegGenerator(seg_count = 8))
+  val seg_handler = Module(new KeyboardSegController)
   val keyboard_controller = Module(new KeyboardController)
 
   seg_handler.io.keycode <> keyboard_controller.io.out
@@ -30,4 +31,3 @@ class Keyboard extends Module {
   io.segs := seg_handler.io.segs
 }
 
-class SegHandler extends SegGenerator(8) { }
