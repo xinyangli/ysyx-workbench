@@ -6,20 +6,35 @@
 #include <nvboard.h>
 #include <VSegHandler.h>
 
+#ifndef VERILATOR_TOPMODULE
+#define VERILATOR_TOPMODULE VSegHandler
+#endif
+
 const int MAX_SIM_TIME=100;
 
-void nvboard_bind_all_pins(VSegHandler* top);
+void nvboard_bind_all_pins(VERILATOR_TOPMODULE* top);
+
+static void single_cycle(VERILATOR_TOPMODULE* top) {
+  top->clock = 0; top->eval();
+  top->clock = 1; top->eval();
+}
+
+static void reset(VERILATOR_TOPMODULE* top, int n) {
+  top->reset = 1;
+  while (n -- > 0) single_cycle(top);
+  top->reset = 0;
+}
 
 int main(int argc, char **argv, char **env) {
-    VSegHandler *top = new VSegHandler;
+    VERILATOR_TOPMODULE *top = new VERILATOR_TOPMODULE;
 
     nvboard_bind_all_pins(top);
     nvboard_init();
+    reset(top, 10);
     while (true) {
         nvboard_update();
         top->eval();
-        printf("%d\n", top->clock);
-        // printf("%d, %d, %d", top->io_segs_0, top->io_segs_1, top->io_segs_2);
+        single_cycle(top);
     }
     delete top;
 }
