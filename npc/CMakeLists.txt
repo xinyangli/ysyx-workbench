@@ -17,7 +17,7 @@ find_package(verilator REQUIRED)
 find_library(NVBOARD_LIBRARY NAMES nvboard)
 find_path(NVBOARD_INCLUDE_DIR NAMES nvboard.h)
 
-set(TOPMODULE "keyboard.SegHandler")
+set(TOPMODULE "SegHandler")
 set(SCALA_CORE "${CMAKE_CURRENT_SOURCE_DIR}/core")
 set(CHISEL_MODULE_CLASS "${CMAKE_PROJECT_NAME}.${TOPMODULE}")
 file(GLOB_RECURSE SCALA_CORE_SOURCES "${SCALA_CORE}/src/main/scala/*.scala")
