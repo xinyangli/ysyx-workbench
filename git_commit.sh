@@ -4,7 +4,7 @@ STUID=ysyx_22040000
 STUNAME=李心杨
 
 TRACER=tracer-ysyx
-GITFLAGS="-q --author=$TRACER<tracer@ysyx.org> --no-verify --allow-empty"
+GITFLAGS="-q --author=$TRACER<tracer@ysyx.org> --no-verify --allow-empty --no-gpg-sign"
 
 WORK_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 WORK_INDEX=.git/index.${WORK_BRANCH}

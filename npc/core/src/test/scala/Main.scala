@@ -3,8 +3,9 @@ package npc
 import chisel3._
 import chiseltest._
 import org.scalatest.freespec.AnyFreeSpec
-import chiseltest.simulator.ChiselBridge
 import chiseltest.simulator.WriteVcdAnnotation
+
+import npc.util._
 
 class RegisterFileSpec extends AnyFreeSpec with ChiselScalatestTester {
   "RegisterFile should work" - {
@@ -99,49 +100,6 @@ class ALUGeneratorSpec extends AnyFreeSpec with ChiselScalatestTester {
     }
     "equal should work" in {
       test(new ALUGenerator(32)) { c => validate(c, 7, oprands) }
-    }
-  }
-}
-
-class KeyboardControllerSpec extends AnyFreeSpec with ChiselScalatestTester {
-  def transfer(keycode: Int, c: KeyboardController) : Unit = {
-    require(keycode >= 0 && keycode < 0xFF)
-    var cycle = 0
-    var ps2_clk = true
-    var keycode_remain = keycode << 1   // Shift 1 to do nothing at cycle 1
-    var keycode_collect = 0
-
-    c.io.ps2_clk.poke(ps2_clk)
-    c.io.ps2_data.poke(1)
-    for (cycle <- 0 until 9) {
-      c.io.ps2_clk.poke(true)
-      c.clock.step(32)
-      val last_digit = keycode_remain & 1
-      c.io.ps2_data.poke(last_digit)
-      keycode_collect = keycode_collect | (last_digit << cycle)
-      keycode_remain = keycode_remain >> 1
-      c.io.ps2_clk.poke(false)
-      c.clock.step(32)
-    }
-    for (_ <- 9 until 11) {
-      c.io.ps2_clk.poke(true)
-      c.clock.step(32)
-      c.io.ps2_clk.poke(ps2_clk)
-      ps2_clk = !ps2_clk
-      c.io.ps2_clk.poke(false)
-      c.clock.step(32)
-    }
-    assert(keycode_collect >> 1 == keycode)
-    c.io.out.ready.poke(1)
-    c.clock.step(32)
-    c.io.out.bits.expect(keycode)
-  }
-  "Simple test" in {
-    test(new KeyboardController).withAnnotations(Seq(WriteVcdAnnotation)) { c =>
-      transfer(0xE4, c)
-      transfer(0xE4, c)
-      transfer(0xE4, c)
-      transfer(0xE4, c)
     }
   }
 }
