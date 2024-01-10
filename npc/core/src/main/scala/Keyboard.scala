@@ -66,7 +66,7 @@ class SegGenerator(seg_count: Int) extends Module {
 
   val seg_regs = RegInit(VecInit(Seq.fill(seg_count)(0.U(8.W))))
   val last_keycode = RegInit(0.U(8.W))
-  val counter = Counter(0xFF)
+  val (counter, _) = Counter(0 to 0xFF, clock.asBool, reset.asBool)
   val digit_to_seg = ((0 until 16).map(_.U)).zip(Seq(
     "b00000011".U, "b10011111".U, "b00100101".U, "b00001101".U,
     "b10011001".U, "b01001001".U, "b01000001".U, "b00011111".U,
@@ -89,10 +89,10 @@ class SegGenerator(seg_count: Int) extends Module {
   val ascii = MuxLookup(keycode, 0.U)(keycode_to_ascii)
   val ascii_digits = VecInit(ascii(3,0)) ++ VecInit(ascii(6,4))
   val ascii_seg = ascii_digits.map(MuxLookup(_, 0xFF.U)(digit_to_seg))
-  val count_digits = VecInit(counter.value(3,0)) ++ VecInit(counter.value(7,4))
+  val count_digits = VecInit(counter(3,0)) ++ VecInit(counter(7,4))
   val count_seg = count_digits.map(MuxLookup(_, 0xFF.U)(digit_to_seg))
 
-  seg_regs :=  count_seg ++ ascii_seg ++ keycode_seg ++ Seq(0xFF.U, 0xFF.U)
+  seg_regs := keycode_seg ++ ascii_seg ++ count_seg ++ Seq(0xFF.U, 0xFF.U)
 
   io.segs := seg_regs
 }
