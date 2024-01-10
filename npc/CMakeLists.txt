@@ -61,7 +61,7 @@ foreach(TOPMODULE IN LISTS TOPMODULES)
     PREFIX V${TOPMODULE}
     SOURCES ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/vsrc/${TOPMODULE}.v)
 
-  add_dependencies(V${TOPMODULE}_nvboard ChiselBuild)
+  add_dependencies(V${TOPMODULE}_nvboard ChiselBuild_${TOPMODULE})
   target_include_directories(V${TOPMODULE}_nvboard PRIVATE ${NVBOARD_INCLUDE_DIR} ${SDL2_INCLUDE_DIRS})
   target_link_libraries(V${TOPMODULE}_nvboard PRIVATE ${NVBOARD_LIBRARY} SDL2::SDL2 SDL2_image::SDL2_image)
 
@@ -78,7 +78,7 @@ foreach(TOPMODULE IN LISTS TOPMODULES)
     PREFIX V${TOPMODULE}
     SOURCES ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/vsrc/${TOPMODULE}.v)
 
-  add_dependencies(V${TOPMODULE} ChiselBuild)
+  add_dependencies(V${TOPMODULE} ChiselBuild_${TOPMODULE})
 
   enable_testing()
   add_test(NAME V${TOPMODULE} COMMAND V${TOPMODULE})
