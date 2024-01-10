@@ -64,6 +64,7 @@ class KeyboardSegController extends Module {
     io.keycode.ready := true.B
   }
 
+  // 0x1C.U -> 0x41.U, ...
   val keycode_to_ascii = Seq(
     0x1C.U, 0x32.U, 0x21.U, 0x23.U, 0x24.U, 0x2B.U,
     0x34.U, 0x33.U, 0x43.U, 0x3B.U, 0x42.U, 0x4B.U,
@@ -80,9 +81,7 @@ class KeyboardSegController extends Module {
     when(io.keycode.bits === 0xF0.U) {
       release_state := true.B
     }.elsewhen(!release_state) {
-      when(io.keycode.bits =/= keycode) {
-        counter.inc()
-      }
+      counter.inc()
       keycode := io.keycode.bits
     }.otherwise{
       // Release code on io.keycode.bits
