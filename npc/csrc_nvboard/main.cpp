@@ -15,9 +15,9 @@ int keycode = 0;
 template <class F> void cycle(VERILATOR_TOPMODULE *top, F &&f) {
   top->clock = 0;
   top->eval();
-  f();
   top->clock = 1;
   top->eval();
+  f();
 }
 
 void nvboard_bind_all_pins(VERILATOR_TOPMODULE *top);
