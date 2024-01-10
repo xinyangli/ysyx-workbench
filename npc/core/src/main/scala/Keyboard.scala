@@ -68,10 +68,10 @@ class SegGenerator(seg_count: Int) extends Module {
   val last_keycode = RegInit(0.U(8.W))
   val counter = Counter(0xFF)
   val digit_to_seg = ((0 until 16).map(_.U)).zip(Seq(
-    "b00000010".U, "b10011110".U, "b00100100".U, "b00001100".U,
-    "b10011000".U, "b01001000".U, "b01000000".U, "b00011110".U,
-    "b00000000".U, "b00001000".U, "b00010000".U, "b11000000".U,
-    "b01100010".U, "b10000100".U, "b01100000".U, "b01110000".U,
+    "b00000011".U, "b10011111".U, "b00100101".U, "b00001101".U,
+    "b10011001".U, "b01001001".U, "b01000001".U, "b00011111".U,
+    "b00000001".U, "b00001001".U, "b00010001".U, "b11000001".U,
+    "b01100011".U, "b10000101".U, "b01100001".U, "b01110001".U,
   ))
 
   val keycode_to_ascii = (((0x41 to 0x5A) ++ (0x30 to 0x39)).map(_.U)).zip(Seq(
@@ -92,7 +92,7 @@ class SegGenerator(seg_count: Int) extends Module {
   val count_digits = VecInit(counter.value(3,0)) ++ VecInit(counter.value(7,4))
   val count_seg = count_digits.map(MuxLookup(_, 0xFF.U)(digit_to_seg))
 
-  seg_regs := Seq(0xFF.U, 0xFF.U) ++ count_seg ++ ascii_seg ++ keycode_seg
+  seg_regs :=  count_seg ++ ascii_seg ++ keycode_seg ++ Seq(0xFF.U, 0xFF.U)
 
   io.segs := seg_regs
 }
