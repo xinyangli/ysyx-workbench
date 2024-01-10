@@ -85,14 +85,14 @@ class SegGenerator(seg_count: Int) extends Module {
 
   val keycode = io.keycode.bits
   val keycode_digits = VecInit(keycode(3,0)) ++ VecInit(keycode(7,4))
-  val keycode_seg = keycode_digits.map(MuxLookup(_, 0.U)(digit_to_seg))
+  val keycode_seg = keycode_digits.map(MuxLookup(_, 0xFF.U)(digit_to_seg))
   val ascii = MuxLookup(keycode, 0.U)(keycode_to_ascii)
   val ascii_digits = VecInit(ascii(3,0)) ++ VecInit(ascii(6,4))
-  val ascii_seg = ascii_digits.map(MuxLookup(_, 0.U)(digit_to_seg))
+  val ascii_seg = ascii_digits.map(MuxLookup(_, 0xFF.U)(digit_to_seg))
   val count_digits = VecInit(counter.value(3,0)) ++ VecInit(counter.value(7,4))
-  val count_seg = count_digits.map(MuxLookup(_, 0.U)(digit_to_seg))
+  val count_seg = count_digits.map(MuxLookup(_, 0xFF.U)(digit_to_seg))
 
-  seg_regs := Seq(0.U, 0.U) ++ count_seg ++ ascii_seg ++ keycode_seg
+  seg_regs := Seq(0xFF.U, 0xFF.U) ++ count_seg ++ ascii_seg ++ keycode_seg
 
   io.segs := seg_regs
 }
