@@ -80,8 +80,10 @@ class KeyboardSegController extends Module {
     when(io.keycode.bits === 0xF0.U) {
       release_state := true.B
     }.elsewhen(!release_state) {
+      when(io.keycode.bits =/= keycode) {
+        counter.inc()
+      }
       keycode := io.keycode.bits
-      counter.inc()
     }.otherwise{
       // Release code on io.keycode.bits
       release_state := false.B
