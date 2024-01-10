@@ -91,7 +91,7 @@ class KeyboardSegController extends Module {
   val keycode_digits = VecInit(keycode(3,0)) ++ VecInit(keycode(7,4))
   val ascii = MuxLookup(keycode, 0.U)(keycode_to_ascii)
 
-  val seg_contoller = SegControllerGenerator(8)
+  val seg_contoller = Module(new SegControllerGenerator(8, UInt(8.W)))
 
   seg_contoller.io.in_segs := VecInit(Seq(keycode, ascii, counter.value, 0.U))
   io.segs := seg_contoller.io.segs
