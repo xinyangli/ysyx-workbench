@@ -74,6 +74,17 @@ class SegGenerator(seg_count: Int) extends Module {
     "b01100010".U, "b10000100".U, "b01100000".U, "b01110000".U
   ))
 
+  val keycode_to_ascii = (((0x41 to 0x5A) ++ (0x30 to 0x39)).map(_.U)).zip(Seq(
+    "0x1C".U, "0x32".U, "0x21".U, "0x23".U, "0x24".U, "0x2B".U,
+    "0x34".U, "0x33".U, "0x43".U, "0x3B".U, "0x42".U, "0x4B".U,
+    "0x3A".U, "0x31".U, "0x44".U, "0x4D".U, "0x15".U, "0x2D".U,
+    "0x1B".U, "0x2C".U, "0x3C".U, "0x2A".U, "0x1D".U, "0x22".U,
+    "0x35".U, "0x1A".U, "0x45".U, "0x16".U, "0x1E".U, "0x26".U,
+    "0x25".U, "0x2E".U, "0x36".U, "0x3D".U, "0x3E".U, "0x46".U,
+  ))
+
+  println(keycode_to_ascii)
+
   val keycode_digits = VecInit(io.keycode.bits(3,0)) ++ VecInit(io.keycode.bits(7,4))
   val keycode_seg = keycode_digits.map(MuxLookup(_, 0.U)(digit_to_seg))
 

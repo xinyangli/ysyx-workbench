@@ -66,7 +66,7 @@ class KeyboardControllerSpec extends AnyFreeSpec with ChiselScalatestTester {
 
 class SegSpec extends AnyFreeSpec with ChiselScalatestTester {
   "try out vec" in {
-    test(new SegHandler) {c =>
+    test(new SegGenerator(8)) {c =>
       c.io.keycode.bits.poke(0xAC)
       c.clock.step(1)
       println(s"out: ${c.io.segs(0).peek().litValue}")
