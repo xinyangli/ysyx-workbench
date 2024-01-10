@@ -1,4 +1,3 @@
-#include <VSegHandler.h>
 #include <cassert>
 #include <cstdlib>
 #include <nvboard.h>
@@ -8,6 +7,12 @@
 #ifndef VERILATOR_TOPMODULE
 #define VERILATOR_TOPMODULE VSegHandler
 #endif
+
+#define CLASS_SYSTEM_HEADER_NAME(name) CLASS_SYSTEM_HEADER_NAME_IMPL(name)
+#define CLASS_SYSTEM_HEADER_NAME_IMPL(name) <name.h>
+#include CLASS_SYSTEM_HEADER_NAME(VERILATOR_TOPMODULE)
+#undef CLASS_SYSTEM_HEADER_NAME
+#undef CLASS_SYSTEM_HEADER_NAME_IMPL
 
 const int MAX_SIM_TIME = 100;
 int keycode = 0;

@@ -25,36 +25,36 @@ file(GLOB_RECURSE SCALA_CORE_TEST_SOURCES "${SCALA_CORE}/src/test/scala/*.scala"
 
 # Configure time verilog source generation for verilator
 execute_process(
-  COMMAND sbt "runMain circt.stage.ChiselMain --target-dir ${CMAKE_CURRENT_BINARY_DIR}/vsrc --module ${CHISEL_MODULE_CLASS} --target verilog"
+  COMMAND sbt "runMain circt.stage.ChiselMain --target-dir ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/vsrc --module ${CHISEL_MODULE_CLASS} --target verilog"
   WORKING_DIRECTORY ${SCALA_CORE}
 )
 
 add_custom_command(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vsrc/${TOPMODULE}.v
-  COMMAND sbt "runMain circt.stage.ChiselMain --target-dir ${CMAKE_CURRENT_BINARY_DIR}/vsrc --module ${CHISEL_MODULE_CLASS} --target verilog"
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/vsrc/${TOPMODULE}.v
+  COMMAND sbt "runMain circt.stage.ChiselMain --target-dir ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/vsrc --module ${CHISEL_MODULE_CLASS} --target verilog"
   WORKING_DIRECTORY ${SCALA_CORE}
   DEPENDS ${SCALA_CORE_SOURCES}
 )
 
 add_custom_target(
     ChiselBuild
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/vsrc/${TOPMODULE}.v
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/vsrc/${TOPMODULE}.v
 )
 
 # -- Build NVBoard executable
 
 add_custom_command(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/auto_bind.cpp
-  COMMAND auto_pin_bind ${CMAKE_SOURCE_DIR}/constr/${TOPMODULE}.nxdc ${CMAKE_CURRENT_BINARY_DIR}/auto_bind.cpp
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/auto_bind.cpp
+  COMMAND auto_pin_bind ${CMAKE_SOURCE_DIR}/constr/${TOPMODULE}.nxdc ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/auto_bind.cpp
   DEPENDS ${CMAKE_SOURCE_DIR}/constr/${TOPMODULE}.nxdc 
 )
 
-add_executable(V${TOPMODULE}_nvboard csrc_nvboard/${TOPMODULE}/main.cpp auto_bind.cpp)
+add_executable(V${TOPMODULE}_nvboard csrc_nvboard/${TOPMODULE}/main.cpp ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/auto_bind.cpp)
 
 verilate(V${TOPMODULE}_nvboard TRACE COVERAGE THREADS
   TOP_MODULE ${TOPMODULE}
   PREFIX V${TOPMODULE}
-  SOURCES ${CMAKE_CURRENT_BINARY_DIR}/vsrc/${TOPMODULE}.v)
+  SOURCES ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/vsrc/${TOPMODULE}.v)
 
 add_dependencies(V${TOPMODULE}_nvboard ChiselBuild)
 target_include_directories(V${TOPMODULE}_nvboard PRIVATE ${NVBOARD_INCLUDE_DIR} ${SDL2_INCLUDE_DIRS})
@@ -69,7 +69,7 @@ add_executable(V${TOPMODULE} csrc/main.cpp)
 verilate(V${TOPMODULE} TRACE COVERAGE THREADS
   TOP_MODULE ${TOPMODULE}
   PREFIX V${TOPMODULE}
-  SOURCES ${CMAKE_CURRENT_BINARY_DIR}/vsrc/${TOPMODULE}.v)
+  SOURCES ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/vsrc/${TOPMODULE}.v)
 
 add_dependencies(V${TOPMODULE} ChiselBuild)
 
