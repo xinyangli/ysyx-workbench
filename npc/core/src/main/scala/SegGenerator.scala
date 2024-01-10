@@ -34,7 +34,7 @@ class SegGenerator(seg_count: Int) extends Module {
 
   val keycode = RegInit(0.U(8.W))
   val counter = Counter(0xFF)
-  val release_state = false.B
+  val release_state = RegInit(Bool(), false.B)
   when(io.keycode.ready && io.keycode.valid) {
     when(io.keycode.bits === 0xF0.U) {
       release_state := true.B
