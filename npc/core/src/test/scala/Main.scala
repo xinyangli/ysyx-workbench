@@ -5,6 +5,8 @@ import chiseltest._
 import org.scalatest.freespec.AnyFreeSpec
 import chiseltest.simulator.WriteVcdAnnotation
 
+import npc.util._
+
 class RegisterFileSpec extends AnyFreeSpec with ChiselScalatestTester {
   "RegisterFile should work" - {
     "with 2 read ports" in {

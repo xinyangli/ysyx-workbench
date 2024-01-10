@@ -32,21 +32,28 @@ class SegGenerator(seg_count: Int) extends Module {
     0x25.U, 0x2E.U, 0x36.U, 0x3D.U, 0x3E.U, 0x46.U,
   ).zip(((0x41 to 0x5A) ++ (0x30 to 0x39)).map(_.U))
 
-  // val keycode = Mux(io.keycode.ready && io.keycode.valid, io.keycode.bits, keycode)
-  val keycode = RegEnable(io.keycode.bits, io.keycode.ready && io.keycode.valid)
+  val keycode = RegInit(0.U(8.W))
+  val counter = Counter(0xFF)
+  val release_state = false.B
+  when(io.keycode.ready && io.keycode.valid) {
+    when(io.keycode.bits === 0xF0.U) {
+      release_state := true.B
+    }.elsewhen(!release_state) {
+      keycode := io.keycode.bits
+      counter.inc()
+    }
+  }
+
   val keycode_digits = VecInit(keycode(3,0)) ++ VecInit(keycode(7,4))
   val keycode_seg = keycode_digits.map(MuxLookup(_, 0xFF.U)(digit_to_seg))
+
   val ascii = MuxLookup(keycode, 0.U)(keycode_to_ascii)
   val ascii_digits = VecInit(ascii(3,0)) ++ VecInit(ascii(6,4))
   val ascii_seg = ascii_digits.map(MuxLookup(_, 0xFF.U)(digit_to_seg))
-  val (counter, _) = Counter(io.keycode.valid && io.keycode.ready && io.keycode.bits =/= keycode, 0xFF)
-  val count_digits = VecInit(counter(3,0)) ++ VecInit(counter(7,4))
-  val count_seg = count_digits.map(MuxLookup(_, 0xFF.U)(digit_to_seg))
 
+  val count_digits = VecInit(counter.value(3,0)) ++ VecInit(counter.value(7,4))
+  val count_seg = count_digits.map(MuxLookup(_, 0xFF.U)(digit_to_seg))
   seg_regs := keycode_seg ++ ascii_seg ++ count_seg ++ Seq(0xFF.U, 0xFF.U)
 
   io.segs := seg_regs
 }
-
-
-

@@ -5,6 +5,8 @@ import chiseltest._
 import org.scalatest.freespec.AnyFreeSpec
 import chiseltest.simulator.WriteVcdAnnotation
 
+import npc.util._
+
 class KeyboardControllerSpec extends AnyFreeSpec with ChiselScalatestTester {
   def transfer(keycode: Int, clock: Clock, ps2: PS2Port) : Unit = {
     require(keycode >= 0 && keycode < 0xFF)
@@ -55,11 +57,6 @@ class KeyboardControllerSpec extends AnyFreeSpec with ChiselScalatestTester {
         c.clock.step(1)
         c.io.out.ready.poke(0)
       })
-    }
-  }
-  import npc.Keyboard
-  "Keyboard Simulation" in {
-    test(new Keyboard) { c => 
     }
   }
 }

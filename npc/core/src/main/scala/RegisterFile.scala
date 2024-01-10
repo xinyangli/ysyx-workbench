@@ -1,3 +1,5 @@
+package npc.util
+
 import chisel3._
 
 class RegisterFile(readPorts: Int) extends Module {

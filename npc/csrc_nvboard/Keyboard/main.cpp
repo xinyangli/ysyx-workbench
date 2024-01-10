@@ -14,7 +14,6 @@
 #undef CLASS_SYSTEM_HEADER_NAME
 #undef CLASS_SYSTEM_HEADER_NAME_IMPL
 
-const int MAX_SIM_TIME = 100;
 int keycode = 0;
 
 template <class F> void cycle(VERILATOR_TOPMODULE *top, F &&f) {
