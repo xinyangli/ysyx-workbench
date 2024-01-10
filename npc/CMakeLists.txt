@@ -20,7 +20,9 @@ find_path(NVBOARD_INCLUDE_DIR NAMES nvboard.h)
 set(TOPMODULES "Switch" "Keyboard")
 
 foreach(TOPMODULE IN LISTS TOPMODULES)
-
+ 
+  # FIXME: all scala source file are tracked here, cause all files to rebuild 
+  # after a source update. 
   set(SCALA_CORE "${CMAKE_CURRENT_SOURCE_DIR}/core")
   set(CHISEL_MODULE_CLASS "${CMAKE_PROJECT_NAME}.${TOPMODULE}")
   file(GLOB_RECURSE SCALA_CORE_SOURCES "${SCALA_CORE}/src/main/scala/*.scala")
