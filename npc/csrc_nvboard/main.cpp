@@ -4,7 +4,7 @@
 #include <verilated.h>
 #include <verilated_vcd_c.h>
 #include <nvboard.h>
-#include <VKeyboard.h>
+#include <VSegHandler.h>
 
 const int MAX_SIM_TIME=100;
 
