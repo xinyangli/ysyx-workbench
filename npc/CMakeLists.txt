@@ -40,7 +40,7 @@ foreach(TOPMODULE IN LISTS TOPMODULES)
   )
 
   add_custom_target(
-      ChiselBuild
+      ChiselBuild_${TOPMODULE}
       DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/vsrc/${TOPMODULE}.v
   )
 
