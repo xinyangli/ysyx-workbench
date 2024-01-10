@@ -68,22 +68,10 @@ class SegGenerator(seg_count: Int) extends Module {
   val last_keycode = RegInit(0.U(8.W))
   val counter = Counter(0xFF)
   val digit_to_seg = ((0 until 16).map(_.U)).zip(Seq(
-    "b11111101".U, // 0
-    "b01100000".U, // 1
-    "b11011010".U, // 2
-    "b11110010".U, // 3
-    "b01100110".U, // 4
-    "b10110110".U, // 5
-    "b10111110".U, // 6
-    "b11100000".U, // 7
-    "b11111110".U, // 8
-    "b11110110".U, // 9
-    "b11101110".U, // A
-    "b00111110".U, // B
-    "b10011100".U, // C
-    "b01111010".U, // D
-    "b10011110".U, // E
-    "b10001110".U  // F
+    "b00000010".U, "b10011111".U, "b00100101".U, "b00001101".U,
+    "b10011001".U, "b01001001".U, "b01000001".U, "b00011111".U,
+    "b00000001".U, "b00001001".U, "b00010001".U, "b11000001".U,
+    "b01100011".U, "b10000101".U, "b01100001".U, "b01110001".U
   ))
 
   val keycode_digits = VecInit(io.keycode.bits(3,0)) ++ VecInit(io.keycode.bits(7,4))
