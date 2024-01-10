@@ -46,7 +46,7 @@ int main(int argc, char **argv, char **env) {
     nvboard_update();
     cycle(top, [&] {
       if (keycode != top->io_keycode_bits) {
-        printf("%d\n", top->io_keycode_bits);
+        printf("%x\n", top->io_keycode_bits);
         keycode = top->io_keycode_bits;
       }
     });
