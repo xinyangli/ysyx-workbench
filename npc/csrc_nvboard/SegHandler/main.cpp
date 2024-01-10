@@ -45,8 +45,8 @@ int main(int argc, char **argv, char **env) {
   while (true) {
     nvboard_update();
     cycle(top, [&] {
-      if (keycode != top->io_ps2_data) {
-        keycode = top->io_ps2_data;
+      if (keycode != top->io_keycode_bits){
+        keycode = top->io_keycode_bits;
         printf("%d\n", keycode);
       }
     });
