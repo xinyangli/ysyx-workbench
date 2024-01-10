@@ -18,6 +18,7 @@ int main(int argc, char **argv, char **env) {
     while (true) {
         nvboard_update();
         top->eval();
+        printf("%d\n", top->clock);
         // printf("%d, %d, %d", top->io_segs_0, top->io_segs_1, top->io_segs_2);
     }
     delete top;
