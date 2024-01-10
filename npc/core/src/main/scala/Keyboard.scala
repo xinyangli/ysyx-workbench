@@ -57,7 +57,7 @@ class KeyboardController extends Module {
   }
 }
 
-class SegHandler(seg_count: Int) extends Module {
+class SegGenerator(seg_count: Int) extends Module {
   val io = IO(new Bundle {
     val keycode = Flipped(Decoupled(UInt(8.W)))
     val segs = Output(Vec(seg_count, UInt(8.W)))
@@ -89,26 +89,9 @@ class SegHandler(seg_count: Int) extends Module {
   val keycode_digits = VecInit(io.keycode.bits(3,0)) ++ VecInit(io.keycode.bits(7,4))
   val keycode_seg = keycode_digits.map(MuxLookup(_, 0.U)(digit_to_seg))
 
-  seg_regs := keycode_seg ++ keycode_seg ++ keycode_seg
+  seg_regs := keycode_seg ++ keycode_seg ++ keycode_seg ++ keycode_seg
 
   io.segs := seg_regs
-
-  // when(io.keycode.valid) {
-  //   val data = io.keycode.bits
-  //   val state_f0_received = RegNext(data === 0xF0.U, false.B)
-  //   io.keycode.ready := true.B
-  //   // Handle keycode based on current state
-  //   // (keyboard press counter) :: (ASCII code) :: (Keycode)
-  //   when(state_f0_received) {
-  //     // Release code
-  //   }.otherwise{
-  //     counter.inc()
-  //     last_keycode := io.keycode.bits
-  //   }
-  // }.otherwise {
-  //   io.keycode.ready := false.B
-  // }
-  
 }
 
 
