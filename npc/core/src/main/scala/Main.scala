@@ -88,7 +88,7 @@ class Keyboard extends Module {
     val segs = Output(Vec(3, UInt(8.W)))
   })
 
-  val seg_handler = Module(new SegHandler)
+  val seg_handler = Module(new SegGenerator(seg_count = 8))
   val keyboard_controller = Module(new KeyboardController)
 
   seg_handler.io.keycode <> keyboard_controller.io.out

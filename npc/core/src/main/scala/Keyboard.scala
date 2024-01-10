@@ -1,7 +1,7 @@
 package npc.keyboard
 
 import chisel3._
-import chisel3.util.{Counter, Decoupled, Queue, Reverse, MuxLookup}
+import chisel3.util.{Counter, Decoupled, Queue, Reverse, MuxLookup, RegEnable}
 
 import npc.seg._
 import upickle.implicits.key
@@ -62,11 +62,15 @@ class SegGenerator(seg_count: Int) extends Module {
     val keycode = Flipped(Decoupled(UInt(8.W)))
     val segs = Output(Vec(seg_count, UInt(8.W)))
   })
-  io.keycode.ready := DontCare
+  val counter = Counter(0xFF)
+
+  io.keycode.ready := false.B
+  when(io.keycode.valid) {
+    io.keycode.ready := true.B
+  }
 
   val seg_regs = RegInit(VecInit(Seq.fill(seg_count)(0.U(8.W))))
   val last_keycode = RegInit(0.U(8.W))
-  val (counter, _) = Counter(0 to 0xFF, clock.asBool, reset.asBool)
   val digit_to_seg = ((0 until 16).map(_.U)).zip(Seq(
     "b00000011".U, "b10011111".U, "b00100101".U, "b00001101".U,
     "b10011001".U, "b01001001".U, "b01000001".U, "b00011111".U,
@@ -83,13 +87,14 @@ class SegGenerator(seg_count: Int) extends Module {
     0x25.U, 0x2E.U, 0x36.U, 0x3D.U, 0x3E.U, 0x46.U,
   ))
 
-  val keycode = io.keycode.bits
+  // val keycode = Mux(io.keycode.ready && io.keycode.valid, io.keycode.bits, keycode)
+  val keycode = RegEnable(io.keycode.bits, 0.U, io.keycode.ready && io.keycode.valid)
   val keycode_digits = VecInit(keycode(3,0)) ++ VecInit(keycode(7,4))
   val keycode_seg = keycode_digits.map(MuxLookup(_, 0xFF.U)(digit_to_seg))
   val ascii = MuxLookup(keycode, 0.U)(keycode_to_ascii)
   val ascii_digits = VecInit(ascii(3,0)) ++ VecInit(ascii(6,4))
   val ascii_seg = ascii_digits.map(MuxLookup(_, 0xFF.U)(digit_to_seg))
-  val count_digits = VecInit(counter(3,0)) ++ VecInit(counter(7,4))
+  val count_digits = VecInit(counter.value(3,0)) ++ VecInit(counter.value(7,4))
   val count_seg = count_digits.map(MuxLookup(_, 0xFF.U)(digit_to_seg))
 
   seg_regs := keycode_seg ++ ascii_seg ++ count_seg ++ Seq(0xFF.U, 0xFF.U)

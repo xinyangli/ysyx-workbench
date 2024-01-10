@@ -49,7 +49,7 @@ add_custom_command(
   DEPENDS ${CMAKE_SOURCE_DIR}/constr/${TOPMODULE}.nxdc 
 )
 
-add_executable(V${TOPMODULE}_nvboard csrc_nvboard/main.cpp auto_bind.cpp)
+add_executable(V${TOPMODULE}_nvboard csrc_nvboard/${TOPMODULE}/main.cpp auto_bind.cpp)
 
 verilate(V${TOPMODULE}_nvboard TRACE COVERAGE THREADS
   TOP_MODULE ${TOPMODULE}
