@@ -4,6 +4,7 @@ import chisel3._
 import chisel3.util.{Counter, Decoupled, Queue, Reverse, MuxLookup}
 
 import npc.seg._
+import upickle.implicits.key
 
 class PS2Port extends Bundle {
   val clk = Input(Bool())
@@ -26,12 +27,12 @@ class KeyboardController extends Module {
   val cycle_counter = Counter(11)
   val concated_data = RegInit(0.U(8.W))
 
-  val queue_io = Wire(Flipped(Decoupled(UInt(8.W))))
-  val queue = Queue(queue_io, entries = 8)
+  val queue_in = Wire(Flipped(Decoupled(UInt(8.W))))
+  val queue = Queue(queue_in, entries = 8)
   val received = RegInit(Bool(), false.B)
-  val pushed = RegNext(queue_io.valid && queue_io.ready, false.B)
-  queue_io.valid := false.B
-  queue_io.bits := Reverse(concated_data)
+  val pushed = RegNext(queue_in.valid && queue_in.ready, false.B)
+  queue_in.valid := false.B
+  queue_in.bits := Reverse(concated_data)
   io.out <> queue
 
   when(cycle_counter.value === 0.U) {
@@ -49,9 +50,9 @@ class KeyboardController extends Module {
   }
 
   when(!pushed && received) {
-    queue_io.valid := true.B
+    queue_in.valid := true.B
   }.elsewhen(pushed && received) {
-    queue_io.valid := false.B
+    queue_in.valid := false.B
     received := false.B
   }
 }
@@ -59,52 +60,55 @@ class KeyboardController extends Module {
 class SegHandler(seg_count: Int) extends Module {
   val io = IO(new Bundle {
     val keycode = Flipped(Decoupled(UInt(8.W)))
-    val segs = Output(Vec(seg_count / 2, UInt(16.W)))
+    val segs = Output(Vec(seg_count, UInt(8.W)))
   })
+  io.keycode.ready := DontCare
 
-
-  val seg_regs = RegInit(VecInit(Seq.fill(seg_count / 2)(0.U(16.W))))
+  val seg_regs = RegInit(VecInit(Seq.fill(seg_count)(0.U(8.W))))
   val last_keycode = RegInit(0.U(8.W))
   val counter = Counter(0xFF)
-  val digit_to_seg = Seq(
-    0.U -> "b0111111".U, // 0
-    1.U ->"b0000110".U, // 1
-    2.U -> "b1011011".U, // 2
-    3.U -> "b1001111".U, // 3
-    4.U -> "b1100110".U, // 4
-    5.U -> "b1101101".U, // 5
-    6.U -> "b1111101".U, // 6
-    7.U -> "b0000111".U, // 7
-    8.U -> "b1111111".U, // 8
-    9.U -> "b1101111".U, // 9
-    10.U -> "b1110111".U, // A
-    11.U -> "b1111100".U, // B
-    12.U -> "b0111001".U, // C
-    13.U -> "b1011110".U, // D
-    14.U -> "b1111001".U, // E
-    15.U -> "b1110001".U  // F
-  )
+  val digit_to_seg = ((0 until 16).map(_.U)).zip(Seq(
+    "b11111101".U, // 0
+    "b01100000".U, // 1
+    "b11011010".U, // 2
+    "b11110010".U, // 3
+    "b01100110".U, // 4
+    "b10110110".U, // 5
+    "b10111110".U, // 6
+    "b11100000".U, // 7
+    "b11111110".U, // 8
+    "b11110110".U, // 9
+    "b11101110".U, // A
+    "b00111110".U, // B
+    "b10011100".U, // C
+    "b01111010".U, // D
+    "b10011110".U, // E
+    "b10001110".U  // F
+  ))
+
+  val keycode_digits = VecInit(io.keycode.bits(3,0)) ++ VecInit(io.keycode.bits(7,4))
+  val keycode_seg = keycode_digits.map(MuxLookup(_, 0.U)(digit_to_seg))
+
+  seg_regs := keycode_seg ++ keycode_seg ++ keycode_seg
+
   io.segs := seg_regs
 
-  when(io.keycode.valid) {
-    val data = io.keycode.bits
-    val state_f0_received = RegNext(data === 0xF0.U, false.B)
-    io.keycode.ready := true.B
-    // Handle keycode based on current state
-    // (keyboard press counter) :: (ASCII code) :: (Keycode)
-    when(state_f0_received) {
-      // Release code
-    }.otherwise{
-      counter.inc()
-      last_keycode := io.keycode.bits
-    }
-  }.otherwise {
-    io.keycode.ready := false.B
-  }
+  // when(io.keycode.valid) {
+  //   val data = io.keycode.bits
+  //   val state_f0_received = RegNext(data === 0xF0.U, false.B)
+  //   io.keycode.ready := true.B
+  //   // Handle keycode based on current state
+  //   // (keyboard press counter) :: (ASCII code) :: (Keycode)
+  //   when(state_f0_received) {
+  //     // Release code
+  //   }.otherwise{
+  //     counter.inc()
+  //     last_keycode := io.keycode.bits
+  //   }
+  // }.otherwise {
+  //   io.keycode.ready := false.B
+  // }
   
-  seg_regs := Seq(counter.value, last_keycode, last_keycode).map(d => {
-    MuxLookup(d & 0xF.U, 0.U)(digit_to_seg) | (MuxLookup((d >> 4.U) & 0xF.U, 0.U)(digit_to_seg) << 8.U)
-  })
 }
 
 
