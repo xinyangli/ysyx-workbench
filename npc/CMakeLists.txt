@@ -17,74 +17,79 @@ find_package(verilator REQUIRED)
 find_library(NVBOARD_LIBRARY NAMES nvboard)
 find_path(NVBOARD_INCLUDE_DIR NAMES nvboard.h)
 
-set(TOPMODULE "Keyboard")
-set(SCALA_CORE "${CMAKE_CURRENT_SOURCE_DIR}/core")
-set(CHISEL_MODULE_CLASS "${CMAKE_PROJECT_NAME}.${TOPMODULE}")
-file(GLOB_RECURSE SCALA_CORE_SOURCES "${SCALA_CORE}/src/main/scala/*.scala")
-file(GLOB_RECURSE SCALA_CORE_TEST_SOURCES "${SCALA_CORE}/src/test/scala/*.scala")
+set(TOPMODULES "Keyboard")
 
-# Configure time verilog source generation for verilator
-execute_process(
-  COMMAND sbt "runMain circt.stage.ChiselMain --target-dir ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/vsrc --module ${CHISEL_MODULE_CLASS} --target verilog"
-  WORKING_DIRECTORY ${SCALA_CORE}
-)
+foreach(TOPMODULE in LISTS TOPMODULES)
 
-add_custom_command(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/vsrc/${TOPMODULE}.v
-  COMMAND sbt "runMain circt.stage.ChiselMain --target-dir ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/vsrc --module ${CHISEL_MODULE_CLASS} --target verilog"
-  WORKING_DIRECTORY ${SCALA_CORE}
-  DEPENDS ${SCALA_CORE_SOURCES}
-)
+  set(SCALA_CORE "${CMAKE_CURRENT_SOURCE_DIR}/core")
+  set(CHISEL_MODULE_CLASS "${CMAKE_PROJECT_NAME}.${TOPMODULE}")
+  file(GLOB_RECURSE SCALA_CORE_SOURCES "${SCALA_CORE}/src/main/scala/*.scala")
+  file(GLOB_RECURSE SCALA_CORE_TEST_SOURCES "${SCALA_CORE}/src/test/scala/*.scala")
 
-add_custom_target(
-    ChiselBuild
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/vsrc/${TOPMODULE}.v
-)
+  # Configure time verilog source generation for verilator
+  execute_process(
+    COMMAND sbt "runMain circt.stage.ChiselMain --target-dir ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/vsrc --module ${CHISEL_MODULE_CLASS} --target verilog"
+    WORKING_DIRECTORY ${SCALA_CORE}
+  )
 
-# -- Build NVBoard executable
+  add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/vsrc/${TOPMODULE}.v
+    COMMAND sbt "runMain circt.stage.ChiselMain --target-dir ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/vsrc --module ${CHISEL_MODULE_CLASS} --target verilog"
+    WORKING_DIRECTORY ${SCALA_CORE}
+    DEPENDS ${SCALA_CORE_SOURCES}
+  )
 
-add_custom_command(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/auto_bind.cpp
-  COMMAND auto_pin_bind ${CMAKE_SOURCE_DIR}/constr/${TOPMODULE}.nxdc ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/auto_bind.cpp
-  DEPENDS ${CMAKE_SOURCE_DIR}/constr/${TOPMODULE}.nxdc 
-)
+  add_custom_target(
+      ChiselBuild
+      DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/vsrc/${TOPMODULE}.v
+  )
 
-add_executable(V${TOPMODULE}_nvboard csrc_nvboard/${TOPMODULE}/main.cpp ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/auto_bind.cpp)
+  # -- Build NVBoard executable
 
-verilate(V${TOPMODULE}_nvboard TRACE COVERAGE THREADS
-  TOP_MODULE ${TOPMODULE}
-  PREFIX V${TOPMODULE}
-  SOURCES ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/vsrc/${TOPMODULE}.v)
+  add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/auto_bind.cpp
+    COMMAND auto_pin_bind ${CMAKE_SOURCE_DIR}/constr/${TOPMODULE}.nxdc ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/auto_bind.cpp
+    DEPENDS ${CMAKE_SOURCE_DIR}/constr/${TOPMODULE}.nxdc 
+  )
 
-add_dependencies(V${TOPMODULE}_nvboard ChiselBuild)
-target_include_directories(V${TOPMODULE}_nvboard PRIVATE ${NVBOARD_INCLUDE_DIR} ${SDL2_INCLUDE_DIRS})
-target_link_libraries(V${TOPMODULE}_nvboard PRIVATE ${NVBOARD_LIBRARY} SDL2::SDL2 SDL2_image::SDL2_image)
+  add_executable(V${TOPMODULE}_nvboard csrc_nvboard/${TOPMODULE}/main.cpp ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/auto_bind.cpp)
 
-install(TARGETS V${TOPMODULE}_nvboard)
+  verilate(V${TOPMODULE}_nvboard TRACE COVERAGE THREADS
+    TOP_MODULE ${TOPMODULE}
+    PREFIX V${TOPMODULE}
+    SOURCES ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/vsrc/${TOPMODULE}.v)
 
-# -- Build Verilator executable and add to test
+  add_dependencies(V${TOPMODULE}_nvboard ChiselBuild)
+  target_include_directories(V${TOPMODULE}_nvboard PRIVATE ${NVBOARD_INCLUDE_DIR} ${SDL2_INCLUDE_DIRS})
+  target_link_libraries(V${TOPMODULE}_nvboard PRIVATE ${NVBOARD_LIBRARY} SDL2::SDL2 SDL2_image::SDL2_image)
 
-add_executable(V${TOPMODULE} csrc/main.cpp)
+  install(TARGETS V${TOPMODULE}_nvboard)
 
-verilate(V${TOPMODULE} TRACE COVERAGE THREADS
-  TOP_MODULE ${TOPMODULE}
-  PREFIX V${TOPMODULE}
-  SOURCES ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/vsrc/${TOPMODULE}.v)
+  # -- Build Verilator executable and add to test
 
-add_dependencies(V${TOPMODULE} ChiselBuild)
+  add_executable(V${TOPMODULE} csrc/main.cpp)
 
-enable_testing()
-add_test(NAME V${TOPMODULE} COMMAND V${TOPMODULE})
+  verilate(V${TOPMODULE} TRACE COVERAGE THREADS
+    TOP_MODULE ${TOPMODULE}
+    PREFIX V${TOPMODULE}
+    SOURCES ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/vsrc/${TOPMODULE}.v)
 
-# -- Add build tracking
-add_custom_command(
-    TARGET V${TOPMODULE}_nvboard PRE_BUILD
-    COMMAND ${CMAKE_SOURCE_DIR}/../git_commit.sh "build_${CMAKE_PROJECT_NAME}_V${TOPMODULE}_nvboard"
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/..
-)
+  add_dependencies(V${TOPMODULE} ChiselBuild)
 
-add_custom_command(
-    TARGET V${TOPMODULE} PRE_BUILD
-    COMMAND ${CMAKE_SOURCE_DIR}/../git_commit.sh "build_${CMAKE_PROJECT_NAME}_V${TOPMODULE}"
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/..
-)
+  enable_testing()
+  add_test(NAME V${TOPMODULE} COMMAND V${TOPMODULE})
+
+  # -- Add build tracking
+  add_custom_command(
+      TARGET V${TOPMODULE}_nvboard PRE_BUILD
+      COMMAND ${CMAKE_SOURCE_DIR}/../git_commit.sh "build_${CMAKE_PROJECT_NAME}_V${TOPMODULE}_nvboard"
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/..
+  )
+
+  add_custom_command(
+      TARGET V${TOPMODULE} PRE_BUILD
+      COMMAND ${CMAKE_SOURCE_DIR}/../git_commit.sh "build_${CMAKE_PROJECT_NAME}_V${TOPMODULE}"
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/..
+  )
+
+endforeach()
