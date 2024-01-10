@@ -41,6 +41,9 @@ class SegGenerator(seg_count: Int) extends Module {
     }.elsewhen(!release_state) {
       keycode := io.keycode.bits
       counter.inc()
+    }.otherwise{
+      // Release code on io.keycode.bits
+      release_state := false.B
     }
   }
 
