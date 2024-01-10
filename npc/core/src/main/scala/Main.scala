@@ -85,7 +85,7 @@ import npc.keyboard._
 class Keyboard extends Module {
   val io = IO(new Bundle {
     val ps2 = PS2Port()
-    val segs = Output(Vec(3, UInt(8.W)))
+    val segs = Output(Vec(8, UInt(8.W)))
   })
 
   val seg_handler = Module(new SegGenerator(seg_count = 8))
