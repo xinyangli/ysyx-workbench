@@ -52,7 +52,7 @@ static struct CMDTable {
        NULL, 0},
       {"c", "Continue the execution of the program", cmd_c, NULL, 0},
       {"q", "Exit NEMU", cmd_q, NULL, 0},
-          {"x", "Examine content of physical memory address", cmd_x, NULL, 0},
+      {"x", "Examine content of physical memory address", cmd_x, NULL, 0},
       {"si", "Execute next [n] program line", cmd_si, NULL, 0},
       {"info", "Print information of registers or watchpoints", cmd_info,
        cmd_info_table, ARRLEN(cmd_info_table)},
@@ -88,6 +88,11 @@ static char *rl_gets() {
  * uint.
  */
 static word_t parse_uint(const char *arg, bool *success) {
+  if (arg == NULL) {
+    puts("Invalid uint argument.");
+    *success = false;
+    return 0;
+  }
   int base = 10;
   int token_length = strnlen(arg, 34);
   if (token_length > 2) {
