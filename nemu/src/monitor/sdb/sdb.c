@@ -137,7 +137,7 @@ static int cmd_info(char *args) {
 static int cmd_help_print(char *args, struct CMDTable* cur_cmd_table) {
   int i;
   printf("Subcommand \n");
-  char *arg = strtok(NULL, " ");
+  char *arg = strtok(args, " ");
   if (arg == NULL) {
     return -1;
   } else {
@@ -145,7 +145,6 @@ static int cmd_help_print(char *args, struct CMDTable* cur_cmd_table) {
       if (strcmp(arg, cur_cmd_table[i].name) == 0) {
         printf("%s ", cur_cmd_table[i].name);
         if (cmd_help_print(args, cur_cmd_table->subcommand) == -1) {
-          // Last avaliable command
           printf("-- %s\n", cur_cmd_table[i].description);
         }
         return 0;
