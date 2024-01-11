@@ -172,7 +172,7 @@ static int cmd_help(char *args) {
           // Print available subcommands
           for (int j = 0; j < cmd_table[i].nr_subcommand; j++) {
             struct CMDTable *sub_cmd_table = cmd_table[i].subcommand;
-            printf("\t %s -- %s", sub_cmd_table[j].name, sub_cmd_table[j].description);
+            printf("\t %s -- %s\n", sub_cmd_table[j].name, sub_cmd_table[j].description);
           }
         }
         return 0;
