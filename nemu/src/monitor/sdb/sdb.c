@@ -85,7 +85,7 @@ static int cmd_q(char *args) {
  * <step>: execute <step> step
  */
 static int cmd_si(char *args) {
-  char *arg = strtok(args, " ");
+  char *arg = strtok(NULL, " ");
   if (arg == NULL) {
     cpu_exec(1);
   } else {
@@ -138,10 +138,8 @@ static int cmd_help_print(char *args, struct CMDTable* cur_cmd_table) {
   int i;
   char *arg = strtok(NULL, " ");
   if (arg == NULL) {
-    // No more subcommand
     return -1;
   } else {
-    // Find sub-command
     for (i = 0; i < cur_cmd_table->nr_subcommand; i++) {
       if (strcmp(arg, cur_cmd_table[i].name) == 0) {
         printf("%s ", cur_cmd_table[i].name);
@@ -164,14 +162,13 @@ static int cmd_help(char *args) {
   if (arg == NULL) {
     /* no argument given */
     for (i = 0; i < NR_CMD; i++) {
-      printf("%s - %s\n", cmd_table[i].name, cmd_table[i].description);
+      printf("%s -- %s\n", cmd_table[i].name, cmd_table[i].description);
     }
   } else {
     for (i = 0; i < NR_CMD; i++) {
       if (strcmp(arg, cmd_table[i].name) == 0) {
         printf("%s ", cmd_table[i].name);
         if (cmd_help_print(args, cmd_table[i].subcommand) == -1) {
-          // Last avaliable command
           printf("-- %s\n", cmd_table[i].description);
         }
         return 0;
