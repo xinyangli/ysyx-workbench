@@ -73,7 +73,7 @@ static char *rl_gets() {
     line_read = NULL;
   }
 
-  line_read = readline("(\e[1;34mnemu\e[0m) ");
+  line_read = readline("\e[1;34m(nemu)\e[0m ");
 
   if (line_read && *line_read) {
     add_history(line_read);
