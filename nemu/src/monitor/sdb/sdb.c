@@ -147,7 +147,7 @@ static int cmd_help_print(char *args, struct CMDTable* cur_cmd_table) {
         printf("%s ", cur_cmd_table[i].name);
         if (cmd_help_print(args, cur_cmd_table->subcommand) == -1) {
           // Last avaliable command
-          printf("-- %s", cur_cmd_table[i].description);
+          printf("-- %s\n", cur_cmd_table[i].description);
         }
         return 0;
       }
@@ -172,7 +172,7 @@ static int cmd_help(char *args) {
         printf("%s ", cmd_table[i].name);
         if (cmd_help_print(args, cmd_table[i].subcommand) == -1) {
           // Last avaliable command
-          printf("-- %s", cmd_table[i].description);
+          printf("-- %s\n", cmd_table[i].description);
         }
         return 0;
       }
