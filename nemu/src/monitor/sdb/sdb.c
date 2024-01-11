@@ -191,6 +191,7 @@ static int cmd_x(char *args) {
     goto wrong_usage;
   for (paddr_t paddr = addr; paddr < addr + n;
        paddr += MUXDEF(CONFIG_ISA64, 4, 8)) {
+    printf("%d, %d", paddr, MUXDEF(CONFIG_ISA64, 4, 8));
     word_t value = paddr_read(addr, MUXDEF(CONFIG_ISA64, 4, 8));
     printf(FMT_WORD "\n", value);
   }
