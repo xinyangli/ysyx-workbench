@@ -4,7 +4,7 @@ STUNAME = 李心杨
 # DO NOT modify the following code!!!
 
 TRACER = tracer-ysyx
-GITFLAGS = -q --author='$(TRACER) <tracer@ysyx.org>' --no-verify --allow-empty
+GITFLAGS = -q --author='$(TRACER) <tracer@ysyx.org>' --no-verify --allow-empty --no-gpg-sign
 
 YSYX_HOME = $(NEMU_HOME)/..
 WORK_BRANCH = $(shell git rev-parse --abbrev-ref HEAD)
