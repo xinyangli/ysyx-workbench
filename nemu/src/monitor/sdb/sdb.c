@@ -189,7 +189,7 @@ static int cmd_x(char *args) {
   word_t addr = parse_expr(arg, &res);
   if (!res)
     goto wrong_usage;
-  addr = addr & ~0x3;
+  addr = addr & ~(WORD_BYTES - 1);
   for (paddr_t paddr = addr; paddr < addr + n;
        paddr += WORD_BYTES) {
     word_t value = paddr_read(addr, WORD_BYTES);
