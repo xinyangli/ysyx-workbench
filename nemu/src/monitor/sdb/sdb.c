@@ -137,14 +137,15 @@ static int cmd_info(char *args) {
 static int cmd_help_print(char *args, struct CMDTable* cur_cmd_table) {
   int i;
   printf("Subcommand \n");
-  char *arg = strtok(args, " ");
+  char *arg = strtok(NULL, " ");
   if (arg == NULL) {
     return -1;
   } else {
     for (i = 0; i < cur_cmd_table->nr_subcommand; i++) {
       if (strcmp(arg, cur_cmd_table[i].name) == 0) {
+        printf("Subcommand \n");
         printf("%s ", cur_cmd_table[i].name);
-        if (cmd_help_print(args, cur_cmd_table->subcommand) == -1) {
+        if (cmd_help_print(arg, cur_cmd_table->subcommand) == -1) {
           printf("-- %s\n", cur_cmd_table[i].description);
         }
         return 0;
