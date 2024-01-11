@@ -169,6 +169,10 @@ static int cmd_help(char *args) {
         printf("%s ", cmd_table[i].name);
         if (cmd_help_print(args, cmd_table[i].subcommand, cmd_table[i].nr_subcommand) == -1) {
           printf("-- %s\n", cmd_table[i].description);
+          // Print available subcommands
+          for (int j = 0; j < cmd_table[i].nr_subcommand; j++) {
+            
+          }
         }
         return 0;
       }
