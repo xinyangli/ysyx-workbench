@@ -26,7 +26,7 @@
             gtkwave
           ];
 
-          inputsFrom = [ self.packages.${system}.default ];
+          inputsFrom = [ self.packages.${system}.nemu ];
         };
 
         packages.nemu = with pkgs; stdenv.mkDerivation rec {
