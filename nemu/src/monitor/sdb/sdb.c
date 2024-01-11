@@ -34,17 +34,21 @@ static struct CMDTable {
   const char *name;
   const char *description;
   int (*handler)(char *);
-  struct CMDTable* subcommand;
+  struct CMDTable *subcommand;
   int nr_subcommand;
-}  cmd_info_table[] = {
-    {"r", "List all registers and their contents", cmd_info_r, NULL, 0},
-    {"w", "Status of specified watchpoints", cmd_info_w, NULL, 0},
-}, cmd_table[] = {
-    {"help", "Display information about all supported commands", cmd_help, NULL, 0},
-    {"c", "Continue the execution of the program", cmd_c, NULL, 0},
-    {"q", "Exit NEMU", cmd_q, NULL, 0},
-    {"si", "Execute next [n] program line", cmd_si, NULL, 0},
-    {"info", "Print information of registers or watchpoints", cmd_info, cmd_info_table, ARRLEN(cmd_info_table)},
+} cmd_info_table[] =
+    {
+        {"r", "List all registers and their contents", cmd_info_r, NULL, 0},
+        {"w", "Status of specified watchpoints", cmd_info_w, NULL, 0},
+},
+  cmd_table[] = {
+      {"help", "Display information about all supported commands", cmd_help,
+       NULL, 0},
+      {"c", "Continue the execution of the program", cmd_c, NULL, 0},
+      {"q", "Exit NEMU", cmd_q, NULL, 0},
+      {"si", "Execute next [n] program line", cmd_si, NULL, 0},
+      {"info", "Print information of registers or watchpoints", cmd_info,
+       cmd_info_table, ARRLEN(cmd_info_table)},
 };
 
 #define NR_CMD ARRLEN(cmd_table)
@@ -117,7 +121,10 @@ static int cmd_si(char *args) {
   return 0;
 }
 
-static int cmd_info_r(char *args) { return 0; }
+static int cmd_info_r(char *args) {
+  isa_reg_display();
+  return 0;
+}
 
 static int cmd_info_w(char *args) { return 0; }
 
@@ -134,7 +141,8 @@ static int cmd_info(char *args) {
   return 0;
 }
 
-static int cmd_help_print(char *args, struct CMDTable* cur_cmd_table, int cur_nr_cmd) {
+static int cmd_help_print(char *args, struct CMDTable *cur_cmd_table,
+                          int cur_nr_cmd) {
   int i;
   char *arg = strtok(NULL, " ");
   if (arg == NULL) {
@@ -143,7 +151,8 @@ static int cmd_help_print(char *args, struct CMDTable* cur_cmd_table, int cur_nr
     for (i = 0; i < cur_nr_cmd; i++) {
       if (strcmp(arg, cur_cmd_table[i].name) == 0) {
         printf("%s ", cur_cmd_table[i].name);
-        if (cmd_help_print(arg, cur_cmd_table[i].subcommand, cur_cmd_table[i].nr_subcommand) == -1) {
+        if (cmd_help_print(arg, cur_cmd_table[i].subcommand,
+                           cur_cmd_table[i].nr_subcommand) == -1) {
           printf("-- %s\n", cur_cmd_table[i].description);
         }
         return 0;
@@ -167,12 +176,14 @@ static int cmd_help(char *args) {
     for (i = 0; i < NR_CMD; i++) {
       if (strcmp(arg, cmd_table[i].name) == 0) {
         printf("%s ", cmd_table[i].name);
-        if (cmd_help_print(args, cmd_table[i].subcommand, cmd_table[i].nr_subcommand) == -1) {
+        if (cmd_help_print(args, cmd_table[i].subcommand,
+                           cmd_table[i].nr_subcommand) == -1) {
           printf("-- %s\n", cmd_table[i].description);
           // Print available subcommands
           for (int j = 0; j < cmd_table[i].nr_subcommand; j++) {
             struct CMDTable *sub_cmd_table = cmd_table[i].subcommand;
-            printf("  > %s -- %s\n", sub_cmd_table[j].name, sub_cmd_table[j].description);
+            printf("  > %s -- %s\n", sub_cmd_table[j].name,
+                   sub_cmd_table[j].description);
           }
         }
         return 0;
