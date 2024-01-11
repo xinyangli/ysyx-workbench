@@ -136,11 +136,11 @@ static int cmd_info(char *args) {
 
 static int cmd_help_print(char *args, struct CMDTable* cur_cmd_table) {
   int i;
-  printf("Subcommand \n");
   char *arg = strtok(NULL, " ");
   if (arg == NULL) {
     return -1;
   } else {
+    printf("Subcommand \n");
     for (i = 0; i < cur_cmd_table->nr_subcommand; i++) {
       if (strcmp(arg, cur_cmd_table[i].name) == 0) {
         printf("Subcommand \n");
