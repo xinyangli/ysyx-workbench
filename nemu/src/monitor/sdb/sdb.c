@@ -19,9 +19,9 @@
 #include <cpu/cpu.h>
 #include <errno.h>
 #include <isa.h>
+#include <memory/paddr.h>
 #include <readline/history.h>
 #include <readline/readline.h>
-#include <memory/paddr.h>
 #include <stdint.h>
 
 static int is_batch_mode = false;
@@ -185,7 +185,8 @@ static int cmd_x(char *args) {
   word_t addr = parse_expr(arg, &res);
   if (!res)
     goto wrong_usage;
-  for (paddr_t paddr = addr; paddr < addr + n; paddr += MUXDEF(CONFIG_ISA64, 4, 8)) {
+  for (paddr_t paddr = addr; paddr < addr + n;
+       paddr += MUXDEF(CONFIG_ISA64, 4, 8)) {
     word_t value = paddr_read(addr, MUXDEF(CONFIG_ISA64, 4, 8));
     printf(FMT_WORD "\n", value);
   }
