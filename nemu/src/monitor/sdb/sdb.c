@@ -107,7 +107,7 @@ static word_t parse_uint(const char *arg, bool *success) {
   char *endptr;
   uintmax_t n = strtoumax(arg, &endptr, base);
   if (errno == ERANGE || n > WORD_T_MAX) {
-    printf("%s is exceed the limit of uint\n", arg);
+    printf("%s exceed the limit of uint\n", arg);
     *success = false;
     return 0;
   } else if (arg == endptr) {
