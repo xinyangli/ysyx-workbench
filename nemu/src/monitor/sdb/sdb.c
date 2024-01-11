@@ -74,7 +74,7 @@ static int cmd_si(char *args) {
       return 0;
     int n = strtoumax(arg, NULL, base);
     if (n == UINTMAX_MAX) {
-      printf("%s is too large\n", args);
+      printf("%s is exceed the limit of uint\n", args);
       return 0;
     } else if (n == 0) {
       printf("Invalid argument for command si: %s\n", args);
