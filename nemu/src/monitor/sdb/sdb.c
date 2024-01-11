@@ -204,7 +204,7 @@ static int cmd_info(char *args) {
     goto wrong_usage;
     return 0;
   }
-  for (i = 0; i < NR_CMD; i++) {
+  for (i = 0; i < ARRLEN(cmd_info_table); i++) {
     if (strcmp(arg, cmd_info_table[i].name) == 0) {
       cmd_info_table[i].handler(args);
       return 0;
