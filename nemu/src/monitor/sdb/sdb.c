@@ -200,13 +200,20 @@ wrong_usage:
 static int cmd_info(char *args) {
   char *arg = strtok(NULL, " ");
   int i;
-
+  if (arg == NULL) {
+    goto wrong_usage;
+    return 0;
+  }
   for (i = 0; i < NR_CMD; i++) {
     if (strcmp(arg, cmd_info_table[i].name) == 0) {
       cmd_info_table[i].handler(args);
       return 0;
     }
   }
+
+wrong_usage:
+  printf("Invalid argument for command info: %s\n", args);
+  printf("Usage: info [r | w]\n");
   return 0;
 }
 
