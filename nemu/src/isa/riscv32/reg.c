@@ -27,9 +27,11 @@ const char *regs[] = {
 void isa_reg_display() {
   int colomn_per_row = 4;
   for(int i = 0; i < ARRLEN(regs); i++) {
-    printf("%3s: %8X\t", reg_name(i), gpr(i));
+    printf("%3s: %#8x\t", reg_name(i), gpr(i));
     if (i % colomn_per_row == 3)
       putchar('\n');
+    else
+      putchar('|');
   }
 }
 
