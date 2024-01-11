@@ -17,7 +17,6 @@
 #include <cpu/cpu.h>
 #include <readline/readline.h>
 #include <readline/history.h>
-#include <getopt.h>
 #include "sdb.h"
 
 static int is_batch_mode = false;
@@ -54,8 +53,31 @@ static int cmd_q(char *args) {
   return -1;
 }
 
+/* Single stepping
+ * <step>: execute <step> step
+ */
 static int cmd_si(char *args) {
-  printf("%s", args);
+  char *arg = strtok(args, " ");
+  if (arg == NULL) {
+    cpu_exec(1);
+  } else {
+    int base = 10;
+    int length = strlen(arg);
+    if (length > 2) {
+      if (arg[0] == '0' && (arg[1] == 'b' || arg[1] == 'B')) {
+        base = 2; arg = arg + 2;
+      } else if (arg[0] == '0' && (arg[1] == 'x' || arg[1] == 'X')) {
+        base = 16; arg = arg + 2;
+      }
+    }
+    int n = strtoumax(arg, NULL, base);
+    if (n == UINTMAX_MAX) {
+      printf("Invalid argument for command si: %s\n", args);
+      return 0;
+    } else {
+      cpu_exec(n);
+    }
+  }
   return 0;
 }
 
@@ -70,9 +92,6 @@ static struct {
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
   { "si", "Single step [n] step", cmd_si },
-
-  /* TODO: Add more commands */
-
 };
 
 #define NR_CMD ARRLEN(cmd_table)
