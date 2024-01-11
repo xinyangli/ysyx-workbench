@@ -70,11 +70,16 @@ static int cmd_si(char *args) {
         base = 16; arg = arg + 2;
       }
     }
+    if (arg[0] == '0') 
+      return 0;
     int n = strtoumax(arg, NULL, base);
     if (n == UINTMAX_MAX) {
+      printf("%s is too large\n", args);
+      return 0;
+    } else if (n == 0) {
       printf("Invalid argument for command si: %s\n", args);
       return 0;
-    } else {
+    }else {
       cpu_exec(n);
     }
   }
