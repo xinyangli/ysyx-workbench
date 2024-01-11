@@ -19,6 +19,7 @@
           packages = [
             clang-tools
             rnix-lsp
+            bear
 
             gdb
             jre
