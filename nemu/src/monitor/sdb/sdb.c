@@ -189,10 +189,10 @@ static int cmd_x(char *args) {
   word_t addr = parse_expr(arg, &res);
   if (!res)
     goto wrong_usage;
-  printf("%d, %d\n", addr, MUXDEF(CONFIG_ISA64, 4, 8));
+  printf("%d, %d\n", addr, WORD_BYTES);
   for (paddr_t paddr = addr; paddr < addr + n;
-       paddr += MUXDEF(CONFIG_ISA64, 4, 8)) {
-    word_t value = paddr_read(addr, MUXDEF(CONFIG_ISA64, 4, 8));
+       paddr += WORD_BYTES) {
+    word_t value = paddr_read(addr, WORD_BYTES);
     printf(FMT_WORD "\n", value);
   }
   return 0;
