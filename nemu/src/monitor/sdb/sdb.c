@@ -192,7 +192,7 @@ static int cmd_x(char *args) {
   for (paddr_t paddr = addr; paddr < addr + n;
        paddr += WORD_BYTES) {
     word_t value = paddr_read(addr, WORD_BYTES);
-    printf("\e[1;34m" FMT_PADDR "\e[0m" "\t" FMT_WORD "\n", paddr, value);
+    printf("\e[1;34m" FMT_PADDR "\e[0m" "  " FMT_WORD "\n", paddr, value);
   }
   return 0;
 
