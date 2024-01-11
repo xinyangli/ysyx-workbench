@@ -27,7 +27,7 @@ const char *regs[] = {
 void isa_reg_display() {
   int colomn_per_row = 4;
   for(int i = 0; i < ARRLEN(regs); i++) {
-    printf("\e[1;34m%3s\e[0m: 0x%08x ", reg_name(i), gpr(i));
+    printf("\e[1;34m%3s\e[0m: " FMT_PADDR, reg_name(i), gpr(i));
     if (i % colomn_per_row == 3)
       putchar('\n');
     else

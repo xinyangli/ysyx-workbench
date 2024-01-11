@@ -14,10 +14,15 @@
  ***************************************************************************************/
 
 #include "sdb.h"
+#include "common.h"
+#include "sys/types.h"
 #include <cpu/cpu.h>
+#include <errno.h>
 #include <isa.h>
 #include <readline/history.h>
 #include <readline/readline.h>
+#include <memory/paddr.h>
+#include <stdint.h>
 
 static int is_batch_mode = false;
 
@@ -25,6 +30,7 @@ static int is_batch_mode = false;
 static int cmd_help(char *args);
 static int cmd_c(char *args);
 static int cmd_q(char *args);
+static int cmd_x(char *args);
 static int cmd_si(char *args);
 static int cmd_info(char *args);
 static int cmd_info_r(char *args);
@@ -46,6 +52,7 @@ static struct CMDTable {
        NULL, 0},
       {"c", "Continue the execution of the program", cmd_c, NULL, 0},
       {"q", "Exit NEMU", cmd_q, NULL, 0},
+          {"x", "Examine content of physical memory address", cmd_x, NULL, 0},
       {"si", "Execute next [n] program line", cmd_si, NULL, 0},
       {"info", "Print information of registers or watchpoints", cmd_info,
        cmd_info_table, ARRLEN(cmd_info_table)},
@@ -75,6 +82,52 @@ static char *rl_gets() {
   return line_read;
 }
 
+/* Extract Integer from a string. Can handle hex, binary and decimal numbers.
+ * Print error if meet any error.
+ * Return `UINTMAX_MAX` if the string is invalid or number exceed the limit of
+ * uint.
+ */
+static word_t parse_uint(const char *arg, bool *success) {
+  int base = 10;
+  int token_length = strnlen(arg, 34);
+  if (token_length > 2) {
+    if (arg[0] == '0' && (arg[1] == 'b' || arg[1] == 'B')) {
+      base = 2;
+      arg = arg + 2;
+    } else if (arg[0] == '0' && (arg[1] == 'x' || arg[1] == 'X')) {
+      base = 16;
+      arg = arg + 2;
+    }
+  }
+  char *endptr;
+  uintmax_t n = strtoumax(arg, &endptr, base);
+  if (errno == ERANGE || n > WORD_T_MAX) {
+    printf("%s is exceed the limit of uint\n", arg);
+    *success = false;
+    return 0;
+  } else if (arg == endptr) {
+    puts("Invalid uint argument.");
+    *success = false;
+    return 0;
+  } else if (n > WORD_T_MAX) {
+    *success = false;
+    return WORD_T_MAX;
+  } else {
+    *success = true;
+    return n;
+  }
+}
+
+static word_t parse_expr(const char *arg, bool *success) {
+  if (arg == NULL) {
+    puts("Invalid expr argument.");
+    *success = false;
+    return 0;
+  }
+
+  return 0;
+}
+
 static int cmd_c(char *args) {
   cpu_exec(-1);
   return 0;
@@ -93,31 +146,17 @@ static int cmd_si(char *args) {
   if (arg == NULL) {
     cpu_exec(1);
   } else {
-    int base = 10;
-    int length = strnlen(arg, 34);
-    if (length > 2) {
-      if (arg[0] == '0' && (arg[1] == 'b' || arg[1] == 'B')) {
-        base = 2;
-        arg = arg + 2;
-      } else if (arg[0] == '0' && (arg[1] == 'x' || arg[1] == 'X')) {
-        base = 16;
-        arg = arg + 2;
-      }
-    }
-    if (arg[0] == '0')
-      return 0;
-    int n = strtoumax(arg, NULL, base);
-    if (n == UINTMAX_MAX) {
-      printf("%s is exceed the limit of uint\n", args);
-      return 0;
-    } else if (n == 0) {
-      printf("Invalid argument for command si: %s\n", args);
-      cmd_help(NULL);
-      return 0;
-    } else {
-      cpu_exec(n);
-    }
+    bool res = false;
+    word_t n = parse_uint(arg, &res);
+    if (!res)
+      goto wrong_usage;
+    cpu_exec(n);
   }
+  return 0;
+
+wrong_usage:
+  printf("Invalid argument for command si: %s\n", args);
+  printf("Usage: si [N: uint]\n");
   return 0;
 }
 
@@ -126,10 +165,35 @@ static int cmd_info_r(char *args) {
   return 0;
 }
 
-static int cmd_info_w(char *args) { return 0; }
+static int cmd_info_w(char *args) {
+  printf("Not implemented");
+  return 0;
+}
+
+static int cmd_x(char *args) {
+  char *arg = strtok(NULL, " ");
+  bool res = false;
+  word_t n = parse_uint(arg, &res);
+  if (!res)
+    goto wrong_usage;
+  arg = strtok(NULL, " ");
+  word_t addr = parse_expr(arg, &res);
+  if (!res)
+    goto wrong_usage;
+  for (paddr_t paddr = addr; paddr < addr + n; paddr += MUXDEF(CONFIG_ISA64, 4, 8)) {
+    word_t value = paddr_read(addr, MUXDEF(CONFIG_ISA64, 4, 8));
+    printf(FMT_WORD "\n", value);
+  }
+  return 0;
+
+wrong_usage:
+  printf("Invalid argument for command si: %s\n", args);
+  printf("Usage: x [N: uint] [EXPR: <expr>]\n");
+  return 0;
+}
 
 static int cmd_info(char *args) {
-  char *arg = strtok(args, " ");
+  char *arg = strtok(NULL, " ");
   int i;
 
   for (i = 0; i < NR_CMD; i++) {
