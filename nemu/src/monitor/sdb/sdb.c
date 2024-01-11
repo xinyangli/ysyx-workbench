@@ -123,14 +123,18 @@ static word_t parse_uint(const char *arg, bool *success) {
   }
 }
 
-static word_t parse_expr(const char *arg, bool *success) {
+static paddr_t parse_expr(const char *arg, bool *success) {
   if (arg == NULL) {
     puts("Invalid expr argument.");
     *success = false;
     return 0;
+  } else {
+    bool res = false;
+    // FIXME: We cannot use `parse_uint` here, it accept `-1234` as input
+    paddr_t addr = parse_uint(arg, &res);
+    *success = res;
+    return addr;
   }
-
-  return 0;
 }
 
 static int cmd_c(char *args) {
