@@ -134,18 +134,17 @@ static int cmd_info(char *args) {
   return 0;
 }
 
-static int cmd_help_print(char *args, struct CMDTable* cur_cmd_table) {
+static int cmd_help_print(char *args, struct CMDTable* cur_cmd_table, int cur_nr_cmd) {
   int i;
   char *arg = strtok(NULL, " ");
   if (arg == NULL) {
     return -1;
   } else {
-    printf("nr_subcommand: %d\n", cur_cmd_table->nr_subcommand);
-    for (i = 0; i < cur_cmd_table->nr_subcommand; i++) {
+    for (i = 0; i < cur_nr_cmd; i++) {
       if (strcmp(arg, cur_cmd_table[i].name) == 0) {
         printf("Subcommand \n");
         printf("%s ", cur_cmd_table[i].name);
-        if (cmd_help_print(arg, cur_cmd_table->subcommand) == -1) {
+        if (cmd_help_print(arg, cur_cmd_table[i].subcommand, cur_cmd_table[i].nr_subcommand) == -1) {
           printf("-- %s\n", cur_cmd_table[i].description);
         }
         return 0;
@@ -169,7 +168,7 @@ static int cmd_help(char *args) {
     for (i = 0; i < NR_CMD; i++) {
       if (strcmp(arg, cmd_table[i].name) == 0) {
         printf("%s ", cmd_table[i].name);
-        if (cmd_help_print(args, cmd_table[i].subcommand) == -1) {
+        if (cmd_help_print(args, cmd_table[i].subcommand, cmd_table[i].nr_subcommand) == -1) {
           printf("-- %s\n", cmd_table[i].description);
         }
         return 0;
