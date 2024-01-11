@@ -37,6 +37,7 @@
             sbt
             nur.xin.nvboard
             self.packages.${system}.circt
+            yosys
           ];
           buildInputs = [
             verilator
