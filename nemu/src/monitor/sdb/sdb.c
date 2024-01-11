@@ -142,7 +142,6 @@ static int cmd_help_print(char *args, struct CMDTable* cur_cmd_table, int cur_nr
   } else {
     for (i = 0; i < cur_nr_cmd; i++) {
       if (strcmp(arg, cur_cmd_table[i].name) == 0) {
-        printf("Subcommand \n");
         printf("%s ", cur_cmd_table[i].name);
         if (cmd_help_print(arg, cur_cmd_table[i].subcommand, cur_cmd_table[i].nr_subcommand) == -1) {
           printf("-- %s\n", cur_cmd_table[i].description);
