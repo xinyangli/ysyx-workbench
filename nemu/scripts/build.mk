@@ -56,7 +56,7 @@ $(OBJ_DIR)/%.yy.c: %.l $(OBJ_DIR)/%.tag.c
 	@mkdir -p $(dir $@)
 	@$(LEX) $(LFLAGS) -o $@ $<
 
-$(OBJ_DIR)/%.yy.o: %(OBJ_DIR)/%.yy.c
+$(OBJ_DIR)/%.yy.o: $(OBJ_DIR)/%.yy.c
 	@echo + CC $<
 	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) -c -o $@ $<
