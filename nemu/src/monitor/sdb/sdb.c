@@ -135,9 +135,10 @@ static paddr_t parse_expr(const char *arg, bool *success) {
     // FIXME: We cannot use `parse_uint` here, it accept `-1234` as input
     // paddr_t addr = parse_uint(arg, &res);
     // *success = res;
-    yy_scan_string(arg);
     paddr_t addr;
+    yy_scan_string(arg);
     *success = yyparse(&addr);
+    yylex_destroy();
     return addr;
   }
 }
