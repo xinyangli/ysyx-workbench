@@ -54,7 +54,7 @@ void gen_rand_op(void) {
 void gen_rand_expr(void) {
   int choice = rand() % 3;
   if (buf_ptr - buf > 2000) {
-    return;
+    choice = 0;
   } 
   switch (choice) {
       case 0: gen_num(); break;
