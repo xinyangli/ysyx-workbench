@@ -1,6 +1,6 @@
-#line 1 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addr-lex.c"
+#line 1 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addrexp.yy.c"
 
-#line 3 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addr-lex.c"
+#line 3 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addrexp.yy.c"
 
 #define YY_NO_UNPUT 1
 #define YY_NO_INPUT 1
@@ -449,11 +449,11 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "src/monitor/sdb/addr-lex.l"
-#line 2 "src/monitor/sdb/addr-lex.l"
-    #include <addr-exp.h>
-#line 455 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addr-lex.c"
-#line 456 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addr-lex.c"
+#line 1 "src/monitor/sdb/addrexp.l"
+#line 2 "src/monitor/sdb/addrexp.l"
+    #include <addrexp.h>
+#line 455 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addrexp.yy.c"
+#line 456 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addrexp.yy.c"
 
 #define INITIAL 0
 
@@ -670,10 +670,10 @@ YY_DECL
 		}
 
 	{
-#line 6 "src/monitor/sdb/addr-lex.l"
+#line 6 "src/monitor/sdb/addrexp.l"
 
 
-#line 676 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addr-lex.c"
+#line 676 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addrexp.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -732,35 +732,35 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 8 "src/monitor/sdb/addr-lex.l"
+#line 8 "src/monitor/sdb/addrexp.l"
 { yylval = strtol(yytext, NULL, 16); return HEX_NUMBER; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 9 "src/monitor/sdb/addr-lex.l"
+#line 9 "src/monitor/sdb/addrexp.l"
 { yylval = atoi(yytext); return NUMBER; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 10 "src/monitor/sdb/addr-lex.l"
+#line 10 "src/monitor/sdb/addrexp.l"
 { return *yytext; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 11 "src/monitor/sdb/addr-lex.l"
+#line 11 "src/monitor/sdb/addrexp.l"
 {  }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 12 "src/monitor/sdb/addr-lex.l"
+#line 12 "src/monitor/sdb/addrexp.l"
 { printf("Unexpected character: %s\n", yytext); }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 13 "src/monitor/sdb/addr-lex.l"
+#line 13 "src/monitor/sdb/addrexp.l"
 ECHO;
 	YY_BREAK
-#line 763 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addr-lex.c"
+#line 763 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addrexp.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1765,6 +1765,6 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 13 "src/monitor/sdb/addr-lex.l"
+#line 13 "src/monitor/sdb/addrexp.l"
 
 

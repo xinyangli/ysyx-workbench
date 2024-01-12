@@ -67,7 +67,7 @@
 
 
 /* First part of user prologue.  */
-#line 1 "src/monitor/sdb/addr-exp.y"
+#line 1 "src/monitor/sdb/addrexp.y"
 
     #include <stdio.h>
     #include <stdlib.h>
@@ -76,7 +76,7 @@
         fprintf(stderr, "Error: %s\n", s);
     }
 
-#line 80 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addr-exp.c"
+#line 80 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addrexp.tag.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -99,7 +99,7 @@
 #  endif
 # endif
 
-#include "addr-exp.h"
+#include "addrexp.h"
 /* Symbol kind.  */
 enum yysymbol_kind_t
 {
@@ -1074,73 +1074,73 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* input: expression  */
-#line 15 "src/monitor/sdb/addr-exp.y"
+#line 15 "src/monitor/sdb/addrexp.y"
                  { printf("Final Result: %d\n", yyvsp[0]); }
-#line 1080 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addr-exp.c"
+#line 1080 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addrexp.tag.c"
     break;
 
   case 3: /* expression: term  */
-#line 19 "src/monitor/sdb/addr-exp.y"
+#line 19 "src/monitor/sdb/addrexp.y"
            { yyval = yyvsp[0]; }
-#line 1086 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addr-exp.c"
+#line 1086 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addrexp.tag.c"
     break;
 
   case 4: /* expression: expression '+' term  */
-#line 20 "src/monitor/sdb/addr-exp.y"
+#line 20 "src/monitor/sdb/addrexp.y"
                            { yyval = yyvsp[-2] + yyvsp[0]; }
-#line 1092 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addr-exp.c"
+#line 1092 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addrexp.tag.c"
     break;
 
   case 5: /* expression: expression '-' term  */
-#line 21 "src/monitor/sdb/addr-exp.y"
+#line 21 "src/monitor/sdb/addrexp.y"
                            { yyval = yyvsp[-2] - yyvsp[0]; }
-#line 1098 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addr-exp.c"
+#line 1098 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addrexp.tag.c"
     break;
 
   case 6: /* term: factor  */
-#line 25 "src/monitor/sdb/addr-exp.y"
+#line 25 "src/monitor/sdb/addrexp.y"
              { yyval = yyvsp[0]; }
-#line 1104 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addr-exp.c"
+#line 1104 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addrexp.tag.c"
     break;
 
   case 7: /* term: term '*' factor  */
-#line 26 "src/monitor/sdb/addr-exp.y"
+#line 26 "src/monitor/sdb/addrexp.y"
                        { yyval = yyvsp[-2] * yyvsp[0]; }
-#line 1110 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addr-exp.c"
+#line 1110 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addrexp.tag.c"
     break;
 
   case 8: /* term: term '/' factor  */
-#line 27 "src/monitor/sdb/addr-exp.y"
+#line 27 "src/monitor/sdb/addrexp.y"
                        { yyval = yyvsp[-2] / yyvsp[0]; }
-#line 1116 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addr-exp.c"
+#line 1116 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addrexp.tag.c"
     break;
 
   case 9: /* factor: NUMBER  */
-#line 31 "src/monitor/sdb/addr-exp.y"
+#line 31 "src/monitor/sdb/addrexp.y"
              { yyval = yyvsp[0]; }
-#line 1122 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addr-exp.c"
+#line 1122 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addrexp.tag.c"
     break;
 
   case 10: /* factor: HEX_NUMBER  */
-#line 32 "src/monitor/sdb/addr-exp.y"
+#line 32 "src/monitor/sdb/addrexp.y"
                  { yyval = yyvsp[0]; }
-#line 1128 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addr-exp.c"
+#line 1128 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addrexp.tag.c"
     break;
 
   case 11: /* factor: '-' factor  */
-#line 33 "src/monitor/sdb/addr-exp.y"
+#line 33 "src/monitor/sdb/addrexp.y"
                  { yyval = -yyvsp[0]; }
-#line 1134 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addr-exp.c"
+#line 1134 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addrexp.tag.c"
     break;
 
   case 12: /* factor: '(' expression ')'  */
-#line 34 "src/monitor/sdb/addr-exp.y"
+#line 34 "src/monitor/sdb/addrexp.y"
                          { yyval = yyvsp[-1]; }
-#line 1140 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addr-exp.c"
+#line 1140 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addrexp.tag.c"
     break;
 
 
-#line 1144 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addr-exp.c"
+#line 1144 "/home/xin/repo/ysyx-workbench/nemu/build/obj-riscv32-nemu-interpreter/src/monitor/sdb/addrexp.tag.c"
 
       default: break;
     }
@@ -1333,5 +1333,5 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 37 "src/monitor/sdb/addr-exp.y"
+#line 37 "src/monitor/sdb/addrexp.y"
 

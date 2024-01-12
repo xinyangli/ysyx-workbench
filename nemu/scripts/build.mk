@@ -30,7 +30,6 @@ OBJS = $(SRCS:%.c=$(OBJ_DIR)/%.o) $(CXXSRC:%.cc=$(OBJ_DIR)/%.o)
 # Compilation patterns
 $(OBJ_DIR)/%.o: %.c
 	@echo + CC $<
-	@echo $@ $<
 	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) -c -o $@ $<
 	$(call call_fixdep, $(@:.o=.d), $@)
@@ -40,6 +39,18 @@ $(OBJ_DIR)/%.o: %.cc
 	@mkdir -p $(dir $@)
 	@$(CXX) $(CFLAGS) $(CXXFLAGS) -c -o $@ $<
 	$(call call_fixdep, $(@:.o=.d), $@)
+
+$(OBJ_DIR)/%.tag.c: %.y
+	@echo + YACC $<
+	@echo $@ $<
+	@mkdir -p $(dir $@)
+	@$(YACC) $(YFLAGS) --header=$(<:.y=.h) -o $@ $<
+
+$(OBJ_DIR)/%.yy.c: %.l $(OBJ_DIR)/%.tag.c
+	@echo + LEX $<
+	@echo $@ $<
+	@mkdir -p $(dir $@)
+	@$(LEX) $(LFLAGS) -o $@ $<
 
 # Depencies
 -include $(OBJS:.o=.d)
