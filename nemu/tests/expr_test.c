@@ -1,4 +1,5 @@
 #include "sys/types.h"
+#include "unistd.h"
 #include <check.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -8,30 +9,37 @@
 #include <assert.h>
 #include <time.h>
 
-char buf[65536] = "python3 -c print(";
-char *buf_ptr = buf + 17;
+char buf[65536] = {};
+static char code_buf[65536 + 128] = {}; // a little larger than `buf`
+const int buf_start_pos = 0;
+char *buf_ptr = buf + buf_start_pos;
+static char *code_format =
+"#include <stdio.h>\n"
+"#include <stdint.h>\n"
+"int main() { "
+"  uint32_t result = %s; "
+"  printf(\"%%u\", result); "
+"  return 0; "
+"}";
+
 
 void gen(char c) {
   *(buf_ptr++) = c;
 }
 
 void gen_num(void) {
-  int len = rand() % 8 + 1;
-  int base = 10;
+  uint32_t num = rand() % 100000;
+  int len = 0;
   switch(rand() % 2) {
-    case 0: base = 10; break;
-    case 1: base = 16; break;
+    case 0:
+      len = snprintf(buf_ptr, 100, "%u", num);
+      break;
+    case 1:
+      len = snprintf(buf_ptr, 100, "0x%x", num);
+      break;
     default: assert(0);
   }
-  const char *strmap = "0123456789abcdef";
-  // TODO: add minus
-  if (base == 16) {
-    gen('0');
-    gen('x');
-  }
-  while(len--) {
-    gen(strmap[rand() % base]);
-  }
+  buf_ptr += len;
 }
 
 void gen_rand_op(void) {
@@ -50,31 +58,39 @@ void gen_rand_expr(void) {
       case 1: gen('('); gen_rand_expr(); gen(')'); break;
       default: gen_rand_expr(); gen_rand_op(); gen_rand_expr(); break;
   }
-  printf("buf: %s\n", buf);
 }
 
-START_TEST(test_test1) {
-  for (int i = 0; i < 10; i++) {
-    gen_rand_expr();
-    yy_scan_string(buf + 18);
-    uint32_t addr;
-    ck_assert(!yyparse(&addr));
-    yylex_destroy();
+START_TEST(test_expr_random_100) {
+  srand(time(0) + _i * 100);
+  gen_rand_expr();
+  yy_scan_string(buf + buf_start_pos);
+  uint32_t addr;
+  ck_assert(!yyparse(&addr));
+  yylex_destroy();
 
-     /* Open the command for reading. */
-    FILE *fp;
-    *(buf_ptr++) = ')';
-    fp = popen(buf, "r");
-    ck_assert(fp != NULL);
+  sprintf(code_buf, code_format, buf);
 
-    /* Read the output a line at a time - output it. */
-    uint32_t reference = 0;
-    ck_assert(fscanf(fp, "%u", &reference) == 0);
-    ck_assert(addr == reference);
+  FILE *fp = fopen("/tmp/.code.c", "w");
+  ck_assert(fp != NULL);
+  fputs(code_buf, fp);
+  fclose(fp);
 
-    while(buf_ptr != buf + 18) {
-        *(--buf_ptr) = '\0';
-    }
+  int ret = system("gcc /tmp/.code.c -o /tmp/.expr 2>/dev/null");
+  ck_assert_msg(!ret, "system ret: %d, error: %s", ret, strerror(ret));
+
+  fp = popen("/tmp/.expr", "r");
+  ck_assert(fp != NULL);
+
+  uint32_t reference;
+  ret = fscanf(fp, "%u", &reference);
+  ck_assert(ret == 1);
+  pclose(fp);
+  // fprintf(stderr, "\n\tbuf = %s\n\taddr = %u, reference = %u", buf, addr, reference);
+
+  ck_assert_msg(addr == reference, "\n\tbuf = %s\n\taddr = %u, reference = %u\n", buf, addr, reference);
+
+  while(buf_ptr != buf + buf_start_pos) {
+      *(--buf_ptr) = '\0';
   }
 } END_TEST
 
@@ -89,18 +105,17 @@ Suite *expr_suite(void) {
     s = suite_create("Expr test");
     tc_core = tcase_create("Core");
 
-    tcase_add_test(tc_core, test_test1);
+    tcase_add_loop_test(tc_core, test_expr_random_100, 0, 100);
     tcase_add_test(tc_core, test_test2);
     suite_add_tcase(s, tc_core);
 
     return s;
 }
 
-int test_main(void) {
+int main(void) {
     int number_failed;
     Suite *s;
     SRunner *sr;
-    srand(time(0));
 
     s = expr_suite();
     sr = srunner_create(s);
@@ -111,4 +126,3 @@ int test_main(void) {
 
     return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
-

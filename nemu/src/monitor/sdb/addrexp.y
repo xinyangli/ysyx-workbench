@@ -21,13 +21,13 @@ input
     ;
 
 expression
-    : expression '+' expression { $$ = $1 + $3; }
+    : number { $$ = $1; }
+    | expression '+' expression { $$ = $1 + $3; }
     | expression '-' expression { $$ = $1 - $3; }
     | expression '*' expression { $$ = $1 * $3; } 
     | expression '/' expression { $$ = $1 / $3; }
     | '-' number { $$ = -$2; }
     | '(' expression ')' { $$ = $2; }
-    | number { $$ = $1; }
 
 number
     : NUMBER 
