@@ -48,7 +48,7 @@ $(OBJ_DIR)/%.tag.c: %.y
 $(OBJ_DIR)/%.yy.c: %.l $(OBJ_DIR)/%.tag.c
 	@echo + LEX $<
 	@mkdir -p $(dir $@)
-	@$(LEX) $(LFLAGS) -o $@ $<
+	@$(LEX) $(LFLAGS) --header=$(<:.l=_lex.h) -o $@ $<
 
 $(OBJ_DIR)/%.tag.o: $(OBJ_DIR)/%.tag.c
 	@echo + CC $<
