@@ -1,3 +1,11 @@
-CFLGAS += $(pkg-config --cflags --libs check)
+TEST_SRCS += tests/expr_test.c
 
-include $(NEMU_HOME)/scripts/build.mk
+$(OBJ_DIR)/%: %.c $(OBJS)
+	@echo + CC $<
+	@$(CC) $(CFLAGS) -Wl,-e,test_main -o $@ $< $(LDFLAGS) $(CFLGAS)
+	@$(CC) $(CFLAGS) -Wl,-e,test_main -o $@ $^ $(LDFLAGS) $(CFLGAS)
+
+$(OBJ_DIR)/%: %.c $(OBJS)
+	@echo + CC $<
+	@$(CC) $(CFLAGS) -Wl,-e,test_main -o $@ $< $(LDFLAGS) $(CFLGAS)
+	@$(CC) $(CFLAGS) -Wl,-e,test_main -o $@ $^ $(LDFLAGS) $(CFLGAS)

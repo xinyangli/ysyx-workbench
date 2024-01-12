@@ -13,8 +13,6 @@
 # See the Mulan PSL v2 for more details.
 #**************************************************************************************/
 
-.EXPORT:
-
 # Sanity check
 ifeq ($(wildcard $(NEMU_HOME)/src/nemu-main.c),)
   $(error NEMU_HOME=$(NEMU_HOME) is not a NEMU repo)
@@ -61,3 +59,13 @@ else
 # Include rules to build NEMU
 include $(NEMU_HOME)/scripts/native.mk
 endif
+
+.PHONY: test
+
+include $(NEMU_HOME)/tests/Makefile
+all-tests: CFLAGS += $(shell pkg-config --cflags check)
+all-tests: LDFLAGS += $(shell pkg-config --libs check)
+all-tests: $(TEST_SRCS:%.c=$(OBJ_DIR)/%)
+
+test: all-tests
+	@$(OBJ_DIR)/tests/expr_test
