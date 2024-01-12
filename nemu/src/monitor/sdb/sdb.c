@@ -23,10 +23,9 @@
 #include <readline/history.h>
 #include <readline/readline.h>
 #include <stdint.h>
+#include <addrexp.h>
 
 static int is_batch_mode = false;
-
-extern int yyparse(void);
 
 // command handlers
 static int cmd_help(char *args);
@@ -131,10 +130,12 @@ static paddr_t parse_expr(const char *arg, bool *success) {
     *success = false;
     return 0;
   } else {
-    bool res = false;
+    // bool res = false;
     // FIXME: We cannot use `parse_uint` here, it accept `-1234` as input
-    paddr_t addr = parse_uint(arg, &res);
-    *success = res;
+    // paddr_t addr = parse_uint(arg, &res);
+    // *success = res;
+    paddr_t addr;
+    *success = yyparse(&addr);
     return addr;
   }
 }

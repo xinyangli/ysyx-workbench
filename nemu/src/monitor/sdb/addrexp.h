@@ -78,7 +78,7 @@ typedef  uint32_t  YYSTYPE;
 extern YYSTYPE yylval;
 
 
-int yyparse (void);
+int yyparse (uint32_t *result);
 
 
 #endif /* !YY_YY_SRC_MONITOR_SDB_ADDREXP_H_INCLUDED  */
