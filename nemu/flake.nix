@@ -40,9 +40,11 @@
             gnumake
             flex
             bison
+            pkg-config
           ];
 
           buildInputs = [
+            check
             readline
             libllvm
           ];
