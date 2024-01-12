@@ -23,6 +23,8 @@
 #include <readline/history.h>
 #include <readline/readline.h>
 #include <stdint.h>
+#include <addrexp.h>
+#include <addrexp_lex.h>
 
 static int is_batch_mode = false;
 
@@ -107,7 +109,7 @@ static word_t parse_uint(const char *arg, bool *success) {
   char *endptr;
   uintmax_t n = strtoumax(arg, &endptr, base);
   if (errno == ERANGE || n > WORD_T_MAX) {
-    printf("%s is exceed the limit of uint\n", arg);
+    printf("%s exceed the limit of uint\n", arg);
     *success = false;
     return 0;
   } else if (arg == endptr) {
@@ -129,10 +131,14 @@ static paddr_t parse_expr(const char *arg, bool *success) {
     *success = false;
     return 0;
   } else {
-    bool res = false;
+    // bool res = false;
     // FIXME: We cannot use `parse_uint` here, it accept `-1234` as input
-    paddr_t addr = parse_uint(arg, &res);
-    *success = res;
+    // paddr_t addr = parse_uint(arg, &res);
+    // *success = res;
+    paddr_t addr;
+    yy_scan_string(arg);
+    *success = !yyparse(&addr);
+    yylex_destroy();
     return addr;
   }
 }
@@ -199,7 +205,7 @@ static int cmd_x(char *args) {
   return 0;
 
 wrong_usage:
-  printf("Invalid argument for command si: %s\n", args);
+  printf("Invalid argument for command x: %s\n", args);
   printf("Usage: x [N: uint] [EXPR: <expr>]\n");
   return 0;
 }
@@ -324,8 +330,8 @@ void sdb_mainloop() {
 }
 
 void init_sdb() {
-  /* Compile the regular expressions. */
-  init_regex();
+  // /* Compile the regular expressions. */
+  // init_regex();
 
   /* Initialize the watchpoint pool. */
   init_wp_pool();

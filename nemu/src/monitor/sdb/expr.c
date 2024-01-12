@@ -21,24 +21,18 @@
 #include <regex.h>
 
 enum {
-  TK_NOTYPE = 256, TK_EQ,
-
-  /* TODO: Add more token types */
-
+  TK_NOTYPE = 256, TK_EQ, TK_NUMBER,
+  LEX_GROUP_OPERATOR, LEX_GROUP_DIGIT
 };
 
 static struct rule {
   const char *regex;
   int token_type;
 } rules[] = {
-
-  /* TODO: Add more rules.
-   * Pay attention to the precedence level of different rules.
-   */
-
-  {" +", TK_NOTYPE},    // spaces
-  {"\\+", '+'},         // plus
-  {"==", TK_EQ},        // equal
+  {"[ \t]+", TK_NOTYPE},
+  {"==", TK_EQ},
+  {"[0-9]+", LEX_GROUP_DIGIT},
+  {"[\\+-*/()", LEX_GROUP_OPERATOR},
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -95,6 +89,16 @@ static bool make_token(char *e) {
          */
 
         switch (rules[i].token_type) {
+          case LEX_GROUP_OPERATOR:
+            tokens[nr_token].type = *substr_start;
+            tokens[nr_token].str[0] = '\0';
+            nr_token++;
+            break;
+          case LEX_GROUP_DIGIT:
+            tokens[nr_token].type = TK_NUMBER;
+            nr_token++;
+            break;
+          case TK_NOTYPE: break;
           default: TODO();
         }
 
