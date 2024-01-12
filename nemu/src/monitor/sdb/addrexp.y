@@ -12,7 +12,7 @@
 %start input
 %define api.value.type { uint32_t }
 %parse-param { uint32_t *result }
-%left '+' '-'
+%left '-' '+'
 %left '*' '/'
 
 %%
