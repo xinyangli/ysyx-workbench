@@ -28,7 +28,7 @@ void gen(char c) {
 }
 
 void gen_num(void) {
-  uint32_t num = rand() % 100000;
+  uint32_t num = rand() % 100;
   int len = 0;
   switch(rand() % 2) {
     case 0:
