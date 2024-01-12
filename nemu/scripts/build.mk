@@ -40,6 +40,16 @@ $(OBJ_DIR)/%.o: %.cc
 	@$(CXX) $(CFLAGS) $(CXXFLAGS) -c -o $@ $<
 	$(call call_fixdep, $(@:.o=.d), $@)
 
+$(OBJ_DIR)/%-lex.l: %-exp.y
+	@echo + YACC $<
+	@mkdir -p $(dir $@)
+	@$(YACC) $(YFLAGS) -H $(<:.y=.h) -o $@ $<
+
+$(OBJ_DIR)/%.c: %-lex.l
+	@echo + LEX $<
+	@mkdir -p $(dir $@)
+	@$(LEX) $(LFLAGS) -o $@ $<
+
 # Depencies
 -include $(OBJS:.o=.d)
 
