@@ -78,7 +78,7 @@ START_TEST(test_expr_random_100) {
   fputs(code_buf, fp);
   fclose(fp);
 
-  int ret = system("gcc /tmp/.code.c -o /tmp/.expr 2>/dev/null");
+  int ret = system("gcc /tmp/.code.c -o /tmp/.expr");
   ck_assert_msg(!ret, "system ret: %d, error: %s", ret, strerror(ret));
 
   fp = popen("/tmp/.expr", "r");
