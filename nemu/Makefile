@@ -69,4 +69,4 @@ all-tests: LDFLAGS += $(shell pkg-config --libs check)
 all-tests: $(TEST_SRCS:%.c=$(OBJ_DIR)/%)
 
 test: all-tests
-	@$(OBJ_DIR)/tests/expr_test
+	@CK_FORK=0 $(OBJ_DIR)/tests/expr_test
