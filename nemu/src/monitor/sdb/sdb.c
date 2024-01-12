@@ -26,6 +26,8 @@
 
 static int is_batch_mode = false;
 
+extern int yyparse(void);
+
 // command handlers
 static int cmd_help(char *args);
 static int cmd_c(char *args);
@@ -284,6 +286,8 @@ void sdb_mainloop() {
     cmd_c(NULL);
     return;
   }
+  // int res = yyparse();
+  // exit(res);
 
   for (char *str; (str = rl_gets()) != NULL;) {
     char *str_end = str + strlen(str);
