@@ -1,11 +1,9 @@
 TEST_SRCS += tests/expr_test.c
 
-$(OBJ_DIR)/%: %.c $(OBJS)
+$(OBJ_DIR)/tests/%.o: tests/%.c
 	@echo + CC $<
-	@$(CC) $(CFLAGS) -Wl,-e,test_main -o $@ $< $(LDFLAGS) $(CFLGAS)
-	@$(CC) $(CFLAGS) -Wl,-e,test_main -o $@ $^ $(LDFLAGS) $(CFLGAS)
+	@$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS) $(CFLGAS)
 
-$(OBJ_DIR)/%: %.c $(OBJS)
-	@echo + CC $<
-	@$(CC) $(CFLAGS) -Wl,-e,test_main -o $@ $< $(LDFLAGS) $(CFLGAS)
-	@$(CC) $(CFLAGS) -Wl,-e,test_main -o $@ $^ $(LDFLAGS) $(CFLGAS)
+$(OBJ_DIR)/tests/%: $(OBJ_DIR)/test/%.o $(OBJS)
+	@echo + LD $<
+	@$(LD) -e test_main -o $@ $^ $(LDFLAGS) $(CFLGAS)
