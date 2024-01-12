@@ -45,16 +45,16 @@ $(OBJ_DIR)/%.tag.c: %.y
 	@mkdir -p $(dir $@)
 	@$(YACC) $(YFLAGS) --header=$(<:.y=.h) -o $@ $<
 
+$(OBJ_DIR)/%.yy.c: %.l $(OBJ_DIR)/%.tag.c
+	@echo + LEX $<
+	@mkdir -p $(dir $@)
+	@$(LEX) $(LFLAGS) -o $@ $<
+
 $(OBJ_DIR)/%.tag.o: $(OBJ_DIR)/%.tag.c
 	@echo + CC $<
 	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) -c -o $@ $<
 	$(call call_fixdep, $(@:.o=.d), $@)
-
-$(OBJ_DIR)/%.yy.c: %.l $(OBJ_DIR)/%.tag.c
-	@echo + LEX $<
-	@mkdir -p $(dir $@)
-	@$(LEX) $(LFLAGS) -o $@ $<
 
 $(OBJ_DIR)/%.yy.o: $(OBJ_DIR)/%.yy.c
 	@echo + CC $<
