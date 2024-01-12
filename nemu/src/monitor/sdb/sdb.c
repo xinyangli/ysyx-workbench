@@ -138,6 +138,7 @@ static paddr_t parse_expr(const char *arg, bool *success) {
     paddr_t addr;
     yy_scan_string(arg);
     *success = yyparse(&addr);
+    printf("sucess: %d", *success);
     yylex_destroy();
     return addr;
   }
@@ -191,7 +192,6 @@ static int cmd_x(char *args) {
   word_t n = parse_uint(arg, &res);
   if (!res)
     goto wrong_usage;
-  printf("%u", n);
   arg = strtok(NULL, " ");
   word_t addr = parse_expr(arg, &res);
   if (!res)
