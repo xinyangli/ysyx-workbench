@@ -26,7 +26,7 @@ expression
     | expression '-' expression { $$ = $1 - $3; }
     | expression '*' expression { $$ = $1 * $3; } 
     | expression '/' expression { $$ = $1 / $3; }
-    | '-' number { $$ = -$2; }
+    // | '-' number { $$ = -$2; }
     | '(' expression ')' { $$ = $2; }
 
 number
