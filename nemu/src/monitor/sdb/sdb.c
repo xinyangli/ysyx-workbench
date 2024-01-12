@@ -137,8 +137,7 @@ static paddr_t parse_expr(const char *arg, bool *success) {
     // *success = res;
     paddr_t addr;
     yy_scan_string(arg);
-    *success = yyparse(&addr);
-    printf("sucess: %d", *success);
+    *success = !yyparse(&addr);
     yylex_destroy();
     return addr;
   }
