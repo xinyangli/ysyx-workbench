@@ -53,6 +53,9 @@ void gen_rand_op(void) {
 
 void gen_rand_expr(void) {
   int choice = rand() % 3;
+  if (buf_ptr - buf > 2000) {
+    return;
+  } 
   switch (choice) {
       case 0: gen_num(); break;
       case 1: gen('('); gen_rand_expr(); gen(')'); break;
