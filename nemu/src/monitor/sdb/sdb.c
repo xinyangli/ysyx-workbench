@@ -286,8 +286,6 @@ void sdb_mainloop() {
     cmd_c(NULL);
     return;
   }
-  // int res = yyparse();
-  // exit(res);
 
   for (char *str; (str = rl_gets()) != NULL;) {
     char *str_end = str + strlen(str);
