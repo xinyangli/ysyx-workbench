@@ -50,6 +50,15 @@
             libllvm
           ];
 
+          bulidPhase = ''
+            make defconfig
+            make app
+          '';
+
+          installPhase = ''
+            cp 
+          '';
+
           NEMU_HOME = src;
 
           meta = with lib; {

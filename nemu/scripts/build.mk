@@ -67,13 +67,17 @@ $(OBJ_DIR)/%.yy.o: $(OBJ_DIR)/%.yy.c
 
 # Some convenient rules
 
-.PHONY: app clean
+.PHONY: app install clean
 
 app: $(BINARY)
 
 $(BINARY):: $(OBJS) $(ARCHIVES)
 	@echo + LD $@
 	@$(LD) -o $@ $(OBJS) $(LDFLAGS) $(ARCHIVES) $(LIBS)
+
+install: $(BINARY)
+	@mkdir -p $(PREFIX)/bin
+	@cp $(BINARY) $(PREFIX)/bin/
 
 clean:
 	-rm -rf $(BUILD_DIR)
