@@ -43,6 +43,7 @@ void gen_num(void) {
     case 3:
       len = snprintf(buf_ptr, 100, "%d", num);
       ref_len = snprintf(ref_buf_ptr, 100, "%d", num);
+      break;
     default: assert(0);
   }
   buf_ptr += len;
