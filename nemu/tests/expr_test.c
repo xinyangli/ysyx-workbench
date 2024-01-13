@@ -29,17 +29,20 @@ void gen(char c) {
 }
 
 void gen_num(void) {
-  int32_t num = rand();
+  uint32_t num = rand();
   int len = 0, ref_len = 0;
-  switch(rand() % 2) {
+  switch(rand() % 3) {
     case 0:
-      len = snprintf(buf_ptr, 100, "%d", num);
+      len = snprintf(buf_ptr, 100, "%u", num);
       ref_len = snprintf(ref_buf_ptr, 100, "%uU", num);
       break;
     case 1:
       len = snprintf(buf_ptr, 100, "0x%x", num);
       ref_len = snprintf(ref_buf_ptr, 100, "%uU", num);
       break;
+    case 3:
+      len = snprintf(buf_ptr, 100, "%d", num);
+      ref_len = snprintf(ref_buf_ptr, 100, "%d", num);
     default: assert(0);
   }
   buf_ptr += len;
