@@ -25,7 +25,7 @@ expression
     | expression '+' expression { $$ = $1 + $3; }
     | expression '-' expression { $$ = $1 - $3; }
     | expression '*' expression { $$ = $1 * $3; } 
-    | expression '/' expression { $$ = $1 / $3; if($3 == 0) perror("Devide by 0\n");}
+    | expression '/' expression { $$ = $1 / $3; if($3 == 0) perror("Devide by 0\n"); YYABORT; }
     | '-' number { $$ = -$2; }
     | '(' expression ')' { $$ = $2; }
 
