@@ -88,7 +88,7 @@ START_TEST(test_expr_random_100) {
   ret = fscanf(fp, "%u", &reference);
   ck_assert(ret == 1);
   pclose(fp);
-  fprintf(stderr, "\n\tbuf = %s\n\taddr = %u, reference = %u", buf, addr, reference);
+//   fprintf(stderr, "\n\tbuf = %s\n\taddr = %u, reference = %u", buf, addr, reference);
 
   yy_scan_string(buf + buf_start_pos);
   uint32_t addr;
