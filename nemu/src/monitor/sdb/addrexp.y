@@ -25,7 +25,13 @@ expression
     | expression '+' expression { $$ = $1 + $3; }
     | expression '-' expression { $$ = $1 - $3; }
     | expression '*' expression { $$ = $1 * $3; } 
-    | expression '/' expression { if($3 == 0) { fprintf(stderr, "Devide by zero at %u / %u\n", $1, $3); YYABORT; }; $$ = $1 / $3;}
+    | expression '/' expression {
+        if($3 == 0) {
+          fprintf(stderr, "Error: divide by zero at %u / %u\n", $1, $3);
+          YYABORT;
+        };
+        $$ = $1 / $3;
+      }
     | '-' number { $$ = -$2; }
     | '(' expression ')' { $$ = $2; }
 
