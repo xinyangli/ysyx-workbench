@@ -205,7 +205,7 @@ static int cmd_x(char *args) {
   return 0;
 
 wrong_usage:
-  printf("Invalid argument for command x: %s\n", args);
+  printf("Invalid argument for command x: %s\n", arg);
   printf("Usage: x [N: uint] [EXPR: <expr>]\n");
   return 0;
 }
