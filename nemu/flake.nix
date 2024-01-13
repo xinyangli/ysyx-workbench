@@ -40,9 +40,12 @@
             gnumake
             flex
             bison
+            pkg-config
+            python3       # for testing
           ];
 
           buildInputs = [
+            check
             readline
             libllvm
           ];

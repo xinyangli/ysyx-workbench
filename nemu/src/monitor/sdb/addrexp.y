@@ -3,8 +3,8 @@
     #include <stdlib.h>
     #include <stdint.h>
     extern int yylex(void);
-    void yyerror(uint32_t *result, const char *s) {
-        fprintf(stderr, "Error: %s\n", s);
+    void yyerror(uint32_t *result, const char *err) {
+      fprintf(stderr, "Error: %s\n", err);
     }
 %}
 
@@ -12,7 +12,7 @@
 %start input
 %define api.value.type { uint32_t }
 %parse-param { uint32_t *result }
-%left '+' '-'
+%left '-' '+'
 %left '*' '/'
 
 %%
@@ -21,13 +21,19 @@ input
     ;
 
 expression
-    : expression '+' expression { $$ = $1 + $3; }
+    : number { $$ = $1; }
+    | expression '+' expression { $$ = $1 + $3; }
     | expression '-' expression { $$ = $1 - $3; }
     | expression '*' expression { $$ = $1 * $3; } 
-    | expression '/' expression { $$ = $1 / $3; }
+    | expression '/' expression {
+        if($3 == 0) {
+          fprintf(stderr, "Error: divide by zero at %u / %u\n", $1, $3);
+          YYABORT;
+        };
+        $$ = $1 / $3;
+      }
     | '-' number { $$ = -$2; }
     | '(' expression ')' { $$ = $2; }
-    | number { $$ = $1; }
 
 number
     : NUMBER 
