@@ -10,7 +10,7 @@ endif
 WORK_DIR  = $(shell pwd)
 BUILD_DIR = $(WORK_DIR)/build
 
-INC_PATH := $(WORK_DIR)/include $(INC_PATH)
+INC_PATH := $(WORK_DIR)/include $(BUILD_DIR)/include $(INC_PATH)
 OBJ_DIR  = $(BUILD_DIR)/obj-$(NAME)$(SO)
 BINARY   = $(BUILD_DIR)/$(NAME)$(SO)
 
@@ -42,13 +42,13 @@ $(OBJ_DIR)/%.o: %.cc
 
 $(OBJ_DIR)/%.tag.c: %.y
 	@echo + YACC $<
-	@mkdir -p $(dir $@)
-	@$(YACC) $(YFLAGS) --header=$(dir %)/$(<:.y=.h) -o $@ $<
+	@mkdir -p $(dir $@) $(BUILD_DIR)/include
+	@$(YACC) $(YFLAGS) --header=$(BUILD_DIR)/include/$(notdir $(<:.y=.h)) -o $@ $<
 
 $(OBJ_DIR)/%.yy.c: %.l $(OBJ_DIR)/%.tag.c
 	@echo + LEX $<
-	@mkdir -p $(dir $@)
-	@$(LEX) $(LFLAGS) --header=$(dir %)/$(<:.l=_lex.h) -o $@ $<
+	@mkdir -p $(dir $@) $(BUILD_DIR)/include
+	@$(LEX) $(LFLAGS) --header=$(BUILD_DIR)/include/$(notdir $(<:.l=_lex.h)) -o $@ $<
 
 $(OBJ_DIR)/%.tag.o: $(OBJ_DIR)/%.tag.c
 	@echo + CC $<
