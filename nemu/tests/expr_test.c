@@ -40,7 +40,7 @@ void gen_num(void) {
       len = snprintf(buf_ptr, 100, "0x%x", num);
       ref_len = snprintf(ref_buf_ptr, 100, "%uU", num);
       break;
-    case 3:
+    case 2:
       len = snprintf(buf_ptr, 100, "%d", num);
       ref_len = snprintf(ref_buf_ptr, 100, "%d", num);
       break;
