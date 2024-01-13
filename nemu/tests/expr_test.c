@@ -34,11 +34,11 @@ void gen_num(void) {
   switch(rand() % 2) {
     case 0:
       len = snprintf(buf_ptr, 100, "%u", num);
-      ref_len = snprintf(buf_ptr, 100, "%uU", num);
+      ref_len = snprintf(ref_buf_ptr, 100, "%uU", num);
       break;
     case 1:
       len = snprintf(buf_ptr, 100, "0x%x", num);
-      ref_len = snprintf(buf_ptr, 100, "%uU", num);
+      ref_len = snprintf(ref_buf_ptr, 100, "%uU", num);
       break;
     default: assert(0);
   }
