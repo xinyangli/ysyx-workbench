@@ -1,7 +1,5 @@
 #include "sys/types.h"
 #include "unistd.h"
-#include <addrexp.h>
-#include <addrexp_lex.h>
 #include <assert.h>
 #include <check.h>
 #include <math.h>
@@ -9,6 +7,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <addrexp.h>
+#include <addrexp_lex.h>
 
 char buf[65536] = {}, ref_buf[65536] = {};
 static char code_buf[65536 + 128] = {}; // a little larger than `buf`
