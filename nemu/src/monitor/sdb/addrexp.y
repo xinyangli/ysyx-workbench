@@ -1,3 +1,6 @@
+%code requires { 
+    #include <common.h>
+}
 %{
     #include <stdio.h>
     #include <stdlib.h>
@@ -10,7 +13,7 @@
 
 %token NUMBER HEX_NUMBER
 %start input
-%define api.value.type { uint32_t }
+%define api.value.type { word_t }
 %parse-param { uint32_t *result }
 %left '-' '+'
 %left '*' '/'

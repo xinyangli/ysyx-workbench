@@ -5,6 +5,7 @@ build/
 .cache/
 .direnv/
 .config
+.config.old
 .envrc
 compile_commands.json
 
