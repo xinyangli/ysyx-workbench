@@ -1,12 +1,15 @@
 %code requires { 
     #include <common.h>
-}
-%{
+    #include <stdint.h>
     #include <stdio.h>
     #include <stdlib.h>
-    #include <stdint.h>
     extern int yylex(void);
-    void yyerror(uint32_t *result, const char *err) {
+}
+%{
+    #include <common.h>
+    #include <stdio.h>
+    #include <stdlib.h>
+    void yyerror(word_t *result, const char *err) {
       fprintf(stderr, "Error: %s\n", err);
     }
 %}
