@@ -38,11 +38,11 @@ static int cmd_info(char *args);
 static int cmd_info_r(char *args);
 static int cmd_info_w(char *args);
 
-static struct CMDTable {
+static struct CommandTable {
   const char *name;
   const char *description;
   int (*handler)(char *);
-  struct CMDTable *subcommand;
+  struct CommandTable *subcommand;
   int nr_subcommand;
 } cmd_info_table[] =
     {
@@ -231,7 +231,7 @@ wrong_usage:
   return 0;
 }
 
-static int cmd_help_print(char *args, struct CMDTable *cur_cmd_table,
+static int cmd_help_print(char *args, struct CommandTable *cur_cmd_table,
                           int cur_nr_cmd) {
   int i;
   char *arg = strtok(NULL, " ");
@@ -271,7 +271,7 @@ static int cmd_help(char *args) {
           printf("-- %s\n", cmd_table[i].description);
           // Print available subcommands
           for (int j = 0; j < cmd_table[i].nr_subcommand; j++) {
-            struct CMDTable *sub_cmd_table = cmd_table[i].subcommand;
+            struct CommandTable *sub_cmd_table = cmd_table[i].subcommand;
             printf("  > %s -- %s\n", sub_cmd_table[j].name,
                    sub_cmd_table[j].description);
           }
