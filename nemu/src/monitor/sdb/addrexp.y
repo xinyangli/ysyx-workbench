@@ -3,8 +3,8 @@
     #include <stdlib.h>
     #include <stdint.h>
     extern int yylex(void);
-    void yyerror(uint32_t *result, const char *s) {
-        fprintf(stderr, "Error: %s\n", s);
+    void yyerror(uint32_t *result, const char *err) {
+        fprintf(stderr, "Error: %s\n", err);
     }
 %}
 
