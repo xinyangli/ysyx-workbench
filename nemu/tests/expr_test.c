@@ -9,10 +9,10 @@
 #include <assert.h>
 #include <time.h>
 
-char buf[65536] = {};
+char buf[65536] = {}, ref_buf[65536] = {};
 static char code_buf[65536 + 128] = {}; // a little larger than `buf`
 const int buf_start_pos = 0;
-char *buf_ptr = buf + buf_start_pos;
+char *buf_ptr = buf + buf_start_pos, *ref_buf_ptr = ref_buf;
 static char *code_format =
 "#include <stdio.h>\n"
 "#include <stdint.h>\n"
@@ -25,21 +25,25 @@ static char *code_format =
 
 void gen(char c) {
   *(buf_ptr++) = c;
+  *(ref_buf_ptr) = c;
 }
 
 void gen_num(void) {
   uint32_t num = rand() % 100;
-  int len = 0;
+  int len = 0, ref_len = 0;
   switch(rand() % 2) {
     case 0:
       len = snprintf(buf_ptr, 100, "%u", num);
+      ref_len = snprintf(buf_ptr, 100, "%uU", num);
       break;
     case 1:
       len = snprintf(buf_ptr, 100, "0x%x", num);
+      ref_len = snprintf(buf_ptr, 100, "%uU", num);
       break;
     default: assert(0);
   }
   buf_ptr += len;
+  ref_buf_ptr += ref_len;
 }
 
 void gen_rand_op(void) {
@@ -71,7 +75,7 @@ START_TEST(test_expr_random_100) {
   ck_assert(!yyparse(&addr));
   yylex_destroy();
 
-  sprintf(code_buf, code_format, buf);
+  sprintf(code_buf, code_format, ref_buf);
 
   FILE *fp = fopen("/tmp/.code.c", "w");
   ck_assert(fp != NULL);
@@ -93,7 +97,10 @@ START_TEST(test_expr_random_100) {
   ck_assert_msg(addr == reference, "\n\tbuf = %s\n\taddr = %u, reference = %u\n", buf, addr, reference);
 
   while(buf_ptr != buf + buf_start_pos) {
-      *(--buf_ptr) = '\0';
+    *(--buf_ptr) = '\0';
+  }
+  while(ref_buf_ptr != ref_buf) {
+    *(--ref_buf_ptr) = '\0';
   }
 } END_TEST
 
