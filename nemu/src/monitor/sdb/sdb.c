@@ -191,7 +191,8 @@ static int cmd_x(char *args) {
   word_t n = parse_uint(arg, &res);
   if (!res)
     goto wrong_usage;
-  arg = strtok(NULL, " ");
+  // No deliminter here, just pass all the remain argument to `parse_expr()`
+  arg = strtok(NULL, "");
   word_t addr = parse_expr(arg, &res);
   if (!res)
     goto wrong_usage;
