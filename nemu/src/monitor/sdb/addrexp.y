@@ -1,6 +1,5 @@
 %code requires { 
     #include <common.h>
-    #include <stdint.h>
     #include <stdio.h>
     #include <stdlib.h>
     extern int yylex(void);
