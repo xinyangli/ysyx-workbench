@@ -25,7 +25,7 @@ expression
     | expression '+' expression { $$ = $1 + $3; }
     | expression '-' expression { $$ = $1 - $3; }
     | expression '*' expression { $$ = $1 * $3; } 
-    | expression '/' expression { if($3 == 0) { YYABORT; }; $$ = $1 / $3;}
+    | expression '/' expression { if($3 == 0) { fprintf(stderr, "Devide by zero at %u / %u", $1, $3); YYABORT; }; $$ = $1 / $3;}
     | '-' number { $$ = -$2; }
     | '(' expression ')' { $$ = $2; }
 
