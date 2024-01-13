@@ -79,7 +79,7 @@ START_TEST(test_expr_random_100) {
   fclose(fp);
 
   int ret = system("gcc /tmp/.code.c -Werror=div-by-zero -o /tmp/.expr");
-  if(ret == -1) {
+  if(ret == 256) {
     // Probably devide by zero. Skip
     goto clean_up;
   }
