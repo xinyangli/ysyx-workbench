@@ -47,7 +47,7 @@ void gen_num(void) {
 }
 
 void gen_rand_op(void) {
-  switch(rand() % 4) {
+  switch(rand() % 3) {
     case 0: gen('+'); break;
     case 1: gen('-'); break;
     case 2: gen('*'); break;
