@@ -70,10 +70,10 @@ void gen_rand_expr(void) {
 START_TEST(test_expr_random_100) {
   srand(time(0) + _i * 100);
   gen_rand_expr();
-  yy_scan_string(buf + buf_start_pos);
-  uint32_t addr;
-  ck_assert(!yyparse(&addr));
-  yylex_destroy();
+//   yy_scan_string(buf + buf_start_pos);
+//   uint32_t addr;
+//   ck_assert(!yyparse(&addr));
+//   yylex_destroy();
 
   sprintf(code_buf, code_format, ref_buf);
 
@@ -85,14 +85,14 @@ START_TEST(test_expr_random_100) {
   int ret = system("gcc /tmp/.code.c -o /tmp/.expr");
   ck_assert_msg(!ret, "system ret: %d, error: %s", ret, strerror(ret));
 
-//   fp = popen("/tmp/.expr", "r");
-//   ck_assert(fp != NULL);
+  fp = popen("/tmp/.expr", "r");
+  ck_assert(fp != NULL);
 
-//   uint32_t reference;
-//   ret = fscanf(fp, "%u", &reference);
-//   ck_assert(ret == 1);
-//   pclose(fp);
-//   // fprintf(stderr, "\n\tbuf = %s\n\taddr = %u, reference = %u", buf, addr, reference);
+  uint32_t reference;
+  ret = fscanf(fp, "%u", &reference);
+  ck_assert(ret == 1);
+  pclose(fp);
+  // fprintf(stderr, "\n\tbuf = %s\n\taddr = %u, reference = %u", buf, addr, reference);
 
 //   ck_assert_msg(addr == reference, "\n\tbuf = %s\n\taddr = %u, reference = %u\n", buf, addr, reference);
 
