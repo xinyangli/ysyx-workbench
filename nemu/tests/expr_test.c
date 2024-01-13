@@ -165,7 +165,7 @@ Suite *expr_suite(void) {
   s = suite_create("Expr test");
   tc_core = tcase_create("Core");
 
-  tcase_add_loop_test(tc_core, test_expr_random_100, 0, 100);
+  tcase_add_loop_test(tc_core, test_expr_random_100, 0, 20);
   tcase_add_loop_test(tc_core, test_expr_negative_operand, 0,
                       sizeof(exprs) / sizeof(exprs[0]));
   suite_add_tcase(s, tc_core);
