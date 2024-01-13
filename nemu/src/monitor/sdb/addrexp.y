@@ -4,7 +4,7 @@
     #include <stdint.h>
     extern int yylex(void);
     void yyerror(uint32_t *result, const char *err) {
-        fprintf(stderr, "Error: %s\n", err);
+        // fprintf(stderr, "Error: %s\n", err);
     }
 %}
 
