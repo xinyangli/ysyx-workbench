@@ -25,7 +25,7 @@ static char *code_format =
 
 void gen(char c) {
   *(buf_ptr++) = c;
-  *(ref_buf_ptr) = c;
+  *(ref_buf_ptr++) = c;
 }
 
 void gen_num(void) {
