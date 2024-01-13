@@ -144,7 +144,9 @@ struct {
   uint32_t reference;
 } exprs[] = {
     {"-1", 0xFFFFFFFFU},
+    {"-0x1", 0xFFFFFFFFU},
     {"0--1", 0x1},
+    {"0--0x1", 0x1},
 };
 START_TEST(test_expr_negative_operand) {
   yy_scan_string(exprs[_i].expr);
