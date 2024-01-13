@@ -50,13 +50,21 @@
             libllvm
           ];
 
-          bulidPhase = ''
-            make defconfig
+          configurePhase = ''
+            echo NEMU_HOME=$NEMU_HOME
+            make -f scripts/config.mk rv32_defconfig
+          '';
+
+          buildPhase = ''
             make app
           '';
 
           installPhase = ''
-            cp 
+            make install
+          '';
+
+          checkPhase = ''
+            make test
           '';
 
           NEMU_HOME = src;

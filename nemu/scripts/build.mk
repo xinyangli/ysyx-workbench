@@ -43,12 +43,12 @@ $(OBJ_DIR)/%.o: %.cc
 $(OBJ_DIR)/%.tag.c: %.y
 	@echo + YACC $<
 	@mkdir -p $(dir $@)
-	@$(YACC) $(YFLAGS) --header=$(<:.y=.h) -o $@ $<
+	@$(YACC) $(YFLAGS) --header=$(dir %)/$(<:.y=.h) -o $@ $<
 
 $(OBJ_DIR)/%.yy.c: %.l $(OBJ_DIR)/%.tag.c
 	@echo + LEX $<
 	@mkdir -p $(dir $@)
-	@$(LEX) $(LFLAGS) --header=$(<:.l=_lex.h) -o $@ $<
+	@$(LEX) $(LFLAGS) --header=$(dir %)/$(<:.l=_lex.h) -o $@ $<
 
 $(OBJ_DIR)/%.tag.o: $(OBJ_DIR)/%.tag.c
 	@echo + CC $<
