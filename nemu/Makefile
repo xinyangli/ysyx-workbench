@@ -64,9 +64,9 @@ endif
 
 include $(NEMU_HOME)/tests/Makefile
 TEST_NAMES = $(notdir $(basename $(TEST_SRCS)))
-$(TEST_NAMES):: TEST_OBJS = $(filter-out $(OBJ_DIR)/src/nemu-main.o, $(OBJS))
-$(TEST_NAMES):: CFLAGS += $(shell pkg-config --cflags check)
-$(TEST_NAMES):: LDFLAGS += $(shell pkg-config --libs check)
+TEST_OBJS = $(filter-out $(OBJ_DIR)/src/nemu-main.o, $(OBJS))
+CFLAGS += $(shell pkg-config --cflags check)
+LDFLAGS += $(shell pkg-config --libs check)
 $(TEST_NAMES):: $(OBJ_DIR)/tests/%
 
 test: $(addprefix $(OBJ_DIR)/tests/, $(TEST_NAMES))
