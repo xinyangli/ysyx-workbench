@@ -6,6 +6,7 @@
 }
 %{
     #include <common.h>
+    #include <isa.h>
     #include <stdio.h>
     #include <stdlib.h>
     void yyerror(word_t *result, const char *err) {
@@ -47,6 +48,6 @@ number
     | HEX_NUMBER 
 
 register
-    : '$' REGISTER { $$ = $2; }
+    : REGISTER { $$ = $1; }
 
 %%
