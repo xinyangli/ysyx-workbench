@@ -181,7 +181,7 @@ START_TEST(test_expr_plain_register) {
     yylex_destroy();
 
     ck_assert(value == i);
-    for (j = 1; j < 5; i++) {
+    for (j = 1; j < 5; j++) {
       buf[i] = '\0';
     }
   }
