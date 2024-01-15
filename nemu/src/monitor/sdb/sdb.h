@@ -18,4 +18,19 @@
 
 #include <common.h>
 
+enum ExprType {
+  EXPR_TYPE_MEM_ADDR,
+  EXPR_TYPE_REG
+};
+
+union ExprValue {
+  word_t addr;
+  word_t *reg;
+};
+
+typedef struct ExprResult {
+  union ExprValue val;
+  enum ExprType type;
+} ExprResult;
+
 #endif

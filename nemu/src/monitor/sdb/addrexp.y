@@ -14,6 +14,7 @@
 %}
 
 %token NUMBER HEX_NUMBER
+%token REGISTER
 %start input
 %define api.value.type { word_t }
 %parse-param { uint32_t *result }
