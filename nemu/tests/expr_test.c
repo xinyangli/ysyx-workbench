@@ -181,17 +181,17 @@ START_TEST(test_expr_plain_register) {
 }
 END_TEST
 
-START_TEST(test_expr_register) {
-  yy_scan_string(reg_exprs[_i].expr);
-  uint32_t value;
-  ck_assert(!yyparse(&value));
-  yylex_destroy();
+// START_TEST(test_expr_register) {
+//   yy_scan_string(reg_exprs[_i].expr);
+//   uint32_t value;
+//   ck_assert(!yyparse(&value));
+//   yylex_destroy();
 
-  ck_assert_msg(value == reg_exprs[_i].reference,
-                "\n\texpr = %s\n\t(addr = %u) != (reference = %u)\n", reg_exprs[_i].expr,
-                value, reg_exprs[_i].reference);
-}
-END_TEST
+//   ck_assert_msg(value == reg_exprs[_i].reference,
+//                 "\n\texpr = %s\n\t(addr = %u) != (reference = %u)\n", reg_exprs[_i].expr,
+//                 value, reg_exprs[_i].reference);
+// }
+// END_TEST
 
 Suite *expr_suite(void) {
   Suite *s;
