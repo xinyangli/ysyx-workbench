@@ -47,6 +47,6 @@ number
     | HEX_NUMBER 
 
 register
-    : REGISTER
+    : '$' REGISTER { $$ = $2; }
 
 %%
