@@ -174,17 +174,17 @@ START_TEST(test_expr_plain_register) {
   for (i = 0; i < 32; i++) {
     ck_assert(strcpy(buf + 1, regs[i]));
     gpr(i) = i;
+    yy_scan_string(buf);
+    uint32_t value;
+    ck_assert(!yyparse(&value));
+    yylex_destroy();
+
+    ck_assert(value == i);
+    for (i = 1; i < 5; i++) {
+      buf[i] = '\0';
+    }
   }
 
-  yy_scan_string(buf);
-  uint32_t value;
-  ck_assert(!yyparse(&value));
-  yylex_destroy();
-
-  ck_assert(value == i);
-  for (i = 1; i < 5; i++) {
-    buf[i] = '\0';
-  }
 }
 END_TEST
 
