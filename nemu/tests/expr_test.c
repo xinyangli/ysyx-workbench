@@ -177,7 +177,7 @@ START_TEST(test_expr_plain_register) {
     gpr(i) = i;
     printf("%d: %s\n", i, buf);
     yy_scan_string(buf);
-    result = !yyparse(&value);
+    result = yyparse(&value);
     ck_assert_msg(result == 0, "expr = %s\n", buf);
     yylex_destroy();
 
