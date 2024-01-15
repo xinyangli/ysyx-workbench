@@ -167,8 +167,9 @@ END_TEST
 
 extern const char *regs[];
 START_TEST(test_expr_plain_register) {
-  int i, j;
+  int i, j, result;
   char buf[5] = {};
+  uint32_t value;
   // NOTE: need to fix this if want to support more arch
   buf[0] = '$';
   for (i = 1; i < 32; i++) {
@@ -176,8 +177,8 @@ START_TEST(test_expr_plain_register) {
     gpr(i) = i;
     printf("%d: %s\n", i, buf);
     yy_scan_string(buf);
-    uint32_t value;
-    ck_assert(!yyparse(&value));
+    result = !yyparse(&value);
+    ck_assert_msg(result == 0, "expr = %s\n", buf);
     yylex_destroy();
 
     ck_assert(value == i);
