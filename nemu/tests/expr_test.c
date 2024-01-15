@@ -175,7 +175,6 @@ START_TEST(test_expr_plain_register) {
   for (i = 1; i < 32; i++) {
     ck_assert(strcpy(buf + 1, regs[i]));
     gpr(i) = i;
-    printf("%d: %s\n", i, buf);
     yy_scan_string(buf);
     result = yyparse(&value);
     ck_assert_msg(result == 0, "expr = %s\n", buf);
