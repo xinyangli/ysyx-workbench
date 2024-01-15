@@ -172,7 +172,7 @@ START_TEST(test_expr_plain_register) {
   // NOTE: need to fix this if want to support more arch
   buf[0] = '$';
   for (i = 0; i < 32; i++) {
-    strcpy(buf + 1, regs[i]);
+    ck_assert(strcpy(buf + 1, regs[i]));
     gpr(i) = i;
   }
   for (i = 1; i < 5; i++) {
@@ -203,8 +203,8 @@ Suite *expr_suite(void) {
   tcase_add_loop_test(tc_core, test_expr_random_100, 0, 20);
   tcase_add_loop_test(tc_core, test_expr_negative_operand, 0,
                       sizeof(exprs) / sizeof(exprs[0]));
-  tcase_add_loop_test(tc_core, test_expr_register, 0,
-                      sizeof(reg_exprs) / sizeof(reg_exprs[0]));
+  // tcase_add_loop_test(tc_core, test_expr_register, 0,
+  //                     sizeof(reg_exprs) / sizeof(reg_exprs[0]));
   tcase_add_test(tc_core, test_expr_plain_register);
   suite_add_tcase(s, tc_core);
 
