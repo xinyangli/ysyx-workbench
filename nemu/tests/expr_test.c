@@ -172,7 +172,7 @@ START_TEST(test_expr_plain_register) {
   uint32_t value;
   // NOTE: need to fix this if want to support more arch
   buf[0] = '$';
-  for (i = 1; i < 32; i++) {
+  for (i = 0; i < 32; i++) {
     ck_assert(strcpy(buf + 1, regs[i]));
     gpr(i) = i;
     printf("%d: %s\n", i, buf);
