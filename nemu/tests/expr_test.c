@@ -10,7 +10,7 @@
 #include <time.h>
 #include <addrexp.h>
 #include <addrexp_lex.h>
-#include <common.h>
+#include <isa.h>
 #include <reg.h>
 
 char buf[65536] = {}, ref_buf[65536] = {};
