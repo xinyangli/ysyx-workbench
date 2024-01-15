@@ -42,9 +42,10 @@ word_t isa_reg_str2val(const char *s, bool *success) {
     ;
 
   if (i == 32) {
-    success = false;
+    *success = false;
     return 0;
   }
+  *success = true;
 
   return gpr(i);
 }
