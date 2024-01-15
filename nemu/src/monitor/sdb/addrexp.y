@@ -43,8 +43,8 @@ expression
     | '(' expression ')' { $$ = $2; }
 
 number
-    : NUMBER 
-    | REGISTER { $$ = $1; }
+    : REGISTER { $$ = $1; }
+    | NUMBER 
     | HEX_NUMBER 
 
 %%
