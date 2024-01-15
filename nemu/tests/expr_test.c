@@ -147,6 +147,8 @@ struct {
     {"-0x1", 0xFFFFFFFFU},
     {"0--1", 0x1},
     {"0--0x1", 0x1},
+}, reg_exprs[] = {
+    {"$$0", 0x0},
 };
 START_TEST(test_expr_negative_operand) {
   yy_scan_string(exprs[_i].expr);
@@ -160,6 +162,18 @@ START_TEST(test_expr_negative_operand) {
 }
 END_TEST
 
+START_TEST(test_expr_register) {
+  yy_scan_string(reg_exprs[_i].expr);
+  uint32_t value;
+  ck_assert(!yyparse(&value));
+  yylex_destroy();
+
+  ck_assert_msg(value == reg_exprs[_i].reference,
+                "\n\texpr = %s\n\t(addr = %u) != (reference = %u)\n", reg_exprs[_i].expr,
+                value, reg_exprs[_i].reference);
+}
+END_TEST
+
 Suite *expr_suite(void) {
   Suite *s;
   TCase *tc_core;
@@ -170,6 +184,8 @@ Suite *expr_suite(void) {
   tcase_add_loop_test(tc_core, test_expr_random_100, 0, 20);
   tcase_add_loop_test(tc_core, test_expr_negative_operand, 0,
                       sizeof(exprs) / sizeof(exprs[0]));
+  tcase_add_loop_test(tc_core, test_expr_register, 0,
+                      sizeof(reg_exprs) / sizeof(reg_exprs[0]));
   suite_add_tcase(s, tc_core);
 
   return s;
