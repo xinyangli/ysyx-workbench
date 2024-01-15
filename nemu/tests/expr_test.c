@@ -1,3 +1,4 @@
+#include "macro.h"
 #include "sys/types.h"
 #include <unistd.h>
 #include <assert.h>
@@ -9,6 +10,7 @@
 #include <time.h>
 #include <addrexp.h>
 #include <addrexp_lex.h>
+#include <reg.h>
 
 char buf[65536] = {}, ref_buf[65536] = {};
 static char code_buf[65536 + 128] = {}; // a little larger than `buf`
@@ -162,6 +164,22 @@ START_TEST(test_expr_negative_operand) {
 }
 END_TEST
 
+extern const char *regs[];
+START_TEST(test_expr_plain_register) {
+  int i;
+  char buf[5] = {};
+  // NOTE: need to fix this if want to support more arch
+  buf[0] = '$';
+  for (i = 0; i < 32; i++) {
+    strcpy(buf + 1, regs[i]);
+    gpr(i) = i;
+  }
+  for (i = 1; i < 5; i++) {
+    buf[i] = '\0';
+  }
+}
+END_TEST
+
 START_TEST(test_expr_register) {
   yy_scan_string(reg_exprs[_i].expr);
   uint32_t value;
@@ -184,6 +202,8 @@ Suite *expr_suite(void) {
   tcase_add_loop_test(tc_core, test_expr_random_100, 0, 20);
   tcase_add_loop_test(tc_core, test_expr_negative_operand, 0,
                       sizeof(exprs) / sizeof(exprs[0]));
+  tcase_add_loop_test(tc_core, test_expr_plain_register, 0,
+                      sizeof(reg_exprs) / sizeof(reg_exprs[0]));
   tcase_add_loop_test(tc_core, test_expr_register, 0,
                       sizeof(reg_exprs) / sizeof(reg_exprs[0]));
   suite_add_tcase(s, tc_core);
