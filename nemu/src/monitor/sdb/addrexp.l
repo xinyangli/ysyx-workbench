@@ -12,5 +12,5 @@ $?[a-zA-Z]{2,3}   { yylval = isa_reg_str2val(yytext + 1, &success); if(!success)
 [0-9]+            { yylval = strtoul(yytext, NULL, 10); return NUMBER; }
 [+\-*/()]         { return *yytext; }
 [ \t]             {  }
-.                 { fprintf(stderr, "Unexpected character: %s\n", yytext); return YYerror; }
+.                 { printf("Unexpected character: %s\n", yytext); return YYerror; }
 %%
