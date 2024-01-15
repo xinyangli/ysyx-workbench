@@ -168,7 +168,7 @@ END_TEST
 extern const char *regs[];
 START_TEST(test_expr_plain_register) {
   int i, j, result;
-  char buf[5] = {};
+  char buf[50] = {};
   uint32_t value;
   // NOTE: need to fix this if want to support more arch
   buf[0] = '$';
@@ -181,7 +181,7 @@ START_TEST(test_expr_plain_register) {
     yylex_destroy();
 
     ck_assert(value == i);
-    for (j = 1; j < 5; j++) {
+    for (j = 1; j < 10; j++) {
       buf[i] = '\0';
     }
   }
