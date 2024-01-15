@@ -151,7 +151,7 @@ struct {
     {"0--1", 0x1},
     {"0--0x1", 0x1},
 }, reg_exprs[] = {
-    {"$$0", 0x0},
+    {"$ra", 0x0},
 };
 START_TEST(test_expr_negative_operand) {
   yy_scan_string(exprs[_i].expr);
