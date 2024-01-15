@@ -173,7 +173,6 @@ START_TEST(test_expr_plain_register) {
   buf[0] = '$';
   for (i = 0; i < 32; i++) {
     ck_assert(strcpy(buf + 1, regs[i]));
-    fputs(buf, stderr);
     gpr(i) = i;
   }
 
