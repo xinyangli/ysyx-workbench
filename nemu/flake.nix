@@ -52,19 +52,17 @@
 
           configurePhase = ''
             echo NEMU_HOME=$NEMU_HOME
-            make -f scripts/config.mk rv32_defconfig
-          '';
-
-          buildPhase = ''
-            make app
+            echo pwd=$(pwd)
+            mkdir -p $(pwd)/kconfig
+            WORK_DIR=$(pwd) obj=$(pwd)/kconfig make --trace -e -f scripts/config.mk WORK_DIR=$(pwd) obj=$(pwd)/kconfig rv32_defconfig
           '';
 
           installPhase = ''
-            make install
+            BUILD_DIR=$out make install
           '';
 
           checkPhase = ''
-            make test
+            BUILD_DIR=$out make test
           '';
 
           NEMU_HOME = src;

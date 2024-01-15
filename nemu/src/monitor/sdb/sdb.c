@@ -16,6 +16,8 @@
 #include "sdb.h"
 #include "common.h"
 #include "sys/types.h"
+#include <addrexp.h>
+#include <addrexp_lex.h>
 #include <cpu/cpu.h>
 #include <errno.h>
 #include <isa.h>
@@ -23,8 +25,6 @@
 #include <readline/history.h>
 #include <readline/readline.h>
 #include <stdint.h>
-#include <addrexp.h>
-#include <addrexp_lex.h>
 
 static int is_batch_mode = false;
 
