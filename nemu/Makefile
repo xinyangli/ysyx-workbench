@@ -66,7 +66,6 @@ include $(NEMU_HOME)/tests/Makefile
 all-tests: TEST_OBJS = $(filter-out $(OBJ_DIR)/src/nemu-main.o, $(OBJS))
 all-tests: CFLAGS += $(shell pkg-config --cflags check)
 all-tests: LDFLAGS += $(shell pkg-config --libs check)
-all-tests: INC_PATH += $(NEMU_HOME)/src/isa/$(GUEST_ISA)/local-include
 all-tests: $(TEST_SRCS:%.c=$(OBJ_DIR)/%)
 
 test: all-tests
