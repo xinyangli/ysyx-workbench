@@ -168,7 +168,7 @@ END_TEST
 extern const char *regs[];
 START_TEST(test_expr_plain_register) {
   int i, j, result;
-  char buf[50] = {};
+  char buf[30] = {};
   uint32_t value;
   // NOTE: need to fix this if want to support more arch
   buf[0] = '$';
