@@ -13,11 +13,11 @@
 $[a-zA-Z]{2,3}    {
     puts(yytext);
     yylval = isa_reg_str2val(yytext + 1, &success);
-    printf("yylval = %d\n", yylval);
     if(!success) {
         yyerror(NULL, "Failed to convert reg to value");
         return YYerror;
     }
+    return REGISTER;
 }
 [+\-*/()]         { return *yytext; }
 [ \t]             {  }
