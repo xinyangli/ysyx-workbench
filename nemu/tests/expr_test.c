@@ -181,17 +181,17 @@ START_TEST(test_expr_plain_register) {
 }
 END_TEST
 
-// START_TEST(test_expr_register) {
-//   yy_scan_string(reg_exprs[_i].expr);
-//   uint32_t value;
-//   ck_assert(!yyparse(&value));
-//   yylex_destroy();
+START_TEST(test_expr_register) {
+  yy_scan_string(reg_exprs[_i].expr);
+  uint32_t value;
+  ck_assert(!yyparse(&value));
+  yylex_destroy();
 
-//   ck_assert_msg(value == reg_exprs[_i].reference,
-//                 "\n\texpr = %s\n\t(addr = %u) != (reference = %u)\n", reg_exprs[_i].expr,
-//                 value, reg_exprs[_i].reference);
-// }
-// END_TEST
+  ck_assert_msg(value == reg_exprs[_i].reference,
+                "\n\texpr = %s\n\t(addr = %u) != (reference = %u)\n", reg_exprs[_i].expr,
+                value, reg_exprs[_i].reference);
+}
+END_TEST
 
 Suite *expr_suite(void) {
   Suite *s;
@@ -203,8 +203,8 @@ Suite *expr_suite(void) {
   tcase_add_loop_test(tc_core, test_expr_random_100, 0, 20);
   tcase_add_loop_test(tc_core, test_expr_negative_operand, 0,
                       sizeof(exprs) / sizeof(exprs[0]));
-  // tcase_add_loop_test(tc_core, test_expr_register, 0,
-  //                     sizeof(reg_exprs) / sizeof(reg_exprs[0]));
+  tcase_add_loop_test(tc_core, test_expr_register, 0,
+                      sizeof(reg_exprs) / sizeof(reg_exprs[0]));
   tcase_add_test(tc_core, test_expr_plain_register);
   suite_add_tcase(s, tc_core);
 
