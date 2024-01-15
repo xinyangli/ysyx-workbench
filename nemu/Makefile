@@ -63,10 +63,11 @@ endif
 .PHONY: test
 
 include $(NEMU_HOME)/tests/Makefile
-all-tests: TEST_OBJS = $(filter-out $(OBJ_DIR)/src/nemu-main.o, $(OBJS))
-all-tests: CFLAGS += $(shell pkg-config --cflags check)
-all-tests: LDFLAGS += $(shell pkg-config --libs check)
-all-tests: $(TEST_SRCS:%.c=$(OBJ_DIR)/%)
+TEST_NAMES = $(notdir $(basename $(TEST_SRCS)))
+$(TEST_NAMES):: TEST_OBJS = $(filter-out $(OBJ_DIR)/src/nemu-main.o, $(OBJS))
+$(TEST_NAMES):: CFLAGS += $(shell pkg-config --cflags check)
+$(TEST_NAMES):: LDFLAGS += $(shell pkg-config --libs check)
+$(TEST_NAMES):: $(OBJ_DIR)/tests/%
 
-test: all-tests
+test: $(addprefix $(OBJ_DIR)/tests/, $(TEST_NAMES))
 	@$(OBJ_DIR)/tests/expr_test
