@@ -18,6 +18,7 @@
 
 #include <common.h>
 
+// TODO: Cache expression evalutation result in ExprResult
 enum ExprType {
   EXPR_TYPE_MEM_ADDR,
   EXPR_TYPE_REG

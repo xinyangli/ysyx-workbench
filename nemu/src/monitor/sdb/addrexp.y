@@ -28,6 +28,7 @@ input
 
 expression
     : number { $$ = $1; }
+    | register { $$ = $1; }
     | expression '+' expression { $$ = $1 + $3; }
     | expression '-' expression { $$ = $1 - $3; }
     | expression '*' expression { $$ = $1 * $3; } 
@@ -44,5 +45,8 @@ expression
 number
     : NUMBER 
     | HEX_NUMBER 
+
+register
+    : REGISTER
 
 %%
