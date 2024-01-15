@@ -176,6 +176,7 @@ START_TEST(test_expr_plain_register) {
     fputs(buf, stderr);
     gpr(i) = i;
   }
+
   yy_scan_string(buf);
   uint32_t value;
   ck_assert(!yyparse(&value));
