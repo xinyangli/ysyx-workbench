@@ -152,7 +152,7 @@ struct {
     {"0--0x1", 0x1},
 }, reg_exprs[] = {
     {"$ra", 0x1},
-    {"4$ra", 0x4},
+    {"4*$ra", 0x4},
 };
 START_TEST(test_expr_negative_operand) {
   yy_scan_string(exprs[_i].expr);
