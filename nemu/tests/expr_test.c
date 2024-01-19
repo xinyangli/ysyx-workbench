@@ -151,7 +151,8 @@ struct {
     {"0--1", 0x1},
     {"0--0x1", 0x1},
 }, reg_exprs[] = {
-    {"$ra", 0x0},
+    {"$ra", 0x1},
+    {"4$ra", 0x4},
 };
 START_TEST(test_expr_negative_operand) {
   yy_scan_string(exprs[_i].expr);
@@ -190,8 +191,13 @@ START_TEST(test_expr_plain_register) {
 END_TEST
 
 START_TEST(test_expr_register) {
-  yy_scan_string(reg_exprs[_i].expr);
+  int i;
   uint32_t value;
+  for (i = 0; i < 32; i++) {
+    gpr(i) = i;
+  }
+
+  yy_scan_string(reg_exprs[_i].expr);
   ck_assert(!yyparse(&value));
   yylex_destroy();
 
