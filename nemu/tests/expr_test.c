@@ -173,14 +173,14 @@ START_TEST(test_expr_plain_register) {
   // NOTE: need to fix this if want to support more arch
   buf[0] = '$';
   for (i = 1; i < 32; i++) {
-    ck_assert(strncpy(buf + 1, regs[i], 10));
-    // gpr(i) = i;
-    // yy_scan_string(buf);
-    // result = yyparse(&value);
-    // yylex_destroy();
-    // ck_assert_msg(result == 0, "expr = %s\n", buf);
+    ck_assert(strncpy(buf + 1, regs[i], 10) != NULL);
+    gpr(i) = i;
+    yy_scan_string(buf);
+    result = yyparse(&value);
+    yylex_destroy();
+    ck_assert_msg(result == 0, "expr = %s\n", buf);
 
-    // ck_assert(value == i);
+    ck_assert(value == i);
     for (j = 1; j < 10; j++) {
       buf[i] = '\0';
     }
