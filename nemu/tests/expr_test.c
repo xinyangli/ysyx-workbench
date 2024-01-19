@@ -182,7 +182,7 @@ START_TEST(test_expr_plain_register) {
 
     ck_assert(value == i);
     for (j = 1; j < 10; j++) {
-      buf[i] = '\0';
+      buf[j] = '\0';
     }
   }
 
