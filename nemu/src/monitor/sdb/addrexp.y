@@ -44,7 +44,7 @@ expression
     | '(' expression ')' { $$ = $2; }
 
 number
-    : REGISTER { $$ = $1; }
+    : REGISTER
     | NUMBER 
     | HEX_NUMBER 
 
