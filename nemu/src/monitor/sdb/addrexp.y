@@ -1,5 +1,6 @@
 %code requires {
     #include <common.h>
+    #include <memory/vaddr.h>
     #include <stdio.h>
     #include <stdlib.h>
     extern int yylex(void);
@@ -41,6 +42,7 @@ expression
         $$ = $1 / $3;
       }
     | '-' number { $$ = -$2; }
+    | '*' expression { printf("deref: %u\n", $2); }
     | '(' expression ')' { $$ = $2; }
 
 number
