@@ -43,7 +43,7 @@ expression
       }
     | '-' number { $$ = -$2; }
     | '*' expression {
-      printf("deref: %u\n", $2);
+      printf("deref: %u - %u\n", $2, vaddr_read($2, WORD_BYTES));
       $$ = vaddr_read($2, WORD_BYTES);
     }
     | '(' expression ')' { $$ = $2; }
