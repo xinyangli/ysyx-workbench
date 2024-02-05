@@ -42,7 +42,7 @@ expression
         $$ = $1 / $3;
       }
     | '-' number { $$ = -$2; }
-    | '*' expression { $$ = vaddr_read($2, WORD_BYTES * 8); }
+    | '*' expression { printf("deref: %u", $2); $$ = vaddr_read($2, WORD_BYTES * 8); }
     | '(' expression ')' { $$ = $2; }
 
 number
