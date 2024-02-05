@@ -1,3 +1,6 @@
 {
-    "digital-ide.welcome.show": false
+    "digital-ide.welcome.show": false,
+    "files.watcherExclude": {
+        "**/target": true
+    }
 }

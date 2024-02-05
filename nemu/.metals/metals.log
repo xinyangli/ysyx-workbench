@@ -1,0 +1,3 @@
+2024.02.03 20:20:12 INFO  Started: Metals version 1.2.0+12-644090c2-SNAPSHOT in folders '/home/xin/repo/ysyx-workbench/nemu' for client Visual Studio Code 1.85.2.[0m
+2024.02.03 20:20:13 WARN  Build server is not auto-connectable.[0m
+2024.02.03 20:20:13 WARN  no build tool detected in workspace '/home/xin/repo/ysyx-workbench/nemu'. The most common cause for this problem is that the editor was opened in the wrong working directory, for example if you use sbt then the workspace directory should contain build.sbt. [0m

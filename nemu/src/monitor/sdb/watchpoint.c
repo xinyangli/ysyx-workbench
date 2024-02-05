@@ -97,12 +97,4 @@ int wp_remove_by_number(int number) {
   return 0;
 }
 
-int wp_eval_all() {
-  WP *wp;
-  for (wp = head; wp != NULL; wp = wp->next) {
-    
-  }
-  return 0;
-}
-
 /* TODO: Implement the functionality of watchpoint */

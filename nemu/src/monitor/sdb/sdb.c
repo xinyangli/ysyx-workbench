@@ -21,7 +21,7 @@
 #include <cpu/cpu.h>
 #include <errno.h>
 #include <isa.h>
-#include <memory/paddr.h>
+#include <memory/vaddr.h>
 #include <readline/history.h>
 #include <readline/readline.h>
 #include <stdint.h>
@@ -125,17 +125,13 @@ static word_t parse_uint(const char *arg, bool *success) {
   }
 }
 
-static paddr_t parse_expr(const char *arg, bool *success) {
+static vaddr_t parse_expr(const char *arg, bool *success) {
   if (arg == NULL) {
     puts("Invalid expr argument.");
     *success = false;
     return 0;
   } else {
-    // bool res = false;
-    // FIXME: We cannot use `parse_uint` here, it accept `-1234` as input
-    // paddr_t addr = parse_uint(arg, &res);
-    // *success = res;
-    paddr_t addr;
+    vaddr_t addr;
     yy_scan_string(arg);
     *success = !yyparse(&addr);
     yylex_destroy();
@@ -197,11 +193,11 @@ static int cmd_x(char *args) {
   if (!res)
     goto wrong_usage;
   addr = addr & ~(WORD_BYTES - 1);
-  for (paddr_t paddr = addr; paddr < addr + n; paddr += WORD_BYTES) {
-    word_t value = paddr_read(addr, WORD_BYTES);
+  for (vaddr_t vaddr = addr; vaddr < addr + n; vaddr += WORD_BYTES) {
+    word_t value = vaddr_read(addr, WORD_BYTES);
     printf("\e[1;34m" FMT_PADDR "\e[0m"
            "  " FMT_WORD "\n",
-           paddr, value);
+           vaddr, value);
   }
   return 0;
 
