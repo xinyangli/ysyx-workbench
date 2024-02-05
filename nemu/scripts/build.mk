@@ -10,7 +10,7 @@ endif
 WORK_DIR  = $(shell pwd)
 BUILD_DIR = $(WORK_DIR)/build
 
-INC_PATH := $(WORK_DIR)/include $(INC_PATH)
+INC_PATH := $(WORK_DIR)/include $(BUILD_DIR)/include $(INC_PATH)
 OBJ_DIR  = $(BUILD_DIR)/obj-$(NAME)$(SO)
 BINARY   = $(BUILD_DIR)/$(NAME)$(SO)
 
@@ -42,13 +42,13 @@ $(OBJ_DIR)/%.o: %.cc
 
 $(OBJ_DIR)/%.tag.c: %.y
 	@echo + YACC $<
-	@mkdir -p $(dir $@)
-	@$(YACC) $(YFLAGS) --header=$(<:.y=.h) -o $@ $<
+	@mkdir -p $(dir $@) $(BUILD_DIR)/include
+	@$(YACC) $(YFLAGS) --header=$(BUILD_DIR)/include/$(notdir $(<:.y=.h)) -o $@ $<
 
 $(OBJ_DIR)/%.yy.c: %.l $(OBJ_DIR)/%.tag.c
 	@echo + LEX $<
-	@mkdir -p $(dir $@)
-	@$(LEX) $(LFLAGS) --header=$(<:.l=_lex.h) -o $@ $<
+	@mkdir -p $(dir $@) $(BUILD_DIR)/include
+	@$(LEX) $(LFLAGS) --header=$(BUILD_DIR)/include/$(notdir $(<:.l=_lex.h)) -o $@ $<
 
 $(OBJ_DIR)/%.tag.o: $(OBJ_DIR)/%.tag.c
 	@echo + CC $<
@@ -67,13 +67,17 @@ $(OBJ_DIR)/%.yy.o: $(OBJ_DIR)/%.yy.c
 
 # Some convenient rules
 
-.PHONY: app clean
+.PHONY: app install clean
 
 app: $(BINARY)
 
 $(BINARY):: $(OBJS) $(ARCHIVES)
 	@echo + LD $@
 	@$(LD) -o $@ $(OBJS) $(LDFLAGS) $(ARCHIVES) $(LIBS)
+
+install: $(BINARY)
+	@mkdir -p $(PREFIX)/bin
+	@cp $(BINARY) $(PREFIX)/bin/
 
 clean:
 	-rm -rf $(BUILD_DIR)
