@@ -189,12 +189,12 @@ static int cmd_x(char *args) {
     goto wrong_usage;
   // No deliminter here, just pass all the remain argument to `parse_expr()`
   arg = strtok(NULL, "");
-  word_t addr = parse_expr(arg, &res);
+  word_t start_addr = parse_expr(arg, &res);
   if (!res)
     goto wrong_usage;
-  addr = addr & ~(WORD_BYTES - 1);
-  for (vaddr_t vaddr = addr; vaddr < addr + n; vaddr += WORD_BYTES) {
-    word_t value = vaddr_read(addr, WORD_BYTES);
+  start_addr = start_addr & ~(WORD_BYTES - 1);
+  for (vaddr_t vaddr = start_addr; vaddr < start_addr + n; vaddr += WORD_BYTES) {
+    word_t value = vaddr_read(vaddr, WORD_BYTES);
     printf("\e[1;34m" FMT_PADDR "\e[0m"
            "  " FMT_WORD "\n",
            vaddr, value);
