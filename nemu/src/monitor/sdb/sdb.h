@@ -18,4 +18,6 @@
 
 #include <common.h>
 
+word_t parse_expr(const char *arg, bool *success);
+
 #endif

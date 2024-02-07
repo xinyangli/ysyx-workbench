@@ -125,17 +125,17 @@ static word_t parse_uint(const char *arg, bool *success) {
   }
 }
 
-static vaddr_t parse_expr(const char *arg, bool *success) {
+word_t parse_expr(const char *arg, bool *success) {
   if (arg == NULL) {
     puts("Invalid expr argument.");
     *success = false;
     return 0;
   } else {
-    vaddr_t addr;
+    word_t res;
     yy_scan_string(arg);
-    *success = !yyparse(&addr);
+    *success = !yyparse(&res);
     yylex_destroy();
-    return addr;
+    return res;
   }
 }
 

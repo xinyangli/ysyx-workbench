@@ -15,6 +15,7 @@
 
 #include "common.h"
 #include "sdb.h"
+#include <stdio.h>
 
 #define NR_WP 32
 
@@ -42,7 +43,7 @@ void init_wp_pool() {
 
 WP *wp_new() {
   if (free_ == NULL) {
-    Log("wp_pool: Watchpoint pool not initialized or is full.");
+    Error("wp_pool: Watchpoint pool not initialized or is full.");
     return NULL;
   }
   
@@ -63,7 +64,7 @@ void wp_delete(WP *wp) {
 int wp_add(char * expr) {
   WP *wp = wp_new();
   if (wp == NULL) {
-    Log("watchpoint: Failed to add watchpoint, pool is full.");
+    Error("watchpoint: Failed to add watchpoint, pool is full.");
     return 1;
   }
 
@@ -83,7 +84,7 @@ int wp_remove_by_number(int number) {
   // Find previous node of target number
   for (target_prev = head; target_prev != NULL && target_prev->next->NO != number; target_prev = target_prev->next) ;
   if (target_prev == NULL) {
-    Log("Watchpoint not found, you can check current watchpoints with `info w`");
+    Error("Watchpoint not found, you can check current watchpoints with `info w`");
     return 1;
   }
   WP *target = target_prev->next;
@@ -96,5 +97,21 @@ int wp_remove_by_number(int number) {
   wp_delete(target);
   return 0;
 }
+
+// int wp_eval(WP* wp) {
+//   bool success = false;
+//   word_t result;
+
+//   result = parse_expr(wp->expr, &success);
+//   if (!success) {
+    
+//   } 
+// }
+
+/* 
+  Check if watchpoint value changed after execution
+*/
+// int wp_eval_all() {
+// }
 
 /* TODO: Implement the functionality of watchpoint */
