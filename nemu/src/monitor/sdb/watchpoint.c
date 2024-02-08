@@ -76,13 +76,13 @@ int wp_add(char * expr) {
     tail->next = wp;
     tail = wp;
   }
-  int len = strlen(expr) + 1;
-  wp->expr = malloc(len * sizeof(char));
+  int len = strlen(expr);
+  wp->expr = malloc((len + 1) * sizeof(char));
   if (wp->expr == NULL) {
     Error("Failed to allocate memory for expression");
     return 1;
   }
-  strncpy(wp->expr, expr, len);
+  strncpy(wp->expr, expr, len + 1);
   wp->expr[len - 1] = '\0';
   return 0;
 }
