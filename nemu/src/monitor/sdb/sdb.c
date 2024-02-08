@@ -188,7 +188,7 @@ static int cmd_w(char *args) {
   bool success = false;
   parse_expr(expr, &success);
   if (!success) {
-    Error("Failed to parse given expression %s", expr);
+    Error("Failed to parse given expression `%s`", expr);
     return 0;
   }
   wp_add(expr);
