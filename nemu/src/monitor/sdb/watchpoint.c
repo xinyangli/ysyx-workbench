@@ -83,7 +83,7 @@ int wp_add(char * expr) {
     return 1;
   }
   strncpy(wp->expr, expr, len + 1);
-  wp->expr[len - 1] = '\0';
+  wp->expr[len] = '\0';
   return 0;
 }
 
