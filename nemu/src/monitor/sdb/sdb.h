@@ -19,5 +19,7 @@
 #include <common.h>
 
 word_t parse_expr(const char *arg, bool *success);
+int wp_add(char * expr);
+int wp_remove_by_number(int number);
 
 #endif

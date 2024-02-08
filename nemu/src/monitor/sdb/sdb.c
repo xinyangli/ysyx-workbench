@@ -32,6 +32,7 @@ static int is_batch_mode = false;
 static int cmd_help(char *args);
 static int cmd_c(char *args);
 static int cmd_q(char *args);
+static int cmd_w(char *args);
 static int cmd_x(char *args);
 static int cmd_si(char *args);
 static int cmd_info(char *args);
@@ -55,6 +56,7 @@ static struct CommandTable {
       {"c", "Continue the execution of the program", cmd_c, NULL, 0},
       {"q", "Exit NEMU", cmd_q, NULL, 0},
       {"x", "Examine content of physical memory address", cmd_x, NULL, 0},
+      {"w", "Break when expression is changed", cmd_w, NULL, 0},
       {"si", "Execute next [n] program line", cmd_si, NULL, 0},
       {"info", "Print information of registers or watchpoints", cmd_info,
        cmd_info_table, ARRLEN(cmd_info_table)},
@@ -178,6 +180,18 @@ static int cmd_info_r(char *args) {
 
 static int cmd_info_w(char *args) {
   printf("Not implemented");
+  return 0;
+}
+
+static int cmd_w(char *args) {
+  char *expr = strtok(NULL, " ");
+  bool success = false;
+  parse_expr(expr, &success);
+  if (!success) {
+    Error("Failed to parse given expression %s", expr);
+    return 0;
+  }
+  wp_add(expr);
   return 0;
 }
 
