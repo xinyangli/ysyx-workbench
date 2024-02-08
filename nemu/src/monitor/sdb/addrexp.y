@@ -11,6 +11,7 @@
     #include <stdio.h>
     #include <stdlib.h>
     void yyerror(word_t *result, const char *err) {
+      Error("Expression syntax error: %s", err);
       fprintf(stderr, "Error: %s\n", err);
     }
 %}
