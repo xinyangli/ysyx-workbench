@@ -32,6 +32,7 @@ input
 expression
     : number { $$ = $1; }
     | expression '=' '=' expression { $$ = ($1 == $3); }
+    | expression '!' '=' expression { $$ = ($1 == $3); }
     | expression '>' '=' expression { $$ = ($1 >= $3); }
     | expression '<' '=' expression { $$ = ($1 <= $3); }
     | expression '>' expression { $$ = ($1 > $3); }
