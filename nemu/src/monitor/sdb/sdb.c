@@ -149,7 +149,7 @@ static int cmd_c(char *args) {
 }
 
 static int cmd_p(char *args) {
-  char *arg = strtok(NULL, " ");
+  char *arg = strtok(NULL, "");
   bool res = false;
 
   word_t result = parse_expr(arg, &res);
@@ -202,7 +202,7 @@ static int cmd_info_w(char *args) {
 }
 
 static int cmd_w(char *args) {
-  char *expr = strtok(NULL, " ");
+  char *expr = strtok(NULL, "");
   wp_add(expr);
   return 0;
 }
