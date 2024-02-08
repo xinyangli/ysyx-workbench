@@ -155,7 +155,7 @@ static int cmd_p(char *args) {
   word_t result = parse_expr(arg, &res);
   if (!res)
     goto wrong_usage;
-  printf("%s: %u", arg, result);
+  printf("%s: %u\n", arg, result);
   return 0;
 
 wrong_usage:
