@@ -136,12 +136,15 @@ static bool wp_check_change(WP* wp) {
 /* 
   Check if watchpoint value changed after execution
 */
-void wp_eval_all() {
+bool wp_eval_all() {
   WP *wp;
+  bool value_change = false;
   for (wp = head; wp != NULL; wp = wp->next) {
     int prev_val = wp->val;
     if (wp_check_change(wp)) {
       printf("Watchpoint %d: %s\n  %u -> %u\n", wp->NO, wp->expr, prev_val, wp->val);
+      value_change = true;
     }
   }
+  return value_change;
 }
