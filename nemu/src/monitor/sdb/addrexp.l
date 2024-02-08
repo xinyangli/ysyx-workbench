@@ -18,7 +18,7 @@ $[asgprt$][0-9pa][0-9]?    {
     }
     return REGISTER;
 }
-[+\-*/()]         { return *yytext; }
+[+\-*/<=()]         { return *yytext; }
 [ \t]             {  }
 .                 { printf("Unexpected character: %s\n", yytext); return YYerror; }
 %%
