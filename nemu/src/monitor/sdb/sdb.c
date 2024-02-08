@@ -31,6 +31,7 @@ static int is_batch_mode = false;
 // command handlers
 static int cmd_help(char *args);
 static int cmd_c(char *args);
+static int cmd_p(char *args);
 static int cmd_q(char *args);
 static int cmd_w(char *args);
 static int cmd_x(char *args);
@@ -54,6 +55,7 @@ static struct CommandTable {
       {"help", "Display information about all supported commands", cmd_help,
        NULL, 0},
       {"c", "Continue the execution of the program", cmd_c, NULL, 0},
+      {"p", "Print expression result", cmd_p, NULL, 0},
       {"q", "Exit NEMU", cmd_q, NULL, 0},
       {"x", "Examine content of physical memory address", cmd_x, NULL, 0},
       {"w", "Break when expression is changed", cmd_w, NULL, 0},
@@ -143,6 +145,22 @@ word_t parse_expr(const char *arg, bool *success) {
 
 static int cmd_c(char *args) {
   cpu_exec(-1);
+  return 0;
+}
+
+static int cmd_p(char *args) {
+  char *arg = strtok(NULL, " ");
+  bool res = false;
+
+  word_t result = parse_expr(arg, &res);
+  if (!res)
+    goto wrong_usage;
+  printf("%s: %u", arg, result);
+  return 0;
+
+wrong_usage:
+  printf("Invalid argument for command p: %s\n", arg);
+  printf("Usage: p [EXPR: <expr>]\n");
   return 0;
 }
 
