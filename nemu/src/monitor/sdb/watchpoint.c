@@ -76,6 +76,7 @@ int wp_add(char * expr) {
     tail->next = wp;
     tail = wp;
   }
+  wp->expr = expr;
   return 0;
 }
 
@@ -104,7 +105,7 @@ static bool wp_check_change(WP* wp) {
 
   result = parse_expr(wp->expr, &success);
   if (!success) {
-    panic("Failed to evaluate %s", wp->expr);
+    panic("Failed to evaluate expression `%s`", wp->expr);
   } 
   if (result != wp->val) {
     wp->val = result;
