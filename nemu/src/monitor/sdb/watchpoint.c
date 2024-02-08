@@ -56,7 +56,7 @@ static WP *wp_new() {
 }
 
 static void wp_delete(WP *wp) {
-  assert(wp);
+  Assert(wp, "Failed to delete watchpoint from pool.");
   wp->next = free_;
   free_ = wp;
 }
@@ -65,7 +65,7 @@ int wp_add(char * expr) {
   WP *wp = wp_new();
   if (wp == NULL) {
     Error("watchpoint: Failed to add watchpoint, pool is full.");
-    return 1;
+    goto failed_create;
   }
 
   wp->NO = wp_count++;
@@ -76,15 +76,27 @@ int wp_add(char * expr) {
     tail->next = wp;
     tail = wp;
   }
+
+  bool success = false;
+  wp->val = parse_expr(expr, &success);
+  if (!success) {
+    Error("Failed to parse given expression `%s`", expr);
+    goto failed_create;
+  }
+
   int len = strlen(expr);
   wp->expr = malloc((len + 1) * sizeof(char));
   if (wp->expr == NULL) {
     Error("Failed to allocate memory for expression");
-    return 1;
+    goto failed_create;
   }
   strncpy(wp->expr, expr, len + 1);
   wp->expr[len] = '\0';
   return 0;
+
+failed_create:
+  wp_delete(wp);
+  return 1;
 }
 
 int wp_remove_by_number(int number) {
