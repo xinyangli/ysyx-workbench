@@ -21,7 +21,7 @@
 #include <utils.h>
 
 #define Log(format, ...) \
-    _Log(ANSI_FMT("[INFO] %s:%d " , ANSI_FG_BLUE) "%s " format "\n", \
+    _Log(ANSI_FMT("[INFO] %s:%d %s" , ANSI_FG_BLUE) format "\n", \
         __FILE__, __LINE__, __func__, ## __VA_ARGS__)
 
 #define Warning(format, ...) \
