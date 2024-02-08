@@ -16,6 +16,8 @@
 #include "sdb.h"
 #include "common.h"
 #include "sys/types.h"
+#include <addrexp.h>
+#include <addrexp_lex.h>
 #include <cpu/cpu.h>
 #include <errno.h>
 #include <isa.h>
@@ -23,15 +25,15 @@
 #include <readline/history.h>
 #include <readline/readline.h>
 #include <stdint.h>
-#include <addrexp.h>
-#include <addrexp_lex.h>
 
 static int is_batch_mode = false;
 
 // command handlers
 static int cmd_help(char *args);
 static int cmd_c(char *args);
+static int cmd_p(char *args);
 static int cmd_q(char *args);
+static int cmd_w(char *args);
 static int cmd_x(char *args);
 static int cmd_si(char *args);
 static int cmd_info(char *args);
@@ -53,8 +55,10 @@ static struct CommandTable {
       {"help", "Display information about all supported commands", cmd_help,
        NULL, 0},
       {"c", "Continue the execution of the program", cmd_c, NULL, 0},
+      {"p", "Print expression result", cmd_p, NULL, 0},
       {"q", "Exit NEMU", cmd_q, NULL, 0},
       {"x", "Examine content of physical memory address", cmd_x, NULL, 0},
+      {"w", "Break when expression is changed", cmd_w, NULL, 0},
       {"si", "Execute next [n] program line", cmd_si, NULL, 0},
       {"info", "Print information of registers or watchpoints", cmd_info,
        cmd_info_table, ARRLEN(cmd_info_table)},
@@ -125,22 +129,38 @@ static word_t parse_uint(const char *arg, bool *success) {
   }
 }
 
-static vaddr_t parse_expr(const char *arg, bool *success) {
+word_t parse_expr(const char *arg, bool *success) {
   if (arg == NULL) {
     puts("Invalid expr argument.");
     *success = false;
     return 0;
   } else {
-    vaddr_t addr;
+    word_t res;
     yy_scan_string(arg);
-    *success = !yyparse(&addr);
+    *success = !yyparse(&res);
     yylex_destroy();
-    return addr;
+    return res;
   }
 }
 
 static int cmd_c(char *args) {
   cpu_exec(-1);
+  return 0;
+}
+
+static int cmd_p(char *args) {
+  char *arg = strtok(NULL, "");
+  bool res = false;
+
+  word_t result = parse_expr(arg, &res);
+  if (!res)
+    goto wrong_usage;
+  printf("%s: %u\n", arg, result);
+  return 0;
+
+wrong_usage:
+  printf("Invalid argument for command p: %s\n", arg);
+  printf("Usage: p [EXPR: <expr>]\n");
   return 0;
 }
 
@@ -178,6 +198,12 @@ static int cmd_info_r(char *args) {
 
 static int cmd_info_w(char *args) {
   printf("Not implemented");
+  return 0;
+}
+
+static int cmd_w(char *args) {
+  char *expr = strtok(NULL, "");
+  wp_add(expr);
   return 0;
 }
 

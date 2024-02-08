@@ -48,6 +48,7 @@ CFLAGS_BUILD += $(if $(CONFIG_CC_ASAN),-fsanitize=address,)
 CFLAGS_TRACE += -DITRACE_COND=$(if $(CONFIG_ITRACE_COND),$(call remove_quote,$(CONFIG_ITRACE_COND)),true)
 CFLAGS  += $(CFLAGS_BUILD) $(CFLAGS_TRACE) -D__GUEST_ISA__=$(GUEST_ISA)
 LDFLAGS += $(CFLAGS_BUILD)
+INC_PATH += $(NEMU_HOME)/src/isa/$(GUEST_ISA)/local-include
 
 # Include rules for menuconfig
 include $(NEMU_HOME)/scripts/config.mk
@@ -60,8 +61,6 @@ else
 include $(NEMU_HOME)/scripts/native.mk
 endif
 
-.PHONY: test
-
 include $(NEMU_HOME)/tests/Makefile
 all-tests: TEST_OBJS = $(filter-out $(OBJ_DIR)/src/nemu-main.o, $(OBJS))
 all-tests: CFLAGS += $(shell pkg-config --cflags check)
@@ -70,3 +69,5 @@ all-tests: $(TEST_SRCS:%.c=$(OBJ_DIR)/%)
 
 test: all-tests
 	@$(OBJ_DIR)/tests/expr_test
+
+.PHONY: test

@@ -21,7 +21,15 @@
 #include <utils.h>
 
 #define Log(format, ...) \
-    _Log(ANSI_FMT("[%s:%d %s] " format, ANSI_FG_BLUE) "\n", \
+    _Log(ANSI_FMT("[INFO] %s:%d %s() ", ANSI_FG_BLUE) format "\n", \
+        __FILE__, __LINE__, __func__, ## __VA_ARGS__)
+
+#define Warning(format, ...) \
+    _Log(ANSI_FMT("[WARNING] %s:%d %s() ", ANSI_FG_YELLOW) format "\n", \
+        __FILE__, __LINE__, __func__, ## __VA_ARGS__)
+
+#define Error(format, ...) \
+    _Log(ANSI_FMT("[ERROR] %s:%d %s() ", ANSI_FG_RED) format "\n", \
         __FILE__, __LINE__, __func__, ## __VA_ARGS__)
 
 #define Assert(cond, format, ...) \

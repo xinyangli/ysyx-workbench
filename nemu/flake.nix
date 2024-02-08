@@ -50,6 +50,21 @@
             libllvm
           ];
 
+          configurePhase = ''
+            echo NEMU_HOME=$NEMU_HOME
+            echo pwd=$(pwd)
+            mkdir -p $(pwd)/kconfig
+            WORK_DIR=$(pwd) obj=$(pwd)/kconfig make --trace -e -f scripts/config.mk WORK_DIR=$(pwd) obj=$(pwd)/kconfig rv32_defconfig
+          '';
+
+          installPhase = ''
+            BUILD_DIR=$out make install
+          '';
+
+          checkPhase = ''
+            BUILD_DIR=$out make test
+          '';
+
           NEMU_HOME = src;
 
           meta = with lib; {
