@@ -154,6 +154,8 @@ struct {
     {"$ra", 0x1},
     {"0x2 + 4*-$a7", 0xFFFFFFBEU},
     {"0x1831/$gp + 13", 2077U},
+    {"$$0 == 123", 0},
+    {"$$0 == 0", 1},
 };
 START_TEST(test_expr_negative_operand) {
   yy_scan_string(exprs[_i].expr);
