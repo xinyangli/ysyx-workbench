@@ -51,17 +51,11 @@
           ];
 
           configurePhase = ''
-            echo NEMU_HOME=$NEMU_HOME
             echo pwd=$(pwd)
-            mkdir -p $(pwd)/kconfig
-            make 
           '';
 
           buildPhase = ''
-            mkdir -p $out
-            cat .config
-            ls /build/nemu/include/
-            make --trace
+            make NEMU_HOME=/build/nemu --trace
           '';
 
           installPhase = ''
@@ -71,8 +65,6 @@
           checkPhase = ''
             BUILD_DIR=$out make test
           '';
-
-          NEMU_HOME = src;
 
           meta = with lib; {
             description = "NJU EMUlator, a full system x86/mips32/riscv32/riscv64 emulator for teaching";
