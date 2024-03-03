@@ -25,8 +25,8 @@
           ];
           packages = [
             pkgs.stdenv.cc
-            pkgs.stdenv.readline
-            pkgs.stdenv.libllvm
+            pkgs.readline
+            pkgs.libllvm
           ];
           shellHook = ''
             export PROJECT_ROOT=/home/xin/repo/ysyx-workbench
