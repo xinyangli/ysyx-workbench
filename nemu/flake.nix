@@ -54,13 +54,14 @@
             echo NEMU_HOME=$NEMU_HOME
             echo pwd=$(pwd)
             mkdir -p $(pwd)/kconfig
+            make 
           '';
-            # WORK_DIR=$(pwd) obj=$(pwd)/kconfig make --trace -e -f scripts/config.mk WORK_DIR=$(pwd) obj=$(pwd)/kconfig rv32_defconfig
 
           buildPhase = ''
             mkdir -p $out
-            ls $out
-            BUILD_DIR=$out make --trace
+            cat .config
+            ls /build/nemu/include/
+            make --trace
           '';
 
           installPhase = ''
