@@ -25,8 +25,8 @@
           ];
           packages = [
             pkgs.stdenv.cc
-            self.packages.${system}.nemu.buildInputs
-            self.packages.${system}.nemu.nativeBuildInputs
+            pkgs.stdenv.readline
+            pkgs.stdenv.libllvm
           ];
           shellHook = ''
             export PROJECT_ROOT=/home/xin/repo/ysyx-workbench
