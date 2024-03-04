@@ -48,6 +48,9 @@ menuconfig: $(MCONF) $(CONF) $(FIXDEP)
 savedefconfig: $(CONF)
 	$(Q)$< $(silent) --$@=configs/defconfig $(Kconfig)
 
+alldefconfig: $(CONF) $(FIXDEP)
+	$(Q)$(CONF) $(silent) --$@ $(Kconfig)
+
 %defconfig: $(CONF) $(FIXDEP)
 	$(Q)$< $(silent) --defconfig=configs/$@ $(Kconfig)
 	$(Q)$< $(silent) --syncconfig $(Kconfig)
@@ -60,7 +63,7 @@ help:
 	@echo  '  savedefconfig   - Save current config as configs/defconfig (minimal config)'
 
 distclean: clean
-	-@rm -rf $(rm-distclean)
+	-rm -rf $(rm-distclean)
 
 .PHONY: help distclean
 
