@@ -9,7 +9,6 @@ stdenv.mkDerivation rec {
 
   src = ./.;
 
-  NEMU_HOME = "/build/nemu";
   nativeBuildInputs = with pkgs; [
     gnumake
     flex
@@ -23,7 +22,7 @@ stdenv.mkDerivation rec {
   ];
 
   configurePhase = ''
-    echo pwd=$(pwd)
+    export NEMU_HOME=$(pwd)
     make alldefconfig
   '';
 
