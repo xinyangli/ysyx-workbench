@@ -61,6 +61,15 @@
             gdb
           ] ++ builtins.attrValues self.packages.${system};
         };
+        
+        devShells.nemu = pkgs.mkShell {
+          packages = with pkgs; [
+            clang-tools
+          ];
+          inputsFrom = [
+            self.packages.${system}.nemu
+          ];
+        };
       }
     );
 }
