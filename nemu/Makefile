@@ -73,6 +73,7 @@ IMAGES = $(patsubst %.bin, %, $(shell find $(IMAGES_PATH) -type f -name '*.bin')
 
 COLOR_RED   = \033[1;31m
 COLOR_GREEN = \033[1;32m
+COLOR_BLUE = \033[1;34m
 COLOR_NONE  = \033[0m
 
 RESULT = .result
@@ -83,7 +84,7 @@ $(IMAGES): %: %.bin $(BINARY)
 	@$(BINARY) -b $< >/dev/null 2&>1 || printf "\t%14s\n" $(notdir $<) >> $(RESULT)
 
 integration-tests: $(IMAGES) 
-	@printf "Test result:\n    ALL: %s, FAILED: %s\n" $(words $(IMAGES)) $(shell wc -l $(RESULT) | cut -f1 -d' ')
+	@printf "$(COLOR_BLUE)RESULT:$(COLOR_BLUE)\n\tALL: %s, FAILED: %s\n" $(words $(IMAGES)) $(shell wc -l $(RESULT) | cut -f1 -d' ')
 	@printf "$(COLOR_RED)FAILED:$(COLOR_NONE)\n"
 	@cat $(RESULT)
 	@$(RM) $(RESULT)
