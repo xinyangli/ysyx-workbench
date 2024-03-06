@@ -71,9 +71,12 @@ unit-tests: $(TEST_SRCS:%.c=$(OBJ_DIR)/%)
 
 IMAGES = $(patsubst %.bin, %, $(shell find $(IMAGES_PATH) -type f -name '*.bin'))
 
+COLOR_RED   = \033[1;31m
+COLOR_GREEN = \033[1;32m
+COLOR_NONE  = \033[0m
+
 $(IMAGES): %: %.bin $(BINARY)
-	@echo + TEST $(notdir $<)
-	@$(BINARY) -b $< > /dev/null || echo "Failure"
+	@$(BINARY) -b $< > /dev/null || printf "[%14s] $(COLOR_RED)***FAIL***$(COLOR_NONE)\n" $<
 
 integration-tests: $(IMAGES) 
 	@echo $(IMAGES_PATH)
