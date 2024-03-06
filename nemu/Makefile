@@ -83,7 +83,7 @@ $(IMAGES): %: %.bin $(BINARY)
 
 integration-tests: $(IMAGES) 
 	@cat $(RESULT)
-	@echo $(shell wc -l $(RESULT))
+	@echo $(shell wc -l $(RESULT) | cut -f1)
 	@$(RM) $(RESULT)
 
 test: unit-tests integration-tests
