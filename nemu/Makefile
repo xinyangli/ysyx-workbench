@@ -76,7 +76,7 @@ COLOR_GREEN = \033[1;32m
 COLOR_BLUE = \033[1;34m
 COLOR_NONE  = \033[0m
 
-RESULT = .result
+RESULT = .result.tmp
 $(shell > $(RESULT)) 	# Clear result file
 
 $(IMAGES): %: %.bin $(BINARY)
