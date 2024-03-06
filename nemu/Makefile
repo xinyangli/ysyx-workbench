@@ -64,12 +64,20 @@ include $(NEMU_HOME)/scripts/native.mk
 endif
 
 include $(NEMU_HOME)/tests/Makefile
-all-tests: TEST_OBJS = $(filter-out $(OBJ_DIR)/src/nemu-main.o, $(OBJS))
-all-tests: CFLAGS += $(shell pkg-config --cflags check)
-all-tests: LDFLAGS += $(shell pkg-config --libs check)
-all-tests: $(TEST_SRCS:%.c=$(OBJ_DIR)/%)
+unit-tests: TEST_OBJS = $(filter-out $(OBJ_DIR)/src/nemu-main.o, $(OBJS))
+unit-tests: CFLAGS += $(shell pkg-config --cflags check)
+unit-tests: LDFLAGS += $(shell pkg-config --libs check)
+unit-tests: $(TEST_SRCS:%.c=$(OBJ_DIR)/%)
 
-test: all-tests
+IMAGES = $(shell find $(IMAGES_PATH) -type f -name '*.bin')
+
+$(IMAGES): %: % $(BINARY)
+	$(BINARY) -b $<
+
+integration-tests: $(IMAGES) 
+
+
+test: unit-tests integration-tests
 	@$(OBJ_DIR)/tests/expr_test
 
 .PHONY: test
