@@ -1,6 +1,7 @@
 { pkgs,
   lib,
-  stdenv
+  stdenv,
+  am-kernels
 }:
 
 stdenv.mkDerivation rec {
@@ -9,21 +10,25 @@ stdenv.mkDerivation rec {
 
   src = ./.;
 
-  NEMU_HOME = "/build/nemu";
   nativeBuildInputs = with pkgs; [
     gnumake
+    pkg-config
     flex
     bison
   ];
 
   buildInputs = with pkgs; [
-    check
     readline
     libllvm
   ];
 
+  checkInputs = [
+    pkgs.check
+    am-kernels
+  ];
+
   configurePhase = ''
-    echo pwd=$(pwd)
+    export NEMU_HOME=$(pwd)
     make alldefconfig
   '';
 
@@ -31,13 +36,20 @@ stdenv.mkDerivation rec {
     make
   '';
 
+  doCheck = true;
   checkPhase = ''
+    export IMAGES_PATH=${am-kernels}/share/images
     make test
   '';
 
   installPhase = ''
     mkdir -p $out/bin
     make PREFIX=$out install
+  '';
+
+  shellHook = ''
+    export NEMU_HOME=$(pwd)
+    export IMAGES_PATH=${am-kernels}/share/images
   '';
 
   meta = with lib; {
