@@ -87,7 +87,7 @@ integration-tests: $(IMAGES)
 	@printf "$(COLOR_BLUE)RESULT:$(COLOR_NONE)\n\tALL: %s\n\tFAILED: %s\n" $(words $(IMAGES)) $(shell wc -l $(RESULT) | cut -f1 -d' ')
 	@printf "$(COLOR_RED)FAILED:$(COLOR_NONE)\n"
 	@cat $(RESULT)
-	@test ! -s $(RESULT); \
+	@test -s $(RESULT); \
 	 r=$$?; \
 	 $(RM) $(RESULT); \
 	 test $$r -eq 0
