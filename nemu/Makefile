@@ -81,12 +81,13 @@ $(shell > $(RESULT)) 	# Clear result file
 
 $(IMAGES): %: %.bin $(BINARY)
 	@echo + TEST $(notdir $<)
-	@$(BINARY) -b $< >/dev/null 2&>1 || printf "\t%14s\n" $(notdir $<) >> $(RESULT)
+	@$(BINARY) -b $< >/dev/null 2>&1 || printf "\t%14s\n" $(notdir $<) >> $(RESULT)
 
 integration-tests: $(IMAGES) 
 	@printf "$(COLOR_BLUE)RESULT:$(COLOR_NONE)\n\tALL: %s\n\tFAILED: %s\n" $(words $(IMAGES)) $(shell wc -l $(RESULT) | cut -f1 -d' ')
 	@printf "$(COLOR_RED)FAILED:$(COLOR_NONE)\n"
 	@cat $(RESULT)
+	@
 	@$(RM) $(RESULT)
 
 test: unit-tests integration-tests
