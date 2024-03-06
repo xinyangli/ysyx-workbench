@@ -84,7 +84,7 @@ $(IMAGES): %: %.bin $(BINARY)
 
 integration-tests: $(IMAGES) 
 	@cat $(RESULT)
-	@printf "ALL: %s, FAILED: %s\n" $(words $(IMAGES)) $(shell wc -l $(RESULT) | cut -f1 -d' ')
+	@printf "Test result:\n\tALL: %s, FAILED: %s\n" $(words $(IMAGES)) $(shell wc -l $(RESULT) | cut -f1 -d' ')
 	@$(RM) $(RESULT)
 
 test: unit-tests integration-tests
