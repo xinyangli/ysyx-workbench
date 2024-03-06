@@ -76,7 +76,9 @@ COLOR_GREEN = \033[1;32m
 COLOR_NONE  = \033[0m
 
 $(IMAGES): %: %.bin $(BINARY)
-	@$(BINARY) -b $< > /dev/null || printf "[%14s] $(COLOR_RED)FAIL$(COLOR_NONE)\n" $(notdir $<)
+	@$(RM) .integration-test.tmp
+	@$(BINARY) -b $< > /dev/null || printf "[%14s] $(COLOR_RED)FAIL$(COLOR_NONE)\n" $(notdir $<) >> .integration-test.tmp
+	@printf "%d Failed \n" $(shell wc -l .integration-test.tmp)
 
 integration-tests: $(IMAGES) 
 	@echo $(IMAGES_PATH)
