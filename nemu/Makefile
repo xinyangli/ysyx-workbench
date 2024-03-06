@@ -69,15 +69,15 @@ unit-tests: CFLAGS += $(shell pkg-config --cflags check)
 unit-tests: LDFLAGS += $(shell pkg-config --libs check)
 unit-tests: $(TEST_SRCS:%.c=$(OBJ_DIR)/%)
 
-IMAGES = $(shell find $(IMAGES_PATH) -type f -name '*.bin')
+IMAGES = $(patsubst %.bin, %, $(shell find $(IMAGES_PATH) -type f -name '*.bin'))
 
-$(IMAGES): %: % $(BINARY)
+$(IMAGES): %: %.bin $(BINARY)
 	-$(BINARY) -b $<
 
 integration-tests: $(IMAGES) 
-
+	@echo $(IMAGES_PATH)
 
 test: unit-tests integration-tests
 	@$(OBJ_DIR)/tests/expr_test
 
-.PHONY: test
+.PHONY: test integration-tests
