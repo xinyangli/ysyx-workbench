@@ -72,7 +72,7 @@ unit-tests: $(TEST_SRCS:%.c=$(OBJ_DIR)/%)
 IMAGES = $(patsubst %.bin, %, $(shell find $(IMAGES_PATH) -type f -name '*.bin'))
 
 $(IMAGES): %: %.bin $(BINARY)
-
+	@echo + TEST $< 
 	@-$(BINARY) -b $< > /dev/null
 
 integration-tests: $(IMAGES) 
