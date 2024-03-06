@@ -17,7 +17,7 @@
         };
       in
       {
-        packages.nemu = pkgs.callPackage ./nemu {};
+        packages.nemu = pkgs.callPackage ./nemu { am-kernels = self.packages.${system}.am-kernels; };
 
         packages.am-kernels = crossPkgs.stdenv.mkDerivation rec {
           pname = "am-kernels";

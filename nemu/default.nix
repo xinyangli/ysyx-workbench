@@ -23,10 +23,11 @@ stdenv.mkDerivation rec {
   ];
 
   checkInputs = [
+    pkgs.check
     am-kernels
   ];
 
-  IMAGES_PATH = "${am-kernels}/share/images"
+  IMAGES_PATH = "${am-kernels}/share/images";
 
   configurePhase = ''
     export NEMU_HOME=$(pwd)
@@ -37,6 +38,7 @@ stdenv.mkDerivation rec {
     make
   '';
 
+  doCheck = true;
   checkPhase = ''
     make test
   '';

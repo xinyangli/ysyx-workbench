@@ -95,4 +95,4 @@ integration-tests: $(IMAGES)
 test: unit-tests integration-tests
 	@$(OBJ_DIR)/tests/expr_test
 
-.PHONY: test integration-tests
+.PHONY: test integration-tests unit-tests
