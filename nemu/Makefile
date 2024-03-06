@@ -76,14 +76,14 @@ COLOR_GREEN = \033[1;32m
 COLOR_NONE  = \033[0m
 
 RESULT = .result
-$(shell > .result) 	# Clear result file
+$(shell > $(RESULT)) 	# Clear result file
 
 $(IMAGES): %: %.bin $(BINARY)
 	@$(BINARY) -b $< > /dev/null || printf "[%14s] $(COLOR_RED)FAIL$(COLOR_NONE)\n" $(notdir $<) >> .result
 
 integration-tests: $(IMAGES) 
 	@cat $(RESULT)
-	@cat $(shell wc -l $(RESULT))
+	@echo $(shell wc -l $(RESULT))
 	@$(RM) $(RESULT)
 
 test: unit-tests integration-tests
