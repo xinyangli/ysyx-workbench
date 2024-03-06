@@ -1,6 +1,7 @@
 { pkgs,
   lib,
-  stdenv
+  stdenv,
+  am-kernels
 }:
 
 stdenv.mkDerivation rec {
@@ -20,6 +21,12 @@ stdenv.mkDerivation rec {
     readline
     libllvm
   ];
+
+  checkInputs = [
+    am-kernels
+  ];
+
+  IMAGES_PATH = "${am-kernels}/share/images"
 
   configurePhase = ''
     export NEMU_HOME=$(pwd)
