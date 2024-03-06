@@ -79,6 +79,7 @@ RESULT = .result
 $(shell > $(RESULT)) 	# Clear result file
 
 $(IMAGES): %: %.bin $(BINARY)
+	@echo +TEST $(notdir $<)
 	@$(BINARY) -b $< >/dev/null 2&>1 || printf "[%14s] $(COLOR_RED)FAIL$(COLOR_NONE)\n" $(notdir $<) >> $(RESULT)
 
 integration-tests: $(IMAGES) 
