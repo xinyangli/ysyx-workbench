@@ -90,7 +90,7 @@ integration-tests: $(IMAGES)
 	@test ! -s $(RESULT); \
 	 r=$$?; \
 	 $(RM) $(RESULT); \
-	 test $r -eq 0
+	 test $$r -eq 0
 
 test: unit-tests integration-tests
 	@$(OBJ_DIR)/tests/expr_test
