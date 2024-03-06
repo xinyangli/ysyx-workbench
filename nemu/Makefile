@@ -84,7 +84,7 @@ $(IMAGES): %: %.bin $(BINARY)
 	@$(BINARY) -b $< >/dev/null 2&>1 || printf "\t%14s\n" $(notdir $<) >> $(RESULT)
 
 integration-tests: $(IMAGES) 
-	@printf "$(COLOR_BLUE)RESULT:$(COLOR_NONE)\n\tALL: %s, FAILED: %s\n" $(words $(IMAGES)) $(shell wc -l $(RESULT) | cut -f1 -d' ')
+	@printf "$(COLOR_BLUE)RESULT:$(COLOR_NONE)\n\tALL: %s\nFAILED: %s\n" $(words $(IMAGES)) $(shell wc -l $(RESULT) | cut -f1 -d' ')
 	@printf "$(COLOR_RED)FAILED:$(COLOR_NONE)\n"
 	@cat $(RESULT)
 	@$(RM) $(RESULT)
