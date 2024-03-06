@@ -12,12 +12,12 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = with pkgs; [
     gnumake
+    pkg-config
     flex
     bison
   ];
 
   buildInputs = with pkgs; [
-    check
     readline
     libllvm
   ];

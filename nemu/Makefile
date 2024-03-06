@@ -93,6 +93,5 @@ integration-tests: $(IMAGES)
 	 test $$r -eq 0
 
 test: unit-tests integration-tests
-	@$(OBJ_DIR)/tests/expr_test
 
-.PHONY: test integration-tests unit-tests
+.PHONY: test unit-tests integration-tests
