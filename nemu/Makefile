@@ -73,7 +73,7 @@ IMAGES = $(patsubst %.bin, %, $(shell find $(IMAGES_PATH) -type f -name '*.bin')
 
 $(IMAGES): %: %.bin $(BINARY)
 	@echo + TEST $(notdir $<)
-	@-$(BINARY) -b $< > /dev/null
+	@$(BINARY) -b $< > /dev/null && echo "Success" || echo "Failure"
 
 integration-tests: $(IMAGES) 
 	@echo $(IMAGES_PATH)
