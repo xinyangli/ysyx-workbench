@@ -85,7 +85,7 @@ $(IMAGES): %: %.bin $(BINARY)
 
 integration-tests: $(IMAGES) 
 	@printf "$(COLOR_BLUE)INTEGRATION TEST RESULT:$(COLOR_NONE)\n\tALL: %s\n\tFAILED: %s\n" $(words $(IMAGES)) $(shell wc -l $(RESULT) | cut -f1 -d' ')
-	@test -s $(RESULT) || printf "$(COLOR_RED)FAILED:$(COLOR_NONE)\n"
+	@test ! -s $(RESULT) || printf "$(COLOR_RED)FAILED:$(COLOR_NONE)\n"
 	@cat $(RESULT)
 	@test ! -s $(RESULT); \
 	 r=$$?; \
