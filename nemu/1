@@ -167,9 +167,9 @@ If it is the second case, remember:
 [0m0x80000068: 02 f7 66 33 rem	a2, a4, a5
 [1;34m[INFO] src/cpu/cpu-exec.c:125 cpu_exec() [0mnemu: [1;31mABORT[0m at pc = 0x80000068
 [1;34m[INFO] src/cpu/cpu-exec.c:125 cpu_exec() [0mnemu: [1;31mABORT[0m at pc = 0x80000068
-[1;34m[INFO] src/cpu/cpu-exec.c:93 statistic() [0mhost time spent = 372 us
-[1;34m[INFO] src/cpu/cpu-exec.c:93 statistic() [0mhost time spent = 372 us
+[1;34m[INFO] src/cpu/cpu-exec.c:93 statistic() [0mhost time spent = 376 us
+[1;34m[INFO] src/cpu/cpu-exec.c:93 statistic() [0mhost time spent = 376 us
 [1;34m[INFO] src/cpu/cpu-exec.c:94 statistic() [0mtotal guest instructions = 123
 [1;34m[INFO] src/cpu/cpu-exec.c:94 statistic() [0mtotal guest instructions = 123
-[1;34m[INFO] src/cpu/cpu-exec.c:95 statistic() [0msimulation frequency = 330,645 inst/s
-[1;34m[INFO] src/cpu/cpu-exec.c:95 statistic() [0msimulation frequency = 330,645 inst/s
+[1;34m[INFO] src/cpu/cpu-exec.c:95 statistic() [0msimulation frequency = 327,127 inst/s
+[1;34m[INFO] src/cpu/cpu-exec.c:95 statistic() [0msimulation frequency = 327,127 inst/s
