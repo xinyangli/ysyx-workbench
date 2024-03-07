@@ -2,7 +2,7 @@ package npc.util
 
 import chisel3._
 
-class RegisterFile(readPorts: Int = 1) extends Module {
+class RegisterFile(readPorts: Int) extends Module {
   require(readPorts >= 0)
   val io = IO(new Bundle {
     val writeEnable = Input(Bool())
