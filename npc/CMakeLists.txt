@@ -83,7 +83,8 @@ foreach(TOPMODULE IN LISTS TOPMODULES)
   add_dependencies(V${TOPMODULE} ChiselBuild_${TOPMODULE})
 
   enable_testing()
-  add_test(NAME V${TOPMODULE} COMMAND V${TOPMODULE})
+  add_test(NAME V${TOPMODULE}_test COMMAND V${TOPMODULE})
+  # set_tests_properties(V${TOPMODULE} PROPERTIES FIXTURES_SETUP )
 
   # -- Add build tracking
   add_custom_command(
