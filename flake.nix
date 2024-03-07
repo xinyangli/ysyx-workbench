@@ -17,7 +17,7 @@
         };
       in
       {
-        packages.nemu = pkgs.callPackage ./nemu {};
+        packages.nemu = pkgs.callPackage ./nemu { am-kernels = self.packages.${system}.am-kernels; };
 
         packages.am-kernels = crossPkgs.stdenv.mkDerivation rec {
           pname = "am-kernels";
@@ -44,12 +44,13 @@
           '';
 
           buildPhase = ''
-            AS=$CC make -C tests/cpu-tests BUILD_DIR=$(pwd)/build ARCH=$ARCH --trace
+            AS=$CC make -C tests/cpu-tests BUILD_DIR=$(pwd)/build ARCH=$ARCH
           '';
 
           installPhase = ''
-            mkdir -p $out/bin
-            cp build/riscv32-nemu/*.bin $out/bin
+            mkdir -p $out/share/images $out/share/dump
+            cp build/riscv32-nemu/*.bin $out/share/images
+            cp build/riscv32-nemu/*.txt $out/share/dump
           '';
 
           dontFixup = true;
@@ -59,6 +60,15 @@
           packages = with pkgs; [
             gdb
           ] ++ builtins.attrValues self.packages.${system};
+        };
+        
+        devShells.nemu = pkgs.mkShell {
+          packages = with pkgs; [
+            clang-tools
+          ];
+          inputsFrom = [
+            self.packages.${system}.nemu
+          ];
         };
       }
     );
