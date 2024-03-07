@@ -84,7 +84,7 @@ foreach(TOPMODULE IN LISTS TOPMODULES)
 
   enable_testing()
   add_test(NAME V${TOPMODULE}_test COMMAND V${TOPMODULE})
-  # set_tests_properties(V${TOPMODULE} PROPERTIES FIXTURES_SETUP )
+  set_tests_properties(V${TOPMODULE}_test PROPERTIES DEPENDS V${TOPMODULE})
 
   # -- Add build tracking
   add_custom_command(
