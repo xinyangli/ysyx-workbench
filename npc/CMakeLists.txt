@@ -84,15 +84,15 @@ foreach(TOPMODULE IN LISTS TOPMODULES)
   add_dependencies(V${TOPMODULE} ChiselBuild_${TOPMODULE})
 
   enable_testing()
-  add_test(V${TOPMODULE}_build
-    "${CMAKE_COMMAND}"
-    --build "${CMAKE_BINARY_DIR}"
-    --config "$<CONFIG>"
-    --target V${TOPMODULE}
-  )
-  set_tests_properties(V${TOPMODULE}_build PROPERTIES FIXTURES_SETUP V${TOPMODULE}_fixture)
+  # add_test(V${TOPMODULE}_build
+  #   "${CMAKE_COMMAND}"
+  #   --build "${CMAKE_BINARY_DIR}"
+  #   --config "$<CONFIG>"
+  #   --target V${TOPMODULE}
+  # )
+  # set_tests_properties(V${TOPMODULE}_build PROPERTIES FIXTURES_SETUP V${TOPMODULE}_fixture)
   add_test(NAME V${TOPMODULE} COMMAND V${TOPMODULE})
-  set_tests_properties(V${TOPMODULE} PROPERTIES FIXTURES_REQUIRED V${TOPMODULE}_fixture)
+  # set_tests_properties(V${TOPMODULE} PROPERTIES FIXTURES_REQUIRED V${TOPMODULE}_fixture)
 
   # -- Add build tracking
   add_custom_command(
