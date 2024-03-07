@@ -92,7 +92,7 @@ foreach(TOPMODULE IN LISTS TOPMODULES)
   )
   set_tests_properties(V${TOPMODULE}_build PROPERTIES FIXTURES_SETUP V${TOPMODULE}_fixture)
   message(${TOPMODULE})
-  add_test(NAME V${TOPMODULE} COMMAND V${TOPMODULE})
+  add_test(V${TOPMODULE} V${TOPMODULE})
   set_tests_properties(V${TOPMODULE} PROPERTIES FIXTURES_REQUIRED V${TOPMODULE}_fixture)
 
   # -- Add build tracking
