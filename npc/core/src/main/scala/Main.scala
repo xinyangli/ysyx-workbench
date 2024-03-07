@@ -32,5 +32,5 @@ class Keyboard extends Module {
 }
 
 class Flowpc extends Module {
-
+  val register_file = Module(new R)
 }
