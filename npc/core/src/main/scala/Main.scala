@@ -31,3 +31,6 @@ class Keyboard extends Module {
   io.segs := seg_handler.io.segs
 }
 
+class Flowpc extends Module {
+
+}

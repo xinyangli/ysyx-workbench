@@ -59,21 +59,6 @@ static void do_branch(Decode *s, bool condition, word_t offset) {
   }
 }
 
-// static word_t mulh(word_t src1, word_t src2) {
-//   word_t split_width = (WORD_BYTES * 8 / 2);
-//   word_t split_low_mask = (1u << split_width) - 1;
-//   word_t src1_lo = src1 & split_low_mask;
-//   word_t src1_hi = src1 >> split_width;
-//   word_t src2_lo = src2 & split_low_mask;
-//   word_t src2_hi = src2 >> split_width;
-//   word_t carry_bit = ((src1_hi * src2_lo & split_low_mask) +
-//                       (src1_lo * src2_hi & split_low_mask) +
-//                       (src1_lo * src2_lo >> split_width)) >>
-//                      split_width;
-//   return src1_hi * src2_hi + (src1_hi * src2_lo >> split_width) +
-//          (src1_lo * src2_hi >> split_width) + carry_bit;
-// }
-
 static int decode_exec(Decode *s) {
   int rd = 0;
   word_t src1 = 0, src2 = 0, imm = 0;
