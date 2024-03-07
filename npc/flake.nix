@@ -19,8 +19,7 @@
           packages = [
             clang-tools
             rnix-lsp
-            metals
-            bloop
+            coursier
 
             gdb
             jre
