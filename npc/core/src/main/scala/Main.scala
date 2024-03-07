@@ -30,7 +30,3 @@ class Keyboard extends Module {
   keyboard_controller.io.ps2 := io.ps2
   io.segs := seg_handler.io.segs
 }
-
-class Flowpc extends Module {
-  val register_file = Module(new R)
-}
