@@ -60,7 +60,7 @@ class ALUGeneratorSpec extends AnyFreeSpec with ChiselScalatestTester {
       6 -> ((a, b) => if (a < b) 1 else 0),
       7 -> ((a, b) => if (a == b) 1 else 0),
     )
-    val validate = (c: ALUGenerator,op: Int, oprands: List[(BigInt, BigInt)]) => {
+    val validate = (c: ALUGenerator[32], op: Int, oprands: List[(BigInt, BigInt)]) => {
       c.io.op.poke(op.U)
       oprands.foreach({ case (a, b) =>
         c.io.a.poke(a.U)
