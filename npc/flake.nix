@@ -19,7 +19,6 @@
           packages = [
             clang-tools
             rnix-lsp
-            coursier
 
             gdb
             jre
