@@ -2,10 +2,8 @@ package npc
 
 import chisel3._
 import chisel3.util.{MuxLookup, Fill, Decoupled, Counter, Queue, Reverse}
-import chisel3.util.{SRAM}
 import chisel3.stage.ChiselOption
-import npc.util.{ KeyboardSegController, RegisterFile }
-import flowpc.components.ProgramCounter
+import npc.util.KeyboardSegController
 
 class Switch extends Module {
   val io = IO(new Bundle {
@@ -33,9 +31,3 @@ class Keyboard extends Module {
   io.segs := seg_handler.io.segs
 }
 
-class Flowpc extends Module {
-  val io = IO(new Bundle { })
-  val register_file = new RegisterFile(readPorts = 2);
-  val pc = new ProgramCounter(32);
-  val adder = new SRAM()
-}
