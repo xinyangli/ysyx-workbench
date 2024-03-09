@@ -3,9 +3,12 @@ package npc
 import chisel3._
 import chisel3.util.{MuxLookup, Fill, Decoupled, Counter, Queue, Reverse}
 import chisel3.util.{SRAM}
+import chisel3.util.experimental.decode.{decoder, TruthTable, QMCMinimizer}
 import chisel3.stage.ChiselOption
-import npc.util.{ KeyboardSegController, RegisterFile }
-import flowpc.components.{ProgramCounter, ProgramCounterSel}
+import npc.util.{ KeyboardSegController }
+import flowpc.components.RegisterFile
+import chisel3.util.log2Ceil
+import chisel3.util.BitPat
 
 class Switch extends Module {
   val io = IO(new Bundle {
@@ -33,12 +36,32 @@ class Keyboard extends Module {
   io.segs := seg_handler.io.segs
 }
 
-object Opcode extends ChiselEnum {
+object RV32Inst extends ChiselEnum {
   val addi = Value("b0010011".U)
+  val inv = Value("b0000000".U)
 }
 
-class Control extends Bundle {
-  
+object InstType extends ChiselEnum {
+  val R, I, S, B, U, J = Value
+}
+
+class RegControl(width: Int) extends Bundle {
+  object RegWriteDataSel extends ChiselEnum {
+    val ALUOut = Value
+  }
+  val T = RegWriteDataSel
+  val writeEnable = Output(Bool()) 
+  val writeSelect = Output(this.T())
+}
+
+class Control(width: Int) extends Bundle {
+  val inst = IO(Input(UInt(width.W)))
+  val out = decoder(QMCMinimizer, inst, TruthTable(
+    Map(
+      BitPat(Opcode.addi.asUInt) -> BitPat("b00001")
+    ), BitPat("b?????")))
+  val regControl = new RegControl(width)
+
 }
 
 class Flowpc extends Module {

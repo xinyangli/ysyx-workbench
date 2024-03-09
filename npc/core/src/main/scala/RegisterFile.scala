@@ -1,25 +1,28 @@
-package npc.util
+package flowpc.components
 
 import chisel3._
+import chisel3.util.log2Ceil
+import chisel3.util.UIntToOH
 
-class RegisterFile(readPorts: Int) extends Module {
-  require(readPorts >= 0)
-  val io = IO(new Bundle {
-    val writeEnable = Input(Bool())
-    val writeAddr = Input(UInt(5.W))
-    val writeData = Input(UInt(32.W))
-    val readAddr = Input(Vec(readPorts, UInt(5.W)))
-    val readData = Output(Vec(readPorts, UInt(32.W)))
+class RegisterFile(width: Int, numRegisters: Int, numReadPorts: Int) extends Module {
+  require(numReadPorts >= 0)
+  val writePort = IO(new Bundle {
+    val enable = Input(Bool())
+    val addr = Input(UInt(log2Ceil(width).W))
+    val data = Input(UInt(width.W))
   })
+  val readPorts = IO(Vec(numReadPorts, new Bundle {
+    val addr = Input(UInt(log2Ceil(width).W))
+    val data = Output(UInt(width.W))
+  }))
 
-  val regFile = RegInit(VecInit(Seq.fill(32)(0.U(32.W))))
-  for (i <- 1 until 32) {
-    regFile(i) := regFile(i)
+  val regFile = RegInit(VecInit(Seq.fill(numRegisters)(0.U(32.W))))
+  val writeAddrOH = UIntToOH(writePort.addr)
+  for ((reg, i) <- regFile.zipWithIndex) {
+    reg := Mux(writeAddrOH(i) && writePort.enable, writePort.data, reg)
   }
-  regFile(io.writeAddr) := Mux(io.writeEnable, io.writeData, regFile(io.writeAddr))
-  regFile(0) := 0.U
 
-  for (i <- 0 until readPorts) {
-    io.readData(i) := regFile(io.readAddr(i))
+  for (readPort <- readPorts) {
+    readPort.data := regFile(readPort.addr)
   }
 }
