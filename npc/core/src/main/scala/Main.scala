@@ -33,12 +33,9 @@ class Keyboard extends Module {
   io.segs := seg_handler.io.segs
 }
 
-<<<<<<< Updated upstream
-=======
 class Flowpc extends Module {
   val io = IO(new Bundle { })
   val register_file = new RegisterFile(readPorts = 2);
   val pc = new ProgramCounter(32);
   val adder = new SRAM()
 }
->>>>>>> Stashed changes
