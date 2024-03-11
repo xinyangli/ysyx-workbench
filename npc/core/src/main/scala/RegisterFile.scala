@@ -31,32 +31,32 @@ class RegFileInterface[T <: Data](size: Int, tpe: T, numReadPorts: Int, numWrite
 }
 
 class RegisterFileCore[T <: Data](size: Int, tpe: T, numReadPorts: Int) extends Module {
-  printf("$numReadPorts\n")
   require(numReadPorts >= 0)
   val writePort = IO(new Bundle {
     val enable = Input(Bool())
-    val addr = Input(UInt(size.W))
+    val addr = Input(UInt(log2Ceil(size).W))
     val data = Input(tpe)
   })
   val readPorts = IO(Vec(numReadPorts, new Bundle {
-    val addr = Input(UInt(size.W))
+    val addr = Input(UInt(log2Ceil(size).W))
     val data = Output(tpe)
   }))
 
-  // val regFile = RegInit(VecInit(Seq.fill(size)(0.U)))
-  // val writeAddrOH = UIntToOH(writePort.addr)
-  // for ((reg, i) <- regFile.zipWithIndex) {
-  //   reg := Mux(writeAddrOH(i) && writePort.enable, writePort.data, reg)
-  // }
+  val regFile = RegInit(VecInit(Seq.fill(size)(0.U(tpe.getWidth.W))))
+  val writeAddrOH = UIntToOH(writePort.addr)
+  for ((reg, i) <- regFile.zipWithIndex.tail) {
+    reg := Mux(writeAddrOH(i) && writePort.enable, writePort.data, reg)
+  }
+  regFile(0) := 0.U
 
-  // for (readPort <- readPorts) {
-  //   readPort.data := regFile(readPort.addr)
-  // }
+  for (readPort <- readPorts) {
+    readPort.data := regFile(readPort.addr)
+  }
 }
 
 object RegisterFile {
   def apply[T <: Data](size: Int, tpe: T, numReadPorts: Int, numWritePorts: Int): RegFileInterface[T] = {
-    val core = new RegisterFileCore(size, tpe, numReadPorts)
+    val core = Module(new RegisterFileCore(size, tpe, numReadPorts))
     val _out = Wire(new RegFileInterface(size, tpe, numReadPorts, numWritePorts))
     val clock = core.clock
     for (i <- 0 to numReadPorts) {
@@ -67,6 +67,7 @@ object RegisterFile {
     core.writePort.data := MuxLookup(_out.control.writeSelect, 0.U)(
       _out.control.WriteSelect.all.map(x => (x -> _out.data.write.data(x.asUInt).asUInt))
     )
+    core.writePort.enable := _out.control.writeEnable
     _out
   }
 }
