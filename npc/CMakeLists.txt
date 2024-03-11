@@ -17,7 +17,7 @@ find_package(verilator REQUIRED)
 find_library(NVBOARD_LIBRARY NAMES nvboard)
 find_path(NVBOARD_INCLUDE_DIR NAMES nvboard.h)
 
-set(TOPMODULES "Switch" "Keyboard")
+set(TOPMODULES "Flow")
 
 foreach(TOPMODULE IN LISTS TOPMODULES)
  

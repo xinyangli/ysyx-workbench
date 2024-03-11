@@ -5,8 +5,6 @@ import chiseltest._
 import org.scalatest.freespec.AnyFreeSpec
 import chiseltest.simulator.WriteVcdAnnotation
 
-import chisel3.util.{SRAM}
-
 import flowpc.components._
 class RegisterFileSpec extends AnyFreeSpec with ChiselScalatestTester {
   "RegisterFileCore" - {
@@ -43,19 +41,22 @@ class RegisterFileSpec extends AnyFreeSpec with ChiselScalatestTester {
     }
   }
   "RegisterInterface" - {
-    class Top extends Module {
-      val io = RegisterFile(32, UInt(32.W), 2, 2)
-    }
     "worked" in {
-      test(new Top) { c =>
-        // import c.io.control.WriteSelect._
-        // c.io.control.writeEnable.poke(true)
-        // c.io.control.writeSelect.poke(rAluOut)
-        // c.io.data.write.addr.poke(1)
-        // c.io.data.write.data(rAluOut.asUInt).poke(0xcdef)
-        // c.io.data.read(0).rs.poke(1)
-        // c.clock.step(1)
-        // c.io.data.read(0).src.expect(0xcdef)
+      class Top extends Module {
+        val io = IO(new RegFileInterface(32, UInt(32.W), 2, 2))
+        val rf = RegisterFile(32, UInt(32.W), 2, 2)
+        io :<>= rf
+      }
+      test(new Top).withAnnotations(Seq(WriteVcdAnnotation)) { c =>
+        import c.io.control.WriteSelect._
+        val writePort = rAluOut.litValue.toInt
+        c.io.control.writeEnable.poke(true)
+        c.io.control.writeSelect.poke(rAluOut)
+        c.io.data.write.addr.poke(5)
+        c.io.data.write.data(writePort).poke(0xcdef)
+        c.io.data.read(0).rs.poke(5)
+        c.clock.step(1)
+        c.io.data.read(0).src.expect(0xcdef)
       }
     }
   }

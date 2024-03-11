@@ -1,16 +1,17 @@
-package flowpc.components
+package flow.components
 
 import chisel3._
 import chisel3.util.log2Ceil
 import chisel3.util.UIntToOH
 import chisel3.util.MuxLookup
+import shapeless.{ HNil, :: }
 
 class RegControl extends Bundle {
-  val writeEnable = Input(Bool()) 
-
   object WriteSelect extends ChiselEnum {
     val rAluOut, rMemOut = Value
   }
+
+  val writeEnable = Input(Bool()) 
   val writeSelect = Input(WriteSelect())
 }
 
@@ -28,6 +29,11 @@ class RegFileData[T <: Data](size:Int, tpe: T, numReadPorts: Int, numWritePorts:
 class RegFileInterface[T <: Data](size: Int, tpe: T, numReadPorts: Int, numWritePorts: Int) extends Bundle {
   val control = new RegControl
   val data = new RegFileData(size, tpe, numReadPorts, numWritePorts)
+
+  type ctrlTypes = Bool :: control.WriteSelect.Type :: HNil
+  def ctrlBindPorts: ctrlTypes = {
+    control.writeEnable :: control.writeSelect :: HNil
+  }
 }
 
 class RegisterFileCore[T <: Data](size: Int, tpe: T, numReadPorts: Int) extends Module {
@@ -59,9 +65,9 @@ object RegisterFile {
     val core = Module(new RegisterFileCore(size, tpe, numReadPorts))
     val _out = Wire(new RegFileInterface(size, tpe, numReadPorts, numWritePorts))
     val clock = core.clock
-    for (i <- 0 to numReadPorts) {
+    for (i <- 0 until numReadPorts) {
       core.readPorts(i).addr := _out.data.read(i).rs
-      core.readPorts(i).data := _out.data.read(i).src
+      _out.data.read(i).src := core.readPorts(i).data
     }
     core.writePort.addr := _out.data.write.addr
     core.writePort.data := MuxLookup(_out.control.writeSelect, 0.U)(

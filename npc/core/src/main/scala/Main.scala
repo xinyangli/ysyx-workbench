@@ -1,4 +1,4 @@
-package npc
+package flow
 
 import scala.reflect.runtime.universe._
 import chisel3._
@@ -6,39 +6,13 @@ import chisel3.util.{MuxLookup, Fill, Decoupled, Counter, Queue, Reverse}
 import chisel3.util.{SRAM}
 import chisel3.util.experimental.decode.{decoder, TruthTable, QMCMinimizer}
 import chisel3.stage.ChiselOption
-import npc.util.{ KeyboardSegController }
-import flowpc.components.RegisterFile
 import chisel3.util.log2Ceil
 import chisel3.util.BitPat
 import chisel3.util.Enum
 import chisel3.experimental.prefix
 import shapeless.{ HNil, :: }
-
-class Switch extends Module {
-  val io = IO(new Bundle {
-    val sw = Input(Vec(2, Bool()))
-    val out = Output(Bool())
-  })
-
-  io.out := io.sw(0) ^ io.sw(1)
-}
-
-import npc.util.{PS2Port, KeyboardController, SegControllerGenerator}
-
-class Keyboard extends Module {
-  val io = IO(new Bundle {
-    val ps2 = PS2Port()
-    val segs = Output(Vec(8, UInt(8.W)))
-  })
-
-  val seg_handler = Module(new KeyboardSegController)
-  val keyboard_controller = Module(new KeyboardController)
-
-  seg_handler.io.keycode <> keyboard_controller.io.out
-
-  keyboard_controller.io.ps2 := io.ps2
-  io.segs := seg_handler.io.segs
-}
+import shapeless.HList
+import shapeless.ops.coproduct.Prepend
 
 object RV32Inst {
   private val bp = BitPat
@@ -54,25 +28,28 @@ class PcControl(width: Int) extends Bundle {
 }
 
 
-import flowpc.components.{ RegisterFile }
+import flow.components.{ RegisterFile, ProgramCounter, ALU }
 class Control(width: Int) extends Module {
-  val reg = Flipped(RegisterFile(32, UInt(32.W), 2, 2))
-  val pc = new PcControl(width)
-  val inst = IO(Input(UInt(width.W)))
+  val inst = Input(UInt(width.W))
+  val reg = Flipped(RegisterFile(32, UInt(width.W), 2, 2))
+  val pc = ProgramCounter(UInt(width.W))
+  val alu = ALU(UInt(width.W))
 
-  type T = Bool :: reg.control.WriteSelect.Type :: HNil
-  val dst: T = reg.control.writeEnable :: reg.control.writeSelect :: HNil
+  // TODO: Add .ctrlTypes together instead of write them by hand.
+  type T = Bool :: reg.control.WriteSelect.Type :: pc.SrcSelect.Type :: alu.control.OpSelect.Type :: HNil
+  val dst: T = reg.ctrlBindPorts ++ pc.ctrlBindPorts ++ alu.ctrlBindPorts
   val dstList: List[Data] = dst.toList
   val reversePrefixSum = dstList.scanLeft(0)(_ + _.getWidth).reverse
   val slices = reversePrefixSum.zip(reversePrefixSum.tail)
 
   import reg.control.WriteSelect._
   import pc.SrcSelect._
+  import alu.control.OpSelect._
   import RV32Inst._
   val ControlMapping: Array[(BitPat, T)] = Array(
     //     Regs                       :: PC          :: Exe
     //     writeEnable :: writeSelect :: srcSelect   :: 
-    (addi, false.B     :: rAluOut     ::               HNil)
+    (addi, false.B     :: rAluOut     :: pStaticNpc  :: aOpAdd :: HNil)
   )
 
   def toBits(t: T): BitPat = {
@@ -82,13 +59,15 @@ class Control(width: Int) extends Module {
 
   val out = decoder(QMCMinimizer, inst, TruthTable(
     ControlMapping.map(it => (it._1, toBits(it._2))), inv))
+
   val srcList = slices.map(s => out(s._1 - 1, s._2))
   srcList.zip(dstList).foreach({ case (src, dst) => dst := src })
 }
 
-class Flowpc extends Module {
+class Flow extends Module {
   val io = IO(new Bundle { })
   val ram = SRAM(size=128*1024*1024, tpe=UInt(32.W), numReadPorts=2, numWritePorts=1,numReadwritePorts=0)
+  val control = new Control(32)
 
   // Instruction Fetch
   ram.readPorts(0).enable := true.B
