@@ -39,9 +39,8 @@ class RV32CPUSpec extends AnyFreeSpec with ChiselScalatestTester {
     }
   }
   "should compile" in {
-    test(new Flow("../resource/addi.txt")) { c =>
+    test(new Flow("../resource/addi.txt")).withAnnotations(Seq(WriteVcdAnnotation)) { c =>
       c.clock.step(1)
-      // c.clock.step(100)
     }
   }
 
