@@ -5,6 +5,7 @@
 #include <verilated_vcd_c.h>
 #include <VFlow.h>
 #define MAX_SIM_TIME 100
+#define VERILATOR_TRACE
 
 int main(int argc, char **argv, char **env) {
     int sim_time = 0;
