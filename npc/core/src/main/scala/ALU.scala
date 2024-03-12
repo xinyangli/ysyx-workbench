@@ -9,10 +9,15 @@ class ALUControlInterface extends Bundle {
     val aOpAdd, aOpSub, aOpNot, aOpAnd, aOpOr, aOpXor, aOpSlt, aOpEq, aOpNop = Value
   }
   val op = Input(OpSelect())
+
+  type ctrlTypes = OpSelect.Type :: HNil
+  def ctrlBindPorts: ctrlTypes = {
+    op :: HNil
+  }
 }
 
 class ALU[T <: UInt](tpe: T) extends Module {
-  val control = new ALUControlInterface
+  val control = IO(new ALUControlInterface)
   val in = IO(new Bundle {
     val a = Input(tpe)
     val b = Input(tpe)
@@ -33,7 +38,7 @@ class ALU[T <: UInt](tpe: T) extends Module {
 
   import control.OpSelect._
 
-  out.result := MuxLookup(control.op, aOpNop.asUInt)(Seq(
+  out.result := MuxLookup(control.op, 0.U)(Seq(
     aOpAdd -> add,
     aOpSub -> sub,
     aOpNot -> not,
@@ -43,15 +48,10 @@ class ALU[T <: UInt](tpe: T) extends Module {
     aOpSlt -> slt,
     aOpEq -> eq
   ))
-
-  type ctrlTypes = control.OpSelect.Type :: HNil
-  def ctrlBindPorts: ctrlTypes = {
-    control.op :: HNil
-  }
 }
 
 object ALU {
   def apply[T <: UInt](tpe: T): ALU[T] = {
-    new ALU(tpe)
+    Module(new ALU(tpe))
   }
 }

@@ -5,7 +5,7 @@ import chiseltest._
 import org.scalatest.freespec.AnyFreeSpec
 import chiseltest.simulator.WriteVcdAnnotation
 
-import flowpc.components._
+import flow.components._
 class RegisterFileSpec extends AnyFreeSpec with ChiselScalatestTester {
   "RegisterFileCore" - {
     "register 0 is always 0" in {

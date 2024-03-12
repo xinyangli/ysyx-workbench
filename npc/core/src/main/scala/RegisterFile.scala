@@ -13,6 +13,11 @@ class RegControl extends Bundle {
 
   val writeEnable = Input(Bool()) 
   val writeSelect = Input(WriteSelect())
+
+  type ctrlTypes = Bool :: WriteSelect.Type :: HNil
+  def ctrlBindPorts: ctrlTypes = {
+    writeEnable :: writeSelect :: HNil
+  }
 }
 
 class RegFileData[T <: Data](size:Int, tpe: T, numReadPorts: Int, numWritePorts: Int) extends Bundle {
@@ -29,11 +34,6 @@ class RegFileData[T <: Data](size:Int, tpe: T, numReadPorts: Int, numWritePorts:
 class RegFileInterface[T <: Data](size: Int, tpe: T, numReadPorts: Int, numWritePorts: Int) extends Bundle {
   val control = new RegControl
   val data = new RegFileData(size, tpe, numReadPorts, numWritePorts)
-
-  type ctrlTypes = Bool :: control.WriteSelect.Type :: HNil
-  def ctrlBindPorts: ctrlTypes = {
-    control.writeEnable :: control.writeSelect :: HNil
-  }
 }
 
 class RegisterFileCore[T <: Data](size: Int, tpe: T, numReadPorts: Int) extends Module {
