@@ -1,6 +1,7 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-circt162.url = "github:NixOS/nixpkgs/7995cae3ad60e3d6931283d650d7f43d31aaa5c7";
     flake-utils.url = "github:numtide/flake-utils";
     nur-xin = {
       url = "git+https://git.xinyang.life/xin/nur.git";
@@ -38,7 +39,7 @@
             cmake
             sbt
             nur.xin.nvboard
-            self.packages.${system}.circt
+            nixpkgs-circt162.legacyPackages.${system}.circt
             yosys
           ];
           buildInputs = [

@@ -34,6 +34,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-circt162": {
+      "locked": {
+        "lastModified": 1705645507,
+        "narHash": "sha256-tX3vipIAmNDBA8WNWG4oY4KyTfnm2YieTHO2BhG8ISA=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "7995cae3ad60e3d6931283d650d7f43d31aaa5c7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "7995cae3ad60e3d6931283d650d7f43d31aaa5c7",
+        "type": "github"
+      }
+    },
     "nur-xin": {
       "inputs": {
         "nixpkgs": [
@@ -58,6 +74,7 @@
       "inputs": {
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs",
+        "nixpkgs-circt162": "nixpkgs-circt162",
         "nur-xin": "nur-xin"
       }
     },
