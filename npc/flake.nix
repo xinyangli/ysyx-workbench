@@ -11,15 +11,16 @@
   outputs = { self, ... }@inputs: with inputs;
     flake-utils.lib.eachDefaultSystem (system:
       let
-        pkgs = nixpkgs.legacyPackages.${system} //
+        pkgs = import nixpkgs { inherit system; config.allowUnfree = true; }//
           { nur.xin = nur-xin.legacyPackages.${system}; };
       in
       {
         devShells.default = with pkgs; mkShell {
           packages = [
             clang-tools
-            rnix-lsp
+            # rnix-lsp
             coursier
+            espresso
 
             gdb
             jre

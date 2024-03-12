@@ -1,70 +1,48 @@
-package npc
+package flow
 
 import chisel3._
 import chiseltest._
 import org.scalatest.freespec.AnyFreeSpec
 import chiseltest.simulator.WriteVcdAnnotation
 
-import npc.util._
+import flow.Flow
 
-// class ALUGeneratorSpec extends AnyFreeSpec with ChiselScalatestTester {
-//   "With 32 width, " - {
-//     val neg = (x: BigInt) => BigInt("FFFFFFFF", 16) - x + 1
-//     val not = (x: BigInt) => x ^ BigInt("FFFFFFFF", 16)
-//     val mask = BigInt("FFFFFFFF", 16)
-//     val oprands: List[(BigInt, BigInt)] = List(
-//       (5, 3), (101010, 101010), (0xFFFFFFFCL, 0xFFFFFFFFL), (4264115, 2)
-//     )
-//     val operations: Map[Int, (BigInt, BigInt) => BigInt] = Map(
-//       0 -> ((a: BigInt, b: BigInt) => (a + b) & mask),
-//       1 -> ((a: BigInt, b: BigInt) => (a + neg(b)) & mask),
-//       2 -> ((a, _) => not(a)),
-//       3 -> (_ & _),
-//       4 -> (_ | _),
-//       5 -> (_ ^ _),
-//       6 -> ((a, b) => if (a < b) 1 else 0),
-//       7 -> ((a, b) => if (a == b) 1 else 0),
-//     )
-//     val validate = (c: ALUGenerator[32], op: Int, oprands: List[(BigInt, BigInt)]) => {
-//       c.io.op.poke(op.U)
-//       oprands.foreach({ case (a, b) =>
-//         c.io.a.poke(a.U)
-//         c.io.b.poke(b.U)
-//         c.io.out.expect(operations(op)(a, b))
-//       })
-//     }
-//     "add should work" in {
-//       test(new ALUGenerator(32)) { c => validate(c, 0, oprands) }
-//     }
-//     "sub should work" - {
-//       "with positive result" in {
-//         test(new ALUGenerator(32)) { c =>
-//           validate(c, 1, oprands.filter({case (a, b) => a >= b}))
-//         }
-//       }
-//       "with negative result" in {
-//         test(new ALUGenerator(32)) { c =>
-//           validate(c, 1, oprands.filter({case (a, b) => a < b}))
-//         }
-//       }
-//     }
-//     "not should work" in {
-//       test(new ALUGenerator(32)) { c => validate(c, 2, oprands) }
-//     }
-//     "and should work" in {
-//       test(new ALUGenerator(32)) { c => validate(c, 3, oprands) }
-//     }
-//     "or should work" in {
-//       test(new ALUGenerator(32)) { c => validate(c, 4, oprands) }
-//     }
-//     "xor should work" in {
-//       test(new ALUGenerator(32)) { c => validate(c, 5, oprands) }
-//     }
-//     "compare should work" in {
-//       test(new ALUGenerator(32)) { c => validate(c, 6, oprands) }
-//     }
-//     "equal should work" in {
-//       test(new ALUGenerator(32)) { c => validate(c, 7, oprands) }
-//     }
-//   }
-// }
+class RV32CPUSpec extends AnyFreeSpec with ChiselScalatestTester {
+  "MemoryFile" - {
+    "correctly load" in {
+      import chisel3.util.{SRAM, SRAMInterface, HexMemoryFile}
+      class UserMem extends Module {
+        val io = IO(new SRAMInterface(1024, UInt(32.W), 1, 1, 0))
+        val memoryFile = HexMemoryFile("../resource/addi.txt") 
+        io :<>= SRAM(
+          size = 1024,
+          tpe = UInt(32.W),
+          numReadPorts = 1,
+          numWritePorts = 1,
+          numReadwritePorts = 0,
+          memoryFile = memoryFile
+        )
+        
+        val read = io.readPorts(0).data
+        printf(cf"memoryFile=$memoryFile, readPort=$read%x\n")
+      }
+      test(new UserMem).withAnnotations(Seq(WriteVcdAnnotation)) { c =>
+        c.io.readPorts(0).enable.poke(true.B)
+        c.io.writePorts(0).enable.poke(false.B)
+        c.io.writePorts(0).address.poke(0.U)
+        c.io.writePorts(0).data.poke(0.U)
+        for (i <- 0 until 32) {
+          c.io.readPorts(0).address.poke(i.U)
+          c.clock.step(1)
+        }
+      }
+    }
+  }
+  "should compile" in {
+    test(new Flow("../resource/addi.txt")) { c =>
+      c.clock.step(1)
+      // c.clock.step(100)
+    }
+  }
+
+}
