@@ -83,15 +83,17 @@ class Flow extends Module {
   ram.readPorts(0).address := pc.out
   val inst = ram.readPorts(0).data
 
+  import control.pc.SrcSelect._
+
+  pc.in.pcSrcs(pStaticNpc.litValue.toInt) := pc.out + 4.U
+  pc.in.pcSrcs(pBranchResult.litValue.toInt) := alu.out.result
+
   control.inst := inst
   reg.control <> control.reg
   pc.control <> control.pc
   alu.control <> control.alu
 
   import control.reg.WriteSelect._
-  import control.pc.SrcSelect._
-  import control.alu.OpSelect._
-
   reg.in.writeData(rAluOut.litValue.toInt) := alu.out.result
   // TODO: Read address in load command goes here
   ram.readPorts(1).enable := false.B
@@ -100,6 +102,11 @@ class Flow extends Module {
   reg.in.writeAddr := inst(11, 7)
   reg.in.rs(0) := inst(19, 15)
   reg.in.rs(1) := inst(24, 20)
+
+  // TODO: Memory write goes here
+  ram.writePorts(0).address := 1.U
+  ram.writePorts(0).data := 1.U
+  ram.writePorts(0).enable := false.B
 
   alu.in.a := reg.out.src(0)
   alu.in.b := reg.out.src(1)
