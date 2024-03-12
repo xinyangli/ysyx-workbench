@@ -63,47 +63,39 @@ class Control(width: Int) extends Module {
   alu.op := alu.OpSelect(0.U)
   pc.srcSelect := pc.SrcSelect(0.U)
 
-  // val out = decoder(
-  //   inst,
-  //   TruthTable(ControlMapping.map(it => (it._1 -> toBits(it._2))), default))
-  val table = TruthTable(
-    (0 until 16).map { i =>
-      BitPat(i.U(4.W)) -> BitPat((1 << i).U(16.W))
-    },
-    BitPat.dontCare(16)
-  )
+  val out = decoder(
+    inst,
+    TruthTable(ControlMapping.map(it => (it._1 -> toBits(it._2))), default))
 
-  val out = decoder.qmc(inst(3,0), table)
+  val dstList = dst.toList
+  val reversePrefixSum = dstList.scanLeft(0)(_ + _.getWidth).reverse
+  val slices = reversePrefixSum.zip(reversePrefixSum.tail)
+  val srcList = slices.map(s => out(s._1 - 1, s._2))
 
-  // val dstList = dst.toList
-  // val reversePrefixSum = dstList.scanLeft(0)(_ + _.getWidth).reverse
-  // val slices = reversePrefixSum.zip(reversePrefixSum.tail)
-  // val srcList = slices.map(s => out(s._1 - 1, s._2))
-
-  // srcList
-  //   .zip(dstList)
-  //   .foreach({ case (src, dst) =>
-  //     dst := src.asTypeOf(dst)
-  //   })
+  srcList
+    .zip(dstList)
+    .foreach({ case (src, dst) =>
+      dst := src.asTypeOf(dst)
+    })
 }
 
 import flow.components.{RegisterFile, RegFileInterface, ProgramCounter, ALU}
 import chisel3.util.experimental.loadMemoryFromFileInline
 class Flow extends Module {
-  // val dataType = UInt(32.W)
+  val dataType = UInt(32.W)
 
   val ram = SRAM(
     size = 128 * 1024 * 1024,
-    tpe = UInt(32.W),
+    tpe = dataType,
     numReadPorts = 2,
     numWritePorts = 1,
     numReadwritePorts = 0,
     // memoryFile = HexMemoryFile(memoryFile)
   )
   val control = Module(new Control(32))
-  val reg = RegisterFile(32, UInt(32.W), 2, 2)
-  val pc = Module(new ProgramCounter(UInt(32.W)))
-  val alu = Module(new ALU(UInt(32.W)))
+  val reg = RegisterFile(32, dataType, 2, 2)
+  val pc = Module(new ProgramCounter(dataType))
+  val alu = Module(new ALU(dataType))
 
   ram.readPorts(0).enable := true.B
   ram.readPorts(0).address := pc.out - 0x80000000L.U
