@@ -10,8 +10,8 @@ class ALUControlInterface extends Bundle {
   }
   val op = Input(OpSelect())
 
-  type ctrlTypes = OpSelect.Type :: HNil
-  def ctrlBindPorts: ctrlTypes = {
+  type CtrlTypes = OpSelect.Type :: HNil
+  def ctrlBindPorts: CtrlTypes = {
     op :: HNil
   }
 }

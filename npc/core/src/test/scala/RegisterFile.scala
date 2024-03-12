@@ -1,4 +1,4 @@
-package flowpc
+package flow
 
 import chisel3._
 import chiseltest._
@@ -41,22 +41,40 @@ class RegisterFileSpec extends AnyFreeSpec with ChiselScalatestTester {
     }
   }
   "RegisterInterface" - {
-    "worked" in {
-      class Top extends Module {
-        val io = IO(new RegFileInterface(32, UInt(32.W), 2, 2))
-        val rf = RegisterFile(32, UInt(32.W), 2, 2)
-        io :<>= rf
-      }
+    class Top extends Module {
+      val io = IO(new RegFileInterface(32, UInt(32.W), 2, 2))
+      val rf = RegisterFile(32, UInt(32.W), 2, 2)
+      io :<>= rf
+    }
+    "write" in {
       test(new Top).withAnnotations(Seq(WriteVcdAnnotation)) { c =>
         import c.io.control.WriteSelect._
         val writePort = rAluOut.litValue.toInt
         c.io.control.writeEnable.poke(true)
         c.io.control.writeSelect.poke(rAluOut)
-        c.io.data.write.addr.poke(5)
-        c.io.data.write.data(writePort).poke(0xcdef)
-        c.io.data.read(0).rs.poke(5)
+        c.io.in.writeAddr.poke(5)
+        c.io.in.writeData(writePort).poke(0xcdef)
+        c.io.in.rs(0).poke(5)
         c.clock.step(1)
-        c.io.data.read(0).src.expect(0xcdef)
+        c.io.out.src(0).expect(0xcdef)
+      }
+    }
+    "no data is written when not enabled" in {
+      test(new Top).withAnnotations(Seq(WriteVcdAnnotation)) { c =>
+        import c.io.control.WriteSelect._
+        val writePort = rAluOut.litValue.toInt
+        c.io.control.writeEnable.poke(true)
+        c.io.control.writeSelect.poke(rAluOut)
+        c.io.in.writeAddr.poke(5)
+        c.io.in.writeData(writePort).poke(0xcdef)
+        c.io.in.rs(0).poke(5)
+        c.clock.step(1)
+
+        c.io.control.writeEnable.poke(false)
+        c.io.in.writeData(writePort).poke(0x1234)
+        c.clock.step(1)
+
+        c.io.out.src(0).expect(0xcdef)
       }
     }
   }

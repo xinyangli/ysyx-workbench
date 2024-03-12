@@ -28,7 +28,6 @@ class PcControl(width: Int) extends Bundle {
 }
 
 
-import flow.components.{ RegisterFile, RegFileInterface, ProgramCounter, ALU }
 import flow.components.{ RegControl, PcControlInterface, ALUControlInterface }
 class Control(width: Int) extends Module {
   val inst = IO(Input(UInt(width.W)))
@@ -65,23 +64,43 @@ class Control(width: Int) extends Module {
   val slices = reversePrefixSum.zip(reversePrefixSum.tail)
   val srcList = slices.map(s => out(s._1 - 1, s._2))
 
-  // def m[T <: Data](src: UInt, dst: T) = dst match {
-  //   case dst: EnumType  => dst := src.asTypeOf(chiselTypeOf(dst)) 
-  //   case dst: Data      => dst := src
-  // }
-
   srcList.zip(dstList).foreach({
     case (src, dst) => dst := src.asTypeOf(dst)
   })
 }
 
+import flow.components.{ RegisterFile, RegFileInterface, ProgramCounter, ALU }
 class Flow extends Module {
-  val io = IO(new Bundle { })
-  val ram = SRAM(size=128*1024*1024, tpe=UInt(32.W), numReadPorts=2, numWritePorts=1,numReadwritePorts=0)
+  val dataType = UInt(32.W)
+
+  val ram = SRAM(size=128*1024*1024, tpe=dataType, numReadPorts=2, numWritePorts=1,numReadwritePorts=0)
   val control = Module(new Control(32))
+  val reg = RegisterFile(32, dataType, 2, 2)
+  val pc = Module(new ProgramCounter(dataType))
+  val alu = Module(new ALU(dataType))
 
-  // Instruction Fetch
   ram.readPorts(0).enable := true.B
-  val instruction = ram.readPorts(0).address
+  ram.readPorts(0).address := pc.out
+  val inst = ram.readPorts(0).data
 
+  control.inst := inst
+  reg.control <> control.reg
+  pc.control <> control.pc
+  alu.control <> control.alu
+
+  import control.reg.WriteSelect._
+  import control.pc.SrcSelect._
+  import control.alu.OpSelect._
+
+  reg.in.writeData(rAluOut.litValue.toInt) := alu.out.result
+  // TODO: Read address in load command goes here
+  ram.readPorts(1).enable := false.B
+  ram.readPorts(1).address := 0.U
+  reg.in.writeData(rMemOut.litValue.toInt) := ram.readPorts(1).data
+  reg.in.writeAddr := inst(11, 7)
+  reg.in.rs(0) := inst(19, 15)
+  reg.in.rs(1) := inst(24, 20)
+
+  alu.in.a := reg.out.src(0)
+  alu.in.b := reg.out.src(1)
 }

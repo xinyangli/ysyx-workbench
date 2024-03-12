@@ -11,8 +11,8 @@ class PcControlInterface extends Bundle {
 
   val srcSelect = Input(SrcSelect())
 
-  type ctrlTypes = SrcSelect.Type :: HNil
-  def ctrlBindPorts: ctrlTypes = {
+  type CtrlTypes = SrcSelect.Type :: HNil
+  def ctrlBindPorts: CtrlTypes = {
     srcSelect :: HNil
   }
 }
@@ -25,7 +25,10 @@ class ProgramCounter[T <: Data](tpe: T) extends Module {
   })
   val out = IO(Output(tpe))
 
-  out := in.pcSrcs(control.srcSelect.asUInt)
+  private val pc = RegInit(0x80000000L.U)
+
+  pc := in.pcSrcs(control.srcSelect.asUInt)
+  out := pc
 }
 
 object ProgramCounter {
