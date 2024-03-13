@@ -19,12 +19,14 @@ int main(int argc, char **argv, char **env) {
     top->trace(m_trace, 5);
     m_trace->open("waveform.vcd");
 #endif
-    top->reset = 1;
-    top->clock = 1;
-    top->eval();
-    top->clock = 0;
-    top->reset = 0;
-    top->eval();
+    for (sim_time = 0; sim_time < 10; sim_time++) {
+        top->eval();
+        top->clock = !top->clock;
+        top->reset = 1;
+#ifdef VERILATOR_TRACE
+        m_trace->dump(sim_time);
+#endif
+    }
     for (sim_time = 0; sim_time < MAX_SIM_TIME; sim_time++) {
         top->eval();
         top->clock = !top->clock;
