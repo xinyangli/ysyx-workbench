@@ -40,6 +40,11 @@ class Control(width: Int) extends Module {
   type T =
     Bool :: reg.WriteSelect.Type :: pc.SrcSelect.Type :: alu.OpSelect.Type :: alu.SrcSelect.Type :: HNil
   val dst: T = reg.ctrlBindPorts ++ pc.ctrlBindPorts ++ alu.ctrlBindPorts
+
+  val dstList = dst.toList
+  val reversePrefixSum = dstList.scanLeft(0)(_ + _.getWidth).reverse
+  val slices = reversePrefixSum.zip(reversePrefixSum.tail)
+
   import reg.WriteSelect._
   import pc.SrcSelect._
   import alu.OpSelect._
@@ -50,26 +55,15 @@ class Control(width: Int) extends Module {
     //     writeEnable :: writeSelect :: srcSelect  ::
     (addi, true.B      :: rAluOut     :: pStaticNpc :: aOpAdd :: aSrcImm :: HNil),
   )
+  val default = BitPat.dontCare(dstList.map(_.getWidth).reduce(_ + _))
+
   def toBits(t: T): BitPat = {
     val list: List[Data] = t.toList
     list.map(x => BitPat(x.litValue.toInt.U(x.getWidth.W))).reduceLeft(_ ## _)
   }
-
-  val default = BitPat("b????????")
-
-  reg.writeEnable := false.B
-  reg.writeSelect := reg.WriteSelect(0.U)
-  alu.op := alu.OpSelect(0.U)
-  pc.srcSelect := pc.SrcSelect(0.U)
-
   val out = decoder(
     inst,
     TruthTable(ControlMapping.map(it => (it._1 -> toBits(it._2))), default))
-  println(out)
-
-  val dstList = dst.toList
-  val reversePrefixSum = dstList.scanLeft(0)(_ + _.getWidth).reverse
-  val slices = reversePrefixSum.zip(reversePrefixSum.tail)
   val srcList = slices.map(s => out(s._1 - 1, s._2))
 
   srcList
