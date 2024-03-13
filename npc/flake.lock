@@ -5,11 +5,11 @@
         "systems": "systems"
       },
       "locked": {
-        "lastModified": 1710146030,
-        "narHash": "sha256-SZ5L6eA7HJ/nmkzGG7/ISclqe6oZdOZTNoesiInkXPQ=",
+        "lastModified": 1701680307,
+        "narHash": "sha256-kAuep2h5ajznlPMD9rnQyffWG8EM/C73lejGofXvdM8=",
         "owner": "numtide",
         "repo": "flake-utils",
-        "rev": "b1d9ab70662946ef0850d488da1c9019f3a9752a",
+        "rev": "4022d587cbbfd70fe950c1e2083a02621806a725",
         "type": "github"
       },
       "original": {
@@ -20,33 +20,17 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1709961763,
-        "narHash": "sha256-6H95HGJHhEZtyYA3rIQpvamMKAGoa8Yh2rFV29QnuGw=",
+        "lastModified": 1704194953,
+        "narHash": "sha256-RtDKd8Mynhe5CFnVT8s0/0yqtWFMM9LmCzXv/YKxnq4=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "3030f185ba6a4bf4f18b87f345f104e6a6961f34",
+        "rev": "bd645e8668ec6612439a9ee7e71f7eac4099d4f6",
         "type": "github"
       },
       "original": {
         "owner": "NixOS",
         "ref": "nixos-unstable",
         "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
-    "nixpkgs-circt162": {
-      "locked": {
-        "lastModified": 1705645507,
-        "narHash": "sha256-tX3vipIAmNDBA8WNWG4oY4KyTfnm2YieTHO2BhG8ISA=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "7995cae3ad60e3d6931283d650d7f43d31aaa5c7",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "7995cae3ad60e3d6931283d650d7f43d31aaa5c7",
         "type": "github"
       }
     },
@@ -57,11 +41,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1707020873,
-        "narHash": "sha256-+dNltc7tjgTIyle/I/5siQ5IvPwu+R5Uf6e24CmjLNk=",
+        "lastModified": 1704450168,
+        "narHash": "sha256-zOLL35LX83Of64quCyxpyP8rTSO/tgrfHNm52tFo6VU=",
         "ref": "refs/heads/master",
-        "rev": "8142717e7154dbaadee0679f0224fe75cebb1735",
-        "revCount": 147,
+        "rev": "beda2a57d946f392d958755c7bb03ac092a20f42",
+        "revCount": 140,
         "type": "git",
         "url": "https://git.xinyang.life/xin/nur.git"
       },
@@ -74,7 +58,6 @@
       "inputs": {
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs",
-        "nixpkgs-circt162": "nixpkgs-circt162",
         "nur-xin": "nur-xin"
       }
     },

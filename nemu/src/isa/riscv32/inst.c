@@ -54,7 +54,7 @@ static void decode_operand(Decode *s, int *rd, word_t *src1, word_t *src2,
 
 static void do_branch(Decode *s, bool condition, word_t offset) {
   if (condition) {
-    puts(s->logbuf);
+    // puts(s->logbuf[s->logbuf_rear]);
     s->dnpc = s->pc + offset;
   }
 }

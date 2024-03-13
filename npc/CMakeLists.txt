@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(flow)
+project(npc)
 set (CMAKE_CXX_STANDARD 11)
 cmake_policy(SET CMP0144 NEW)
 
@@ -17,7 +17,7 @@ find_package(verilator REQUIRED)
 find_library(NVBOARD_LIBRARY NAMES nvboard)
 find_path(NVBOARD_INCLUDE_DIR NAMES nvboard.h)
 
-set(TOPMODULES "Flow")
+set(TOPMODULES "Switch" "Keyboard")
 
 foreach(TOPMODULE IN LISTS TOPMODULES)
  
@@ -58,7 +58,7 @@ foreach(TOPMODULE IN LISTS TOPMODULES)
   file(GLOB_RECURSE SOURCES csrc_nvboard/${TOPMODULE}/*.cpp)
   add_executable(V${TOPMODULE}_nvboard ${SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/auto_bind.cpp)
 
-  verilate(V${TOPMODULE}_nvboard TRACE THREADS
+  verilate(V${TOPMODULE}_nvboard TRACE COVERAGE THREADS
     TOP_MODULE ${TOPMODULE}
     PREFIX V${TOPMODULE}
     SOURCES ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/vsrc/${TOPMODULE}.v)
