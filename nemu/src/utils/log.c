@@ -43,6 +43,7 @@ IFDEF(CONFIG_ITRACE, int logbuf_rear);
 void log_itrace_print() {
   puts("ITRACE buffer:");
   for (int i = (logbuf_rear + 1) % CONFIG_ITRACE_BUFFER; i != logbuf_rear; i = (i + 1) % CONFIG_ITRACE_BUFFER) {
+    if (logbuf[i][0] == '\0') continue;
     puts(logbuf[i]);
   }
 }
