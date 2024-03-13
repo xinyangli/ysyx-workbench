@@ -30,14 +30,17 @@ uint64_t g_nr_guest_inst = 0;
 static uint64_t g_timer = 0; // unit: us
 static bool g_print_step = false;
 
+IFDEF(CONFIG_ITRACE, char logbuf[CONFIG_ITRACE_BUFFER][128]);
+IFDEF(CONFIG_ITRACE, int logbuf_rear);
+
 void device_update();
 bool wp_eval_all();
 
 static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 #ifdef CONFIG_ITRACE_COND
-  if (ITRACE_COND) { log_write("%s\n", _this->logbuf[_this->logbuf_rear]); }
+  if (ITRACE_COND) { log_write("%s\n", logbuf[logbuf_rear]); }
 #endif
-  if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(_this->logbuf[_this->logbuf_rear])); }
+  if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(logbuf[logbuf_rear])); }
   IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
 }
 
@@ -47,9 +50,9 @@ static void exec_once(Decode *s, vaddr_t pc) {
   isa_exec_once(s);
   cpu.pc = s->dnpc;
 #ifdef CONFIG_ITRACE
-  s->logbuf_rear = (s->logbuf_rear + 1) % CONFIG_ITRACE_BUFFER;
-  char *p = s->logbuf[s->logbuf_rear];
-  p += snprintf(p, sizeof(s->logbuf), FMT_WORD ":", s->pc);
+  logbuf_rear = (logbuf_rear + 1) % CONFIG_ITRACE_BUFFER;
+  char *p = logbuf[logbuf_rear];
+  p += snprintf(p, sizeof(logbuf), FMT_WORD ":", s->pc);
   int ilen = s->snpc - s->pc;
   int i;
   uint8_t *inst = (uint8_t *)&s->isa.inst.val;
@@ -65,7 +68,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
 
 #ifndef CONFIG_ISA_loongarch32r
   void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
-  disassemble(p, s->logbuf[s->logbuf_rear] + sizeof(s->logbuf) - p,
+  disassemble(p, logbuf[logbuf_rear] + sizeof(logbuf[logbuf_rear]) - p,
       MUXDEF(CONFIG_ISA_x86, s->snpc, s->pc), (uint8_t *)&s->isa.inst.val, ilen);
 #else
   p[0] = '\0'; // the upstream llvm does not support loongarch32r
@@ -75,15 +78,12 @@ static void exec_once(Decode *s, vaddr_t pc) {
 
 static void execute(uint64_t n) {
   Decode s;
-#ifdef CONFIG_ITRACE
-  memset(s.logbuf, 0, CONFIG_ITRACE_BUFFER * 128 * sizeof(char));
-#endif
   for (;n > 0; n --) {
     exec_once(&s, cpu.pc);
     g_nr_guest_inst ++;
     trace_and_difftest(&s, cpu.pc);
     if (wp_eval_all()) { 
-      puts(s.logbuf[s.logbuf_rear]);
+      puts(logbuf[logbuf_rear]);
       break;
     }
     if (nemu_state.state != NEMU_RUNNING) break;
