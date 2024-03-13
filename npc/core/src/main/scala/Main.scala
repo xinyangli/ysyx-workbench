@@ -71,8 +71,6 @@ class Control(width: Int) extends Module {
   val reversePrefixSum = dstList.scanLeft(0)(_ + _.getWidth).reverse
   val slices = reversePrefixSum.zip(reversePrefixSum.tail)
   val srcList = slices.map(s => out(s._1 - 1, s._2))
-  // println(dstList)
-  // println(srcList)
 
   srcList
     .zip(dstList.reverse)
@@ -128,7 +126,9 @@ class Flow extends Module {
   ram.writePorts(0).data := 1.U
   ram.writePorts(0).enable := false.B
 
-  alu.in.a := reg.out.src(0)
+  import control.alu.SrcSelect._
+  alu.in.a(aSrcRs1.litValue.toInt) := reg.out.src(0)
+  alu.in.a(aSrcImm.litValue.toInt) := inst(31, 20)
   alu.in.b := reg.out.src(1)
   dontTouch(control.out)
 }
