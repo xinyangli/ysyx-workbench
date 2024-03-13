@@ -50,7 +50,6 @@ class Control(width: Int) extends Module {
     //     writeEnable :: writeSelect :: srcSelect  ::
     (addi, true.B      :: rAluOut     :: pStaticNpc :: aOpAdd :: aSrcImm :: HNil),
   )
-  println(ControlMapping)
   def toBits(t: T): BitPat = {
     val list: List[Data] = t.toList
     list.map(x => BitPat(x.litValue.toInt.U(x.getWidth.W))).reduceLeft(_ ## _)
@@ -66,6 +65,7 @@ class Control(width: Int) extends Module {
   val out = decoder(
     inst,
     TruthTable(ControlMapping.map(it => (it._1 -> toBits(it._2))), default))
+  println(out)
 
   val dstList = dst.toList
   val reversePrefixSum = dstList.scanLeft(0)(_ + _.getWidth).reverse
