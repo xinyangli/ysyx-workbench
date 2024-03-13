@@ -21,6 +21,7 @@ int main(int argc, char **argv, char **env) {
 #endif
     for (sim_time = 0; sim_time < MAX_SIM_TIME; sim_time++) {
         top->eval();
+        top->clock = !top->clock;
 #ifdef VERILATOR_TRACE
         m_trace->dump(sim_time);
 #endif
