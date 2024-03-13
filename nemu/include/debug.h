@@ -20,6 +20,9 @@
 #include <stdio.h>
 #include <utils.h>
 
+#define Trace(format, ...) \
+    _Log("[TRACE] " format "\n", ## __VA_ARGS__)
+
 #define Log(format, ...) \
     _Log(ANSI_FMT("[INFO] %s:%d %s() ", ANSI_FG_BLUE) format "\n", \
         __FILE__, __LINE__, __func__, ## __VA_ARGS__)

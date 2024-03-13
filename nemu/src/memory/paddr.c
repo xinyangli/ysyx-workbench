@@ -52,7 +52,7 @@ static void out_of_bound(paddr_t addr) {
 static void mtrace_print(char type, word_t addr, int len, word_t data) {
   for (int i = 0; i < range_count; i++)
     if (addr <= mtrace_end[i] && addr >= mtrace_start[i] ) {
-      printf("[TRACE] Mem %c " FMT_PADDR "%d D " FMT_PADDR "\n", type, addr, len, data);
+      Trace("Mem %c " FMT_PADDR "%d D " FMT_PADDR "\n", type, addr, len, data);
       break;
     }
 }
@@ -77,11 +77,10 @@ void init_mem() {
     ptr = strtok_r(NULL, ",", &saveptr);
     if (!ptr) break;
   }
-  puts("MTRACE ranges: ");
+  Trace("MTRACE ranges: ");
   for (int i = 0; i < range_count; i++) {
-    printf("[0x%x, 0x%x], ", mtrace_start[i], mtrace_end[i]);
+    Trace("[0x%x, 0x%x]", mtrace_start[i], mtrace_end[i]);
   }
-  puts("");
 #endif
   IFDEF(CONFIG_MEM_RANDOM, memset(pmem, rand(), CONFIG_MSIZE));
   Log("physical memory area [" FMT_PADDR ", " FMT_PADDR "]", PMEM_LEFT, PMEM_RIGHT);
