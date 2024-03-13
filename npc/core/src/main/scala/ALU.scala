@@ -8,33 +8,39 @@ class ALUControlInterface extends Bundle {
   object OpSelect extends ChiselEnum {
     val aOpAdd, aOpSub, aOpNot, aOpAnd, aOpOr, aOpXor, aOpSlt, aOpEq, aOpNop = Value
   }
+  object SrcSelect extends ChiselEnum {
+    val aSrcRs2, aSrcImm = Value
+  }
   val op = Input(OpSelect())
+  val src = Input(SrcSelect())
 
-  type CtrlTypes = OpSelect.Type :: HNil
+  type CtrlTypes = OpSelect.Type :: SrcSelect.Type :: HNil
   def ctrlBindPorts: CtrlTypes = {
-    op :: HNil
+    op :: src :: HNil
   }
 }
 
 class ALU[T <: UInt](tpe: T) extends Module {
   val control = IO(new ALUControlInterface)
   val in = IO(new Bundle {
-    val a = Input(tpe)
+    val a = Input(Vec(control.SrcSelect.getWidth, tpe))
     val b = Input(tpe)
   })
   val out = IO(new Bundle {
     val result = Output(tpe)
   })
 
+  val a = in.a(control.src.asUInt)
+
   // val adder_b = (Fill(tpe.getWidth, io.op(0)) ^ io.b) + io.op(0)  // take (-b) if sub
-  val add = in.a + in.b 
-  val sub = in.a - in.b
-  val and = in.a & in.b
-  val not = ~in.a
-  val or = in.a | in.b
-  val xor = in.a ^ in.b
-  val slt = in.a < in.b
-  val eq = in.a === in.b
+  val add = a + in.b 
+  val sub = a - in.b
+  val and = a & in.b
+  val not = ~a
+  val or = a | in.b
+  val xor = a ^ in.b
+  val slt = a < in.b
+  val eq = a === in.b
 
   import control.OpSelect._
 

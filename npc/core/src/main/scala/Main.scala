@@ -38,23 +38,25 @@ class Control(width: Int) extends Module {
 
   // TODO: Add .ctrlTypes together instead of writing them by hand.
   type T =
-    Bool :: reg.WriteSelect.Type :: pc.SrcSelect.Type :: alu.OpSelect.Type :: HNil
+    Bool :: reg.WriteSelect.Type :: pc.SrcSelect.Type :: alu.OpSelect.Type :: alu.SrcSelect.Type :: HNil
   val dst: T = reg.ctrlBindPorts ++ pc.ctrlBindPorts ++ alu.ctrlBindPorts
   import reg.WriteSelect._
   import pc.SrcSelect._
   import alu.OpSelect._
+  import alu.SrcSelect._
   import RV32Inst._
   val ControlMapping: Array[(BitPat, T)] = Array(
     //     Regs                       :: PC         :: Exe
     //     writeEnable :: writeSelect :: srcSelect  ::
-    (addi, false.B     :: rAluOut     :: pStaticNpc :: aOpAdd :: HNil),
+    (addi, true.B      :: rAluOut     :: pStaticNpc :: aOpAdd :: aSrcImm :: HNil),
   )
+  println(ControlMapping)
   def toBits(t: T): BitPat = {
     val list: List[Data] = t.toList
     list.map(x => BitPat(x.litValue.toInt.U(x.getWidth.W))).reduceLeft(_ ## _)
   }
 
-  val default = BitPat("b???????")
+  val default = BitPat("b????????")
 
   reg.writeEnable := false.B
   reg.writeSelect := reg.WriteSelect(0.U)
@@ -126,6 +128,5 @@ class Flow extends Module {
 
   alu.in.a := reg.out.src(0)
   alu.in.b := reg.out.src(1)
-  printf("Yes\n")
   dontTouch(control.out)
 }
