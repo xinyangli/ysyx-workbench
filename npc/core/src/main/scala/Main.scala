@@ -71,6 +71,8 @@ class Control(width: Int) extends Module {
   val reversePrefixSum = dstList.scanLeft(0)(_ + _.getWidth).reverse
   val slices = reversePrefixSum.zip(reversePrefixSum.tail)
   val srcList = slices.map(s => out(s._1 - 1, s._2))
+  println(dstList)
+  println(srcList)
 
   srcList
     .zip(dstList)
