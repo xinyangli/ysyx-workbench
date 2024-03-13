@@ -27,6 +27,7 @@ int main(int argc, char **argv, char **env) {
         m_trace->dump(sim_time);
 #endif
     }
+    top->reset = 0;
     for (sim_time = 10; sim_time < MAX_SIM_TIME; sim_time++) {
         top->eval();
         top->clock = !top->clock;
