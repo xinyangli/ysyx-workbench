@@ -88,7 +88,7 @@ class Flow extends Module {
     numReadPorts = 2,
     numWritePorts = 1,
     numReadwritePorts = 0,
-    memoryFile = HexMemoryFile("../resource/addi.txt")
+    memoryFile = HexMemoryFile("./resource/addi.txt")
   )
   val control = Module(new Control(32))
   val reg = RegisterFile(32, dataType, 2, 2)
