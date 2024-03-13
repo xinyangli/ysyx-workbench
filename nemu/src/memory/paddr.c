@@ -77,7 +77,7 @@ void init_mem() {
     ptr = strtok_r(NULL, ",", &saveptr);
     if (!ptr) break;
   }
-  Log("MTRACE ranges: ");
+  puts("MTRACE ranges: ");
   for (int i = 0; i < range_count; i++) {
     printf("[0x%x, 0x%x], ", mtrace_start[i], mtrace_end[i]);
   }
