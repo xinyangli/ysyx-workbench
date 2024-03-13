@@ -67,12 +67,13 @@ void init_mem() {
   char range[sizeof(CONFIG_MTRACE_RANGE)] = CONFIG_MTRACE_RANGE;
   char *saveptr, *ptr;
   ptr = strtok_r(range, ",", &saveptr);
-  for (range_count = 0; range_count < CONFIG_MTRACE_RANGE_MAX; range_count++) {
+  for (range_count = 0; range_count < CONFIG_MTRACE_RANGE_MAX; ) {
     word_t start, end;
-    Assert(sscanf(ptr, "%d-%d", &start, &end) == 2, "Config option MTRACE_RANGE has wrong format");
+    Assert(sscanf(ptr, "%x-%x", &start, &end) == 2, "Config option MTRACE_RANGE has wrong format");
     mtrace_start[range_count] = start;
     mtrace_end[range_count] = end;
 
+    range_count++;
     ptr = strtok_r(NULL, ",", &saveptr);
     if (!ptr) break;
   }
