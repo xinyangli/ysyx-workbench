@@ -94,7 +94,6 @@ class Flow extends Module {
   ram.readPorts(0).enable := true.B
   ram.readPorts(0).address := pc.out - 0x80000000L.U
   val inst = ram.readPorts(0).data
-  printf(cf"$inst\n")
 
   import control.pc.SrcSelect._
 
