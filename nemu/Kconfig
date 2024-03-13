@@ -151,6 +151,10 @@ config ITRACE_COND
   string "Only trace instructions when the condition is true"
   default "true"
 
+config ITRACE_BUFFER
+  depends on ITRACE
+  int "Buffer size for intruction trace (unit: number of instructions)"
+  default 10
 
 config DIFFTEST
   depends on TARGET_NATIVE_ELF
