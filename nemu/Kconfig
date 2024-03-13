@@ -156,6 +156,24 @@ config ITRACE_BUFFER
   int "Buffer size for intruction trace (unit: number of instructions)"
   default 10
 
+config MTRACE
+  depends on TRACE && TARGET_NATIVE_ELF && ENGINE_INTERPRETER
+  bool "Enable memory tracer"
+
+
+config MTRACE_RANGE
+  depends on MTRACE
+  string "Memory trace active range"
+  default "0x0-0xfffffff"
+  help
+    Memory tracer will only print memory access in these ranges.
+    Use comma to seperate between ranges.
+
+config MTRACE_RANGE_MAX
+  depends on MTRACE
+  int "Max range count in MTRACE_RANGE"
+  default 10
+
 config DIFFTEST
   depends on TARGET_NATIVE_ELF
   bool "Enable differential testing"
