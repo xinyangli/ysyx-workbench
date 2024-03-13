@@ -159,7 +159,7 @@ config ITRACE_BUFFER
 config MTRACE
   depends on TRACE && TARGET_NATIVE_ELF && ENGINE_INTERPRETER
   bool "Enable memory tracer"
-
+  default n
 
 config MTRACE_RANGE
   depends on MTRACE
@@ -173,6 +173,16 @@ config MTRACE_RANGE_MAX
   depends on MTRACE
   int "Max range count in MTRACE_RANGE"
   default 10
+
+config FTRACE
+  depends on TRACE && TARGET_NATIVE_ELF && ENGINE_INTERPRETER
+  bool "Enable function tracer"
+  default y
+
+config FTRACE_LOG
+  depends on FTRACE
+  bool "Print log when entering a funciton"
+  default n
 
 config DIFFTEST
   depends on TARGET_NATIVE_ELF
