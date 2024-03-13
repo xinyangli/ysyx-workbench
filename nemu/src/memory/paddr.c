@@ -69,7 +69,7 @@ void init_mem() {
   ptr = strtok_r(range, ",", &saveptr);
   for (range_count = 0; range_count < CONFIG_MTRACE_RANGE_MAX; range_count++) {
     word_t start, end;
-    Assert(sscanf(ptr, "%x-%x", &start, &end) == 2, "Config option MTRACE_RANGE has wrong format");
+    Assert(sscanf(ptr, "%d-%d", &start, &end) == 2, "Config option MTRACE_RANGE has wrong format");
     mtrace_start[range_count] = start;
     mtrace_end[range_count] = end;
 
