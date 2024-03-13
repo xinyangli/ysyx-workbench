@@ -134,6 +134,7 @@ void cpu_exec(uint64_t n) {
       nemu_state.halt_ret = 1;
 #ifdef CONFIG_ITRACE
       if (nemu_state.halt_ret != 0) {
+        puts("ITRACE buffer:");
         for (int i = (logbuf_rear + 1) % CONFIG_ITRACE_BUFFER; i != logbuf_rear; i = (i + 1) % CONFIG_ITRACE_BUFFER) {
           puts(logbuf[i]);
         }
