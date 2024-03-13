@@ -1,6 +1,3 @@
-#include <cstdlib>
-#include <cassert>
-#include <cstdlib>
 #include <verilated.h>
 #include <verilated_vcd_c.h>
 #include <nvboard.h>
@@ -13,10 +10,9 @@ void nvboard_bind_all_pins(VFLow* top);
 int main(int argc, char **argv, char **env) {
     VFlow *top = new VFlow;
 
-    nvboard_bind_all_pins(top);
-    nvboard_init();
+    // nvboard_init();
     while (true) {
-        nvboard_update();
+        // nvboard_update();
         top->eval();
     }
     delete top;
