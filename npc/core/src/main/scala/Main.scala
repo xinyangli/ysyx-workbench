@@ -47,15 +47,13 @@ class Control(width: Int) extends Module {
   val ControlMapping: Array[(BitPat, T)] = Array(
     //     Regs                       :: PC         :: Exe
     //     writeEnable :: writeSelect :: srcSelect  ::
-    (addi, false.B :: rAluOut :: pStaticNpc :: aOpAdd :: HNil),
-    // ("", false.B :: rAluOut :: pStaticNpc :: aOpNop :: HNil),
+    (addi, false.B     :: rAluOut     :: pStaticNpc :: aOpAdd :: HNil),
   )
   def toBits(t: T): BitPat = {
     val list: List[Data] = t.toList
-    list.map(x => BitPat(x.litValue.toInt.U(x.getWidth.W))).reduce(_ ## _)
+    list.map(x => BitPat(x.litValue.toInt.U(x.getWidth.W))).reduceLeft(_ ## _)
   }
 
-  // val default = toBits(false.B :: rAluOut :: pStaticNpc :: aOpAdd :: HNil).getWidth
   val default = BitPat("b???????")
 
   reg.writeEnable := false.B
@@ -90,7 +88,7 @@ class Flow extends Module {
     numReadPorts = 2,
     numWritePorts = 1,
     numReadwritePorts = 0,
-    // memoryFile = HexMemoryFile(memoryFile)
+    memoryFile = HexMemoryFile("../resource/addi.txt")
   )
   val control = Module(new Control(32))
   val reg = RegisterFile(32, dataType, 2, 2)
@@ -128,4 +126,6 @@ class Flow extends Module {
 
   alu.in.a := reg.out.src(0)
   alu.in.b := reg.out.src(1)
+  printf("Yes\n")
+  dontTouch(control.out)
 }

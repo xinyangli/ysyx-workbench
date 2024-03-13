@@ -1,0 +1,4 @@
+[{
+    "class": "firrtl.transforms.DontTouchAnnotation",
+    "target": "~Flow|Control"
+}]

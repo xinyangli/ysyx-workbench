@@ -66,6 +66,7 @@ class RegisterFileCore[T <: Data](size: Int, tpe: T, numReadPorts: Int) extends 
   for (readPort <- readPorts) {
     readPort.data := regFile(readPort.addr)
   }
+  dontTouch(regFile)
 }
 
 object RegisterFile {
