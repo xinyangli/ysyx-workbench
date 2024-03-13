@@ -13,6 +13,7 @@
 * See the Mulan PSL v2 for more details.
 ***************************************************************************************/
 
+#include "utils.h"
 #include <cpu/cpu.h>
 #include <cpu/decode.h>
 #include <cpu/difftest.h>
@@ -29,9 +30,8 @@ CPU_state cpu = {};
 uint64_t g_nr_guest_inst = 0;
 static uint64_t g_timer = 0; // unit: us
 static bool g_print_step = false;
-
-IFDEF(CONFIG_ITRACE, char logbuf[CONFIG_ITRACE_BUFFER][128]);
-IFDEF(CONFIG_ITRACE, int logbuf_rear);
+IFDEF(CONFIG_ITRACE, extern char logbuf[CONFIG_ITRACE_BUFFER][128]);
+IFDEF(CONFIG_ITRACE, extern int logbuf_rear);
 
 void device_update();
 bool wp_eval_all();
@@ -132,16 +132,10 @@ void cpu_exec(uint64_t n) {
             ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED))),
           nemu_state.halt_pc);
       nemu_state.halt_ret = 1;
-#ifdef CONFIG_ITRACE
-      if (nemu_state.halt_ret != 0) {
-        puts("ITRACE buffer:");
-        for (int i = (logbuf_rear + 1) % CONFIG_ITRACE_BUFFER; i != logbuf_rear; i = (i + 1) % CONFIG_ITRACE_BUFFER) {
-          puts(logbuf[i]);
-        }
+      if(nemu_state.halt_ret != 0) {
+        log_itrace_print();
       }
-    }
-#endif
-      // fall through
+    } // fall through
     case NEMU_QUIT: statistic();
   }
 }

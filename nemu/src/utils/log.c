@@ -35,3 +35,15 @@ bool log_enable() {
          (g_nr_guest_inst <= CONFIG_TRACE_END), false);
 }
 #endif
+
+IFDEF(CONFIG_ITRACE, char logbuf[CONFIG_ITRACE_BUFFER][128]);
+IFDEF(CONFIG_ITRACE, int logbuf_rear);
+
+#ifdef CONFIG_ITRACE
+void log_itrace_print() {
+  puts("ITRACE buffer:");
+  for (int i = (logbuf_rear + 1) % CONFIG_ITRACE_BUFFER; i != logbuf_rear; i = (i + 1) % CONFIG_ITRACE_BUFFER) {
+    puts(logbuf[i]);
+  }
+}
+#endif
