@@ -131,6 +131,7 @@ void cpu_exec(uint64_t n) {
            (nemu_state.halt_ret == 0 ? ANSI_FMT("HIT GOOD TRAP", ANSI_FG_GREEN) :
             ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED))),
           nemu_state.halt_pc);
+      nemu_state.halt_ret = 1;
 #ifdef CONFIG_ITRACE
       if (nemu_state.halt_ret != 0) {
         for (int i = (logbuf_rear + 1) % CONFIG_ITRACE_BUFFER; i != logbuf_rear; i = (i + 1) % CONFIG_ITRACE_BUFFER) {
