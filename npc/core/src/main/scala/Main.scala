@@ -125,7 +125,5 @@ class Flow extends Module {
   alu.in.a(aSrcImm.litValue.toInt) := inst(31, 20)
   alu.in.b := reg.out.src(1)
 
-  val pcValue = IO(Output(chiselTypeOf(pc.out)))
-  pcValue := pc.out
   dontTouch(control.out)
 }
