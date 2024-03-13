@@ -63,7 +63,7 @@ mtrace:
 }
 
 void paddr_write(paddr_t addr, int len, word_t data) {
-  IFDEF(CONFIG_MTRACE, printf("W " FMT_WORD "%d D" FMT_WORD "\n", addr, len, data));
+  IFDEF(CONFIG_MTRACE, printf("W " FMT_WORD "%d D " FMT_WORD "\n", addr, len, data));
   if (likely(in_pmem(addr))) { pmem_write(addr, len, data); return; }
   IFDEF(CONFIG_DEVICE, mmio_write(addr, len, data); return);
   out_of_bound(addr);
