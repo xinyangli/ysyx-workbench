@@ -179,6 +179,11 @@ config FTRACE
   bool "Enable function tracer"
   default y
 
+config FTRACE_STACK_SIZE
+  depends on FTRACE
+  int "Max function track stack size"
+  default 100
+
 config FTRACE_LOG
   depends on FTRACE
   bool "Print log when entering a funciton"
