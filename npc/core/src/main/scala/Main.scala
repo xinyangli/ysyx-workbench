@@ -83,7 +83,7 @@ class Flow extends Module {
   val dataType = UInt(32.W)
 
   val ram = SRAM(
-    size = 128 * 1024 * 1024,
+    size = 1024,
     tpe = dataType,
     numReadPorts = 2,
     numWritePorts = 1,
