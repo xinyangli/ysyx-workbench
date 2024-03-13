@@ -65,6 +65,7 @@
         devShells.nemu = pkgs.mkShell {
           packages = with pkgs; [
             clang-tools
+            gdb
           ];
           inputsFrom = [
             self.packages.${system}.nemu

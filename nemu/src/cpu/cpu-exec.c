@@ -75,6 +75,9 @@ static void exec_once(Decode *s, vaddr_t pc) {
 
 static void execute(uint64_t n) {
   Decode s;
+#ifdef CONFIG_ITRACE
+  memset(s.logbuf, 0, CONFIG_ITRACE_BUFFER * 128 * sizeof(char));
+#endif
   for (;n > 0; n --) {
     exec_once(&s, cpu.pc);
     g_nr_guest_inst ++;
