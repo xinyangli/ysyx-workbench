@@ -46,5 +46,7 @@ void log_itrace_print() {
     if (logbuf[i][0] == '\0') continue;
     puts(logbuf[i]);
   }
+  puts("Current command:");
+  puts(logbuf[logbuf_rear]);
 }
 #endif
