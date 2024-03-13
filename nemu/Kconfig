@@ -164,7 +164,7 @@ config MTRACE
 config MTRACE_RANGE
   depends on MTRACE
   string "Memory trace active range"
-  default "0-fffffff"
+  default "0-0xfffffff"
   help
     Memory tracer will only print memory access in these ranges.
     Use comma to seperate between ranges.
