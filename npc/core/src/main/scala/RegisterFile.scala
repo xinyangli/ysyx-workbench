@@ -1,17 +1,23 @@
-package flowpc.components
+package flow.components
 
 import chisel3._
 import chisel3.util.log2Ceil
 import chisel3.util.UIntToOH
 import chisel3.util.MuxLookup
+import shapeless.{ HNil, :: }
 
 class RegControl extends Bundle {
-  val writeEnable = Input(Bool()) 
-
   object WriteSelect extends ChiselEnum {
     val rAluOut, rMemOut = Value
   }
+
+  val writeEnable = Input(Bool()) 
   val writeSelect = Input(WriteSelect())
+
+  type CtrlTypes = Bool :: WriteSelect.Type :: HNil
+  def ctrlBindPorts: CtrlTypes = {
+    writeEnable :: writeSelect :: HNil
+  }
 }
 
 class RegFileData[T <: Data](size:Int, tpe: T, numReadPorts: Int, numWritePorts: Int) extends Bundle {
@@ -27,7 +33,15 @@ class RegFileData[T <: Data](size:Int, tpe: T, numReadPorts: Int, numWritePorts:
 
 class RegFileInterface[T <: Data](size: Int, tpe: T, numReadPorts: Int, numWritePorts: Int) extends Bundle {
   val control = new RegControl
-  val data = new RegFileData(size, tpe, numReadPorts, numWritePorts)
+  // val data = new RegFileData(size, tpe, numReadPorts, numWritePorts)
+  val in = new Bundle {
+    val writeAddr = Input(UInt(size.W))
+    val writeData = Input(Vec(numWritePorts, tpe))
+    val rs = Input(Vec(numReadPorts, UInt(size.W)))
+  }
+  val out = new Bundle {
+    val src = Output(Vec(numReadPorts, tpe))
+  }
 }
 
 class RegisterFileCore[T <: Data](size: Int, tpe: T, numReadPorts: Int) extends Module {
@@ -52,6 +66,7 @@ class RegisterFileCore[T <: Data](size: Int, tpe: T, numReadPorts: Int) extends 
   for (readPort <- readPorts) {
     readPort.data := regFile(readPort.addr)
   }
+  dontTouch(regFile)
 }
 
 object RegisterFile {
@@ -60,13 +75,11 @@ object RegisterFile {
     val _out = Wire(new RegFileInterface(size, tpe, numReadPorts, numWritePorts))
     val clock = core.clock
     for (i <- 0 until numReadPorts) {
-      core.readPorts(i).addr := _out.data.read(i).rs
-      _out.data.read(i).src := core.readPorts(i).data
+      core.readPorts(i).addr := _out.in.rs(i)
+      _out.out.src(i) := core.readPorts(i).data
     }
-    core.writePort.addr := _out.data.write.addr
-    core.writePort.data := MuxLookup(_out.control.writeSelect, 0.U)(
-      _out.control.WriteSelect.all.map(x => (x -> _out.data.write.data(x.asUInt).asUInt))
-    )
+    core.writePort.addr := _out.in.writeAddr
+    core.writePort.data := _out.in.writeData(_out.control.writeSelect.asUInt)
     core.writePort.enable := _out.control.writeEnable
     _out
   }

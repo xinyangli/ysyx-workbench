@@ -1,34 +1,63 @@
-package npc.util
+package flow.components
 
 import chisel3._
 import chisel3.util._
+import shapeless.{HNil, ::}
 
-class ALUGenerator(width: Int) extends Module {
-  require(width >= 0)
-  val io = IO(new Bundle {
-    val a = Input(UInt(width.W))
-    val b = Input(UInt(width.W))
-    val op = Input(UInt(4.W))
-    val out = Output(UInt(width.W))
+class ALUControlInterface extends Bundle {
+  object OpSelect extends ChiselEnum {
+    val aOpAdd, aOpSub, aOpNot, aOpAnd, aOpOr, aOpXor, aOpSlt, aOpEq, aOpNop = Value
+  }
+  object SrcSelect extends ChiselEnum {
+    val aSrcRs1, aSrcImm = Value
+  }
+  val op = Input(OpSelect())
+  val src = Input(SrcSelect())
+
+  type CtrlTypes = OpSelect.Type :: SrcSelect.Type :: HNil
+  def ctrlBindPorts: CtrlTypes = {
+    op :: src :: HNil
+  }
+}
+
+class ALU[T <: UInt](tpe: T) extends Module {
+  val control = IO(new ALUControlInterface)
+  val in = IO(new Bundle {
+    val a = Input(Vec(control.SrcSelect.all.length, tpe))
+    val b = Input(tpe)
+  })
+  val out = IO(new Bundle {
+    val result = Output(tpe)
   })
 
-  val adder_b = (Fill(width, io.op(0)) ^ io.b) + io.op(0)  // take (-b) if sub
-  val add = io.a + adder_b
-  val and = io.a & io.b
-  val not = ~io.a
-  val or = io.a | io.b
-  val xor = io.a ^ io.b
-  val slt = io.a < io.b
-  val eq = io.a === io.b
+  val a = in.a(control.src.asUInt)
 
-  io.out := MuxLookup(io.op, 0.U)(Seq(
-    0.U -> add,
-    1.U -> add, // add with b reversed
-    2.U -> not,
-    3.U -> and,
-    4.U -> or,
-    5.U -> xor,
-    6.U -> slt,
-    7.U -> eq,
+  // val adder_b = (Fill(tpe.getWidth, io.op(0)) ^ io.b) + io.op(0)  // take (-b) if sub
+  val add = a + in.b 
+  val sub = a - in.b
+  val and = a & in.b
+  val not = ~a
+  val or = a | in.b
+  val xor = a ^ in.b
+  val slt = a < in.b
+  val eq = a === in.b
+
+  import control.OpSelect._
+
+  out.result := MuxLookup(control.op, 0.U)(Seq(
+    aOpAdd -> add,
+    aOpSub -> sub,
+    aOpNot -> not,
+    aOpAnd -> and,
+    aOpOr  -> or,
+    aOpXor -> xor,
+    aOpSlt -> slt,
+    aOpEq -> eq
   ))
+}
+
+object ALU {
+  def apply[T <: UInt](tpe: T): ALU[T] = {
+    Module(new ALU(tpe))
+  }
 }
