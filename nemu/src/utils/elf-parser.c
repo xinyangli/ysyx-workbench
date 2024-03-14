@@ -39,9 +39,9 @@ void init_elf(const char *path) {
     FAILED_GOTO(failed, fgets(func, 30, elf_file) > 0);
     puts(func);
   }
-
+  return;
 failed:
   free(sym);
 failed_nosym:
-  ;
+  Error("Failed reading elf file");
 }
