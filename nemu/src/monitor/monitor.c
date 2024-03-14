@@ -130,6 +130,7 @@ void init_monitor(int argc, char *argv[]) {
   /* Initialize the simple debugger. */
   init_sdb();
 
+  printf("elf_file: %s\n", elf_file);
   if(elf_file != NULL) {
     void init_elf(const char *path);
     puts("init_elf");
