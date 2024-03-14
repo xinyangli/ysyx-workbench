@@ -14,7 +14,7 @@ void init_elf(const char *path) {
   Elf32_Shdr section_header, *psh;
   FAILED_GOTO(failed_nosym, fread(&header, sizeof(Elf32_Ehdr), 1, elf_file) <= 0);
   FAILED_GOTO(failed_nosym, fseek(elf_file, header.e_shoff, SEEK_SET) != 0);
-  printf("%hu %hu\n", header.e_shentsize, header.e_shnum);
+  printf("%hu %hu %u\n", header.e_shentsize, header.e_shnum, header.e_shoff);
   FAILED_GOTO(failed_nosym, fread(&section_header, header.e_shentsize, header.e_shnum, elf_file) <= 0);
 
   Elf32_Shdr *symtab = NULL, *strtab = NULL;
