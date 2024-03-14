@@ -11,7 +11,7 @@
 void init_elf(const char *path) {
   FILE *elf_file = fopen(path, "rb");
   Elf32_Ehdr header;
-  Elf32_Shdr section_header, *psh;
+  Elf32_Shdr section_header[200], *psh;
   FAILED_GOTO(failed_nosym, fread(&header, sizeof(Elf32_Ehdr), 1, elf_file) <= 0);
   FAILED_GOTO(failed_nosym, fseek(elf_file, header.e_shoff, SEEK_SET) != 0);
   printf("%hu %hu %u\n", header.e_shentsize, header.e_shnum, header.e_shoff);
@@ -19,7 +19,7 @@ void init_elf(const char *path) {
 
   Elf32_Shdr *symtab = NULL, *strtab = NULL;
   for(int i = 0; i < header.e_shnum; i++) {
-    psh = &section_header + i;
+    psh = section_header + i;
     if (psh->sh_type == SHT_SYMTAB) {
       symtab = psh;
     } else if (psh->sh_type == SHT_STRTAB) {
