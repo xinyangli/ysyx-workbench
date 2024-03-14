@@ -132,6 +132,7 @@ void init_monitor(int argc, char *argv[]) {
 
   if(elf_file != NULL) {
     void init_elf(const char *path);
+    puts("init_elf");
     init_elf(elf_file);
   }
 
