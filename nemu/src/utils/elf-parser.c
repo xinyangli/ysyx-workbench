@@ -22,11 +22,10 @@ void init_elf(const char *path) {
     psh = section_header + i;
     if (psh->sh_type == SHT_SYMTAB) {
       symtab = psh;
-      break;
     } else if (psh->sh_type == SHT_STRTAB) {
       strtab = psh;
-      break;
     }
+    if(symtab && strtab) break;
   }
 
 
