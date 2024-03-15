@@ -36,7 +36,7 @@ void init_elf(const char *path) {
     if(ELF32_ST_TYPE(sym[j].st_info) != STT_FUNC) continue;
     // Only read function type symbol
     char func[30];
-    FAILED_GOTO(failed, fseek(elf_file, (strtab + sym[j].st_name)->sh_offset, SEEK_SET) != 0);
+    FAILED_GOTO(failed, fseek(elf_file, strtab->sh_offset + sym[j].st_name, SEEK_SET) != 0);
     FAILED_GOTO(failed, fgets(func, 30, elf_file) <= 0);
     puts(func);
   }
