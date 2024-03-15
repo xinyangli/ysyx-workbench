@@ -28,18 +28,19 @@ void init_elf(const char *path) {
   }
 
 
-  int sym_length = symtab->sh_entsize / sizeof(Elf32_Sym);
+  int sym_length = symtab->sh_size / sizeof(Elf32_Sym);
   Elf32_Sym *sym = calloc(sym_length, sizeof(Elf32_Sym));
   FAILED_GOTO(failed, fseek(elf_file, symtab->sh_offset, SEEK_SET) != 0);
   FAILED_GOTO(failed, fread(sym, sizeof(Elf32_Sym), sym_length, elf_file) <= 0);
   for(int j = 0; j < sym_length; j++) {
     if(ELF32_ST_TYPE(sym[j].st_info) != STT_FUNC) continue;
     // Only read function type symbol
-    char func[30] = "";
+    char func[30];
     FAILED_GOTO(failed, fseek(elf_file, sym[j].st_name + strtab->sh_offset, SEEK_SET) != 0);
     FAILED_GOTO(failed, fgets(func, 30, elf_file) <= 0);
     puts(func);
   }
+  free(sym);
   return;
 failed:
   free(sym);
