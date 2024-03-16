@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <common.h>
 #include <elf.h>
 
@@ -16,6 +17,8 @@ void init_elf(const char *path) {
   FAILED_GOTO(failed_nosym, fseek(elf_file, header.e_shoff, SEEK_SET) != 0);
   FAILED_GOTO(failed_nosym, fread(section_header, header.e_shentsize, header.e_shnum, elf_file) <= 0);
 
+  char *shstrtab = calloc(1, section_header[header.e_shstrndx].sh_size);
+
   Elf32_Shdr *symtab = NULL, *strtab = NULL;
   for(int i = 0; i < header.e_shnum; i++) {
     psh = section_header + i;
@@ -26,12 +29,16 @@ void init_elf(const char *path) {
       strtab = psh;
       printf("strtab: %u %u\n", strtab->sh_size, strtab->sh_offset);
     }
+    FAILED_GOTO(failed_shstrtab, fseek(elf_file, section_header[header.e_shstrndx].sh_offset, SEEK_SET) != 0);
+    FAILED_GOTO(failed_shstrtab, fread(shstrtab, sizeof(Elf32_Sym), section_header[header.e_shstrndx].sh_size, elf_file) <= 0);
+    printf("%s", shstrtab);
     // if(symtab && strtab) break;
   }
 
 
   int sym_length = symtab->sh_size / sizeof(Elf32_Sym);
   Elf32_Sym *sym = calloc(sym_length, sizeof(Elf32_Sym));
+  FAILED_GOTO(failed_nosym, sym == NULL);
   FAILED_GOTO(failed, fseek(elf_file, symtab->sh_offset, SEEK_SET) != 0);
   FAILED_GOTO(failed, fread(sym, sizeof(Elf32_Sym), sym_length, elf_file) <= 0);
   for(int j = 0; j < sym_length; j++) {
@@ -46,6 +53,8 @@ void init_elf(const char *path) {
   return;
 failed:
   free(sym);
+failed_shstrtab:
+  free(shstrtab);
 failed_nosym:
   Error("Failed reading elf file");
 }
