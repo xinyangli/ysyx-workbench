@@ -26,7 +26,7 @@ void init_elf(const char *path) {
       strtab = psh;
       printf("strtab: %u %u\n", strtab->sh_size, strtab->sh_offset);
     }
-    if(symtab && strtab) break;
+    // if(symtab && strtab) break;
   }
 
 
