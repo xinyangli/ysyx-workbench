@@ -10,6 +10,7 @@
 #define FAILED_GOTO(tag, exp) do {if((exp)) goto tag;} while(0)
 
 void init_elf(const char *path) {
+  bool success = false;
   FILE *elf_file = fopen(path, "rb");
   Elf32_Ehdr header;
   Elf32_Shdr section_header[200], *psh;
@@ -49,12 +50,12 @@ void init_elf(const char *path) {
     FAILED_GOTO(failed, fgets(func, 30, elf_file) <= 0);
     puts(func);
   }
-  free(sym);
-  return;
+  success = true;
 failed:
   free(sym);
 failed_shstrtab:
   free(shstrtab);
 failed_nosym:
-  Error("Failed reading elf file");
+  if(success) return;
+  else Error("Failed reading elf file");
 }
