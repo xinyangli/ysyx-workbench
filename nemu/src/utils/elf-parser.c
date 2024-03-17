@@ -19,6 +19,8 @@ void init_elf(const char *path) {
   FAILED_GOTO(failed_nosym, fread(section_header, header.e_shentsize, header.e_shnum, elf_file) <= 0);
 
   char *shstrtab = calloc(1, section_header[header.e_shstrndx].sh_size);
+  FAILED_GOTO(failed_shstrtab, fseek(elf_file, section_header[header.e_shstrndx].sh_offset, SEEK_SET) != 0);
+  FAILED_GOTO(failed_shstrtab, fread(shstrtab, section_header[header.e_shstrndx].sh_size, 1, elf_file) <= 0);
 
   Elf32_Shdr *symtab = NULL, *strtab = NULL;
   for(int i = 0; i < header.e_shnum; i++) {
@@ -30,9 +32,7 @@ void init_elf(const char *path) {
       strtab = psh;
       printf("strtab: %u %u\n", strtab->sh_size, strtab->sh_offset);
     }
-    FAILED_GOTO(failed_shstrtab, fseek(elf_file, section_header[header.e_shstrndx].sh_offset, SEEK_SET) != 0);
-    // printf("%u\n", section_header[header.e_shstrndx].sh_offset);
-    FAILED_GOTO(failed_shstrtab, fread(shstrtab, section_header[header.e_shstrndx].sh_size, 1, elf_file) <= 0);
+    printf("%s\n", shstrtab + psh->sh_name);
     // if(symtab && strtab) break;
   }
 
