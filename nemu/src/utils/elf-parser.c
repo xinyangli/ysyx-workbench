@@ -32,7 +32,7 @@ void init_elf(const char *path) {
       strtab = psh;
       printf("strtab: %u %u\n", strtab->sh_size, strtab->sh_offset);
     }
-    printf("%s\n", shstrtab + psh->sh_name);
+    printf("section name: %s\n", shstrtab + psh->sh_name);
     // if(symtab && strtab) break;
   }
 
