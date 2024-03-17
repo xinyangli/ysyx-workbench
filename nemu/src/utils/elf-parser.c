@@ -5,6 +5,7 @@
 // Put this into another file
 #ifdef CONFIG_FTRACE
 // static vaddr_t g_function_stack[CONFIG_FTRACE_STACK_SIZE] = {0};
+// static vaddr_t *g_function_start = NULL;
 #endif
 
 #define FAILED_GOTO(tag, exp) do {if((exp)) goto tag;} while(0)
@@ -32,12 +33,14 @@ void init_elf(const char *path) {
     }
   }
 
-
   int sym_length = symtab->sh_size / sizeof(Elf32_Sym);
   Elf32_Sym *sym = calloc(sym_length, sizeof(Elf32_Sym));
   FAILED_GOTO(failed_nosym, sym == NULL);
   FAILED_GOTO(failed, fseek(elf_file, symtab->sh_offset, SEEK_SET) != 0);
   FAILED_GOTO(failed, fread(sym, sizeof(Elf32_Sym), sym_length, elf_file) <= 0);
+
+  // Count how many function symbol in elf file
+
   for(int j = 0; j < sym_length; j++) {
     if(ELF32_ST_TYPE(sym[j].st_info) != STT_FUNC) continue;
     // Only read function type symbol
