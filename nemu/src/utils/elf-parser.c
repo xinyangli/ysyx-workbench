@@ -27,10 +27,10 @@ void init_elf(const char *path) {
     psh = section_header + i;
     if (psh->sh_type == SHT_SYMTAB) {
       symtab = psh;
-      printf("symtab: %u %u\n", symtab->sh_size, symtab->sh_offset);
+      // printf("symtab: %u %u\n", symtab->sh_size, symtab->sh_offset);
     } else if (psh->sh_type == SHT_STRTAB) {
       strtab = psh;
-      printf("strtab: %u %u\n", strtab->sh_size, strtab->sh_offset);
+      // printf("strtab: %u %u\n", strtab->sh_size, strtab->sh_offset);
     }
     printf("section name: %s\n", shstrtab + psh->sh_name);
     // if(symtab && strtab) break;
