@@ -28,7 +28,7 @@ void init_elf(const char *path) {
     if (psh->sh_type == SHT_SYMTAB) {
       symtab = psh;
       // printf("symtab: %u %u\n", symtab->sh_size, symtab->sh_offset);
-    } else if (psh->sh_type == SHT_STRTAB && strncmp(shstrtab + psh->sh_name, ".strtab", 8)) {
+    } else if (psh->sh_type == SHT_STRTAB && strncmp(shstrtab + psh->sh_name, ".strtab", 8) == 0) {
       strtab = psh;
       // printf("strtab: %u %u\n", strtab->sh_size, strtab->sh_offset);
     }
