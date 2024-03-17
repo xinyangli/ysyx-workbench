@@ -31,8 +31,8 @@ void init_elf(const char *path) {
       printf("strtab: %u %u\n", strtab->sh_size, strtab->sh_offset);
     }
     FAILED_GOTO(failed_shstrtab, fseek(elf_file, section_header[header.e_shstrndx].sh_offset, SEEK_SET) != 0);
-    FAILED_GOTO(failed_shstrtab, fread(shstrtab, sizeof(Elf32_Sym), section_header[header.e_shstrndx].sh_size, elf_file) <= 0);
     printf("%u", section_header[header.e_shstrndx].sh_offset);
+    FAILED_GOTO(failed_shstrtab, fread(shstrtab, sizeof(Elf32_Sym), section_header[header.e_shstrndx].sh_size, elf_file) <= 0);
     // if(symtab && strtab) break;
   }
 
