@@ -13,7 +13,7 @@ int func_table_len = 0, func_table_size = 8;
 #endif
 
 static int cmp_func_t(const void *a, const void *b) {
-  return ((func_t *)a)->start > ((func_t *)b)->start;
+  return ((func_t *)a)->start >= ((func_t *)b)->start;
 }
 
 func_t *get_func(vaddr_t addr) {
