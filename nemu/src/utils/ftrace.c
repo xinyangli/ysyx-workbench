@@ -100,10 +100,10 @@ failed_nosym:
 }
 
 void ftrace_call(vaddr_t addr) {
-  printf("call [%s@0x%x]", get_func_name(addr), addr);
+  printf("[FTRACE] call [%s@0x%x]", get_func_name(addr), addr);
 }
 
 void ftrace_return(vaddr_t addr) {
-  printf("ret [%s@0x%x]", get_func_name(addr), addr);
+  printf("[FTRACE] ret [%s@0x%x]", get_func_name(addr), addr);
 }
 
