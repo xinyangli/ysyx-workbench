@@ -1,5 +1,3 @@
-#include <debug.h>
-#include <macro.h>
 #include <assert.h>
 #include <common.h>
 #include <elf.h>

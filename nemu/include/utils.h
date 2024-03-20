@@ -16,7 +16,7 @@
 #ifndef __UTILS_H__
 #define __UTILS_H__
 
-#include <common.h>
+#include <types.h>
 
 // ----------- state -----------
 
@@ -72,9 +72,6 @@ uint64_t get_time();
     printf(__VA_ARGS__); \
     log_write(__VA_ARGS__); \
   } while (0)
-
-
-IFDEF(CONFIG_ITRACE, void log_itrace_print());
 
 
 #endif

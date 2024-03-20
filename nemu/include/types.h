@@ -1,5 +1,7 @@
 #ifndef __TYPES_H__
 #define __TYPES_H__
+#include <inttypes.h>
+#include <macro.h>
 #if CONFIG_MBASE + CONFIG_MSIZE > 0x100000000ul
 #define PMEM64 1
 #endif

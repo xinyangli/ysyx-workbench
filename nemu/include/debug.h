@@ -17,7 +17,11 @@
 #define __DEBUG_H__
 
 #include <stdio.h>
+#include <types.h>
+#include <macro.h>
 #include <utils.h>
+
+IFDEF(CONFIG_ITRACE, void log_itrace_print());
 
 #define Trace(format, ...) \
     _Log("[TRACE] " format "\n", ## __VA_ARGS__)
