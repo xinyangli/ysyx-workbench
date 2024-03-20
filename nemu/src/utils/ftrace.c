@@ -35,9 +35,9 @@ void init_elf(const char *path) {
   func_table = (func_t *)calloc(func_table_size, sizeof(func_t));
   assert(func_table);
 
-  FAILED_GOTO(failed_nosym, fread(&header, sizeof(Elf32_Ehdr), 1, elf_file) <= 0);
-  FAILED_GOTO(failed_nosym, fseek(elf_file, header.e_shoff, SEEK_SET) != 0);
-  FAILED_GOTO(failed_nosym, fread(section_header, header.e_shentsize, header.e_shnum, elf_file) <= 0);
+  FAILED_GOTO(failed_header, fread(&header, sizeof(Elf32_Ehdr), 1, elf_file) <= 0);
+  FAILED_GOTO(failed_header, fseek(elf_file, header.e_shoff, SEEK_SET) != 0);
+  FAILED_GOTO(failed_header, fread(section_header, header.e_shentsize, header.e_shnum, elf_file) <= 0);
 
   char *shstrtab = calloc(1, section_header[header.e_shstrndx].sh_size);
   FAILED_GOTO(failed_shstrtab, fseek(elf_file, section_header[header.e_shstrndx].sh_offset, SEEK_SET) != 0);
@@ -56,16 +56,16 @@ void init_elf(const char *path) {
   int sym_length = symtab->sh_size / sizeof(Elf32_Sym);
   Elf32_Sym *sym = calloc(sym_length, sizeof(Elf32_Sym));
   assert(sym);
-  FAILED_GOTO(failed, fseek(elf_file, symtab->sh_offset, SEEK_SET) != 0);
-  FAILED_GOTO(failed, fread(sym, sizeof(Elf32_Sym), sym_length, elf_file) <= 0);
+  FAILED_GOTO(failed_funcname, fseek(elf_file, symtab->sh_offset, SEEK_SET) != 0);
+  FAILED_GOTO(failed_funcname, fread(sym, sizeof(Elf32_Sym), sym_length, elf_file) <= 0);
   
   for(int j = 0; j < sym_length; j++) {
     if(ELF32_ST_TYPE(sym[j].st_info) != STT_FUNC) continue;
     // Only read function type symbol
     func_t *f = &func_table[func_table_len];
     char *func = (char *)malloc(30);
-    FAILED_GOTO(failed, fseek(elf_file, strtab->sh_offset + sym[j].st_name, SEEK_SET) != 0);
-    FAILED_GOTO(failed, fgets(func, 30, elf_file) <= 0);
+    FAILED_GOTO(failed_funcname, fseek(elf_file, strtab->sh_offset + sym[j].st_name, SEEK_SET) != 0);
+    FAILED_GOTO(failed_funcname, fgets(func, 30, elf_file) <= 0);
     f->start = sym[j].st_value;
     f->len = sym[j].st_size;
     f->name = func;
@@ -85,11 +85,11 @@ success:
   free(shstrtab);
   return;
 
-failed:
+failed_funcname:
   free(sym);
 failed_shstrtab:
   free(shstrtab);
-failed_nosym:
+failed_header:
   for(int i = 0; i < func_table_len; i++) {
     func_t *f = &func_table[i];
     if(f->name) { free(f->name); }

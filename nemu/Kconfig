@@ -143,8 +143,11 @@ config TRACE_END
 
 config ITRACE
   depends on TRACE && TARGET_NATIVE_ELF && ENGINE_INTERPRETER
-  bool "Enable instruction tracer"
+  bool "Enable instruction tracing"
   default y
+  help
+    Instraction tracing will log past instructions into a ring buffer
+    and print them when NEMU exit unexpectedly.
 
 config ITRACE_COND
   depends on ITRACE
@@ -158,7 +161,7 @@ config ITRACE_BUFFER
 
 config MTRACE
   depends on TRACE && TARGET_NATIVE_ELF && ENGINE_INTERPRETER
-  bool "Enable memory tracer"
+  bool "Enable memory tracing"
   default n
 
 config MTRACE_RANGE
@@ -176,7 +179,7 @@ config MTRACE_RANGE_MAX
 
 config FTRACE
   depends on TRACE && TARGET_NATIVE_ELF && ENGINE_INTERPRETER
-  bool "Enable function tracer"
+  bool "Enable function tracing"
   default y
 
 config FTRACE_STACK_SIZE
