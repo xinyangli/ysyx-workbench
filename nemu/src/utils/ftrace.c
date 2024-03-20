@@ -28,13 +28,12 @@ const char *get_func_name(vaddr_t addr) {
 }
 
 void init_elf(const char *path) {
-  bool success = false;
   FILE *elf_file = fopen(path, "rb");
   Elf32_Ehdr header;
   Elf32_Shdr section_header[200], *psh;
 
   func_table = (func_t *)calloc(func_table_size, sizeof(func_t));
-  FAILED_GOTO(failed_nosym, func_table == NULL);
+  assert(func_table);
 
   FAILED_GOTO(failed_nosym, fread(&header, sizeof(Elf32_Ehdr), 1, elf_file) <= 0);
   FAILED_GOTO(failed_nosym, fseek(elf_file, header.e_shoff, SEEK_SET) != 0);
@@ -56,7 +55,7 @@ void init_elf(const char *path) {
 
   int sym_length = symtab->sh_size / sizeof(Elf32_Sym);
   Elf32_Sym *sym = calloc(sym_length, sizeof(Elf32_Sym));
-  FAILED_GOTO(failed_nosym, sym == NULL);
+  assert(sym);
   FAILED_GOTO(failed, fseek(elf_file, symtab->sh_offset, SEEK_SET) != 0);
   FAILED_GOTO(failed, fread(sym, sizeof(Elf32_Sym), sym_length, elf_file) <= 0);
   
@@ -79,17 +78,23 @@ void init_elf(const char *path) {
     }
   }
   qsort(func_table, func_table_len, sizeof(func_t), cmp_func_t);
-  success = true;
+  goto success;
+
+success:
+  free(sym);
+  free(shstrtab);
+  return;
+
 failed:
-//   for(int i = 0; i < func_table_len; i++) {
-//     func_t *f = &func_table[i];
-//     if(f->name) { free(f->name); }
-//   } 
-//   free(func_table);
-//   free(sym);
+  free(sym);
 failed_shstrtab:
-//   free(shstrtab);
+  free(shstrtab);
 failed_nosym:
-  if(success) return;
-  else Error("Failed reading elf file");
+  for(int i = 0; i < func_table_len; i++) {
+    func_t *f = &func_table[i];
+    if(f->name) { free(f->name); }
+  } 
+  free(func_table);
+  Error("Failed reading elf file");
+  return;
 }
