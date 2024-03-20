@@ -16,14 +16,14 @@ static int cmp_func_t(const void *a, const void *b) {
   return ((func_t *)a)->start > ((func_t *)b)->start;
 }
 
-func_t *get_func(vaddr_t addr) {
+const char *get_func_name(vaddr_t addr) {
   int l = 0, r = func_table_len - 1;
   while(l <= r) {
     int mid = (l + r) / 2;
     if(func_table[mid].start <= addr)  l = mid + 1;
     else r = mid - 1;
   }
-  return &func_table[l];
+  return l == 0 ? "???" : func_table[l - 1].name;
 }
 
 void init_elf(const char *path) {
@@ -82,10 +82,10 @@ void init_elf(const char *path) {
     func_t *f = &func_table[i];
     printf("%s: 0x%x - 0x%x\n", f->name, f->start, f->start + f->len);
   } 
-  printf("%s\n", get_func(0x80000010)->name);
-  printf("%s\n", get_func(0x80000012)->name);
-  printf("%s\n", get_func(0x7fffffff)->name);
-  printf("%s\n", get_func(0x80000000)->name);
+  printf("%s\n", get_func_name(0x80000010));
+  printf("%s\n", get_func_name(0x80000012));
+  printf("%s\n", get_func_name(0x7fffffff));
+  printf("%s\n", get_func_name(0x80000000));
   success = true;
 failed:
   for(int i = 0; i < func_table_len; i++) {
