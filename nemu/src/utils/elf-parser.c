@@ -13,7 +13,6 @@ int func_table_len = 0, func_table_size = 8;
 #endif
 
 static int cmp_func_t(const void *a, const void *b) {
-
   return ((func_t *)a)->start > ((func_t *)b)->start;
 }
 
@@ -70,7 +69,7 @@ void init_elf(const char *path) {
   }
   qsort(func_table, func_table_len, sizeof(func_t), cmp_func_t);
   for(int i = 0; i < func_table_len; i++) {
-    func_t *f = &func_table[func_table_len];
+    func_t *f = &func_table[i];
     // puts(func);
     printf("%s: 0x%x - 0x%x\n", f->name, f->start, f->start + f->len);
   } 
