@@ -61,8 +61,6 @@ void init_elf(const char *path) {
     f->len = sym[j].st_size;
     f->name = func;
     ++func_table_len;
-    // puts(func);
-    printf("%s: 0x%x - 0x%x\n", f->name, f->start, f->start + f->len);
     if(func_table_len >= func_table_size) {
       Assert(func_table_size * 2 > func_table_size, "Function table exceed memory limit");
       func_table_size *= 2;
@@ -71,6 +69,11 @@ void init_elf(const char *path) {
     }
   }
   qsort(func_table, func_table_len, sizeof(func_t), cmp_func_t);
+  for(int i = 0; i < func_table_len; i++) {
+    func_t *f = &func_table[func_table_len];
+    // puts(func);
+    printf("%s: 0x%x - 0x%x\n", f->name, f->start, f->start + f->len);
+  } 
   success = true;
 failed:
   for(int i = 0; i < func_table_len; i++) {
