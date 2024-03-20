@@ -114,7 +114,7 @@ void ftrace_return(vaddr_t pc, vaddr_t addr) {
   --ftrace_stack_len;
   for (; addr != ftrace_stack[ftrace_stack_len] && ftrace_stack_len >= 0;
        ftrace_stack_len--) {
-    Trace("%*s0x%x ret [%s@0x%x] ", ftrace_stack_len, "", pc, get_func_name(addr), addr);
+    // Trace("%*s0x%x ret [%s@0x%x] ", ftrace_stack_len, "", pc, get_func_name(addr), addr);
   }
-  // Trace("%*s0x%x ret [%s@0x%x]", ftrace_stack_pos, "", pc, get_func_name(addr), addr);
+  Trace("%*s0x%x ret [%s@0x%x]", ftrace_stack_len, "", pc, get_func_name(addr), addr);
 }
