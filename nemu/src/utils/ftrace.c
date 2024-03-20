@@ -2,7 +2,7 @@
 #include <assert.h>
 #include <common.h>
 #include <elf.h>
-#include <func.h>
+#include <ftrace.h>
 
 // Put this into another file
 #ifdef CONFIG_FTRACE
@@ -16,7 +16,7 @@ static int cmp_func_t(const void *a, const void *b) {
   return ((func_t *)a)->start > ((func_t *)b)->start;
 }
 
-const char *get_func_name(vaddr_t addr) {
+static const char *get_func_name(vaddr_t addr) {
   int l = 0, r = func_table_len - 1;
   while(l <= r) {
     int mid = (l + r) / 2;
@@ -98,3 +98,12 @@ failed_nosym:
   Error("Failed reading elf file");
   return;
 }
+
+void ftrace_call(vaddr_t addr) {
+  printf("call [%s@0x%x]", get_func_name(addr), addr);
+}
+
+void ftrace_return(vaddr_t addr) {
+  printf("ret [%s@0x%x]", get_func_name(addr), addr);
+}
+

@@ -9,8 +9,10 @@ typedef struct {
   char * name;
 } func_t;
 
-func_t *func_table;
-const char *get_func_name(vaddr_t addr);
+extern func_t *func_table;
+void ftrace_call(vaddr_t);
+void ftrace_return(vaddr_t);
+// const char *get_func_name(vaddr_t addr);
 #endif
 
 #endif
