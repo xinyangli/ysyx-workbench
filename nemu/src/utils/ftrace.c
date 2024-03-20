@@ -105,7 +105,7 @@ void ftrace_call(vaddr_t pc, vaddr_t addr) {
          "Ftrace stack exceed size limit, consider turn off ftrace or increase "
          "FTRACE_STACK_SIZE.");
   ftrace_stack[ftrace_stack_len] = pc + 4;
-  Trace("%*s0x%x call <%s@0x%x>", ftrace_stack_len, "", pc, f == NULL ? "???" : f->name,
+  Trace("%*s0x%x call <%s+0x%x>", ftrace_stack_len, "", pc, f == NULL ? "???" : f->name,
         addr);
   ftrace_stack_len++;
 }
