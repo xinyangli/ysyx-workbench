@@ -54,7 +54,7 @@
           installPhase = ''
             mkdir -p $out/bin
             ls build/
-            cp build/native/*.elf $out/bin/
+            cp build/native/* $out/bin/
           '';
 
           # dontFixup = true;
