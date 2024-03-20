@@ -23,6 +23,7 @@ const char *get_func_name(vaddr_t addr) {
     if(func_table[mid].start <= addr)  l = mid + 1;
     else r = mid - 1;
   }
+  if(func_table[l].start + func_table[l].len < addr) return "???";
   return l == 0 ? "???" : func_table[l - 1].name;
 }
 
@@ -78,24 +79,16 @@ void init_elf(const char *path) {
     }
   }
   qsort(func_table, func_table_len, sizeof(func_t), cmp_func_t);
-  for(int i = 0; i < func_table_len; i++) {
-    func_t *f = &func_table[i];
-    printf("%s: 0x%x - 0x%x\n", f->name, f->start, f->start + f->len);
-  } 
-  printf("%s\n", get_func_name(0x80000010));
-  printf("%s\n", get_func_name(0x80000012));
-  printf("%s\n", get_func_name(0x7fffffff));
-  printf("%s\n", get_func_name(0x80000000));
   success = true;
 failed:
-  for(int i = 0; i < func_table_len; i++) {
-    func_t *f = &func_table[i];
-    if(f->name) { free(f->name); }
-  } 
-  free(func_table);
-  free(sym);
+//   for(int i = 0; i < func_table_len; i++) {
+//     func_t *f = &func_table[i];
+//     if(f->name) { free(f->name); }
+//   } 
+//   free(func_table);
+//   free(sym);
 failed_shstrtab:
-  free(shstrtab);
+//   free(shstrtab);
 failed_nosym:
   if(success) return;
   else Error("Failed reading elf file");

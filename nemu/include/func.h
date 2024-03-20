@@ -10,6 +10,7 @@ typedef struct {
 } func_t;
 
 func_t *func_table;
+const char *get_func_name(vaddr_t addr);
 #endif
 
 #endif
