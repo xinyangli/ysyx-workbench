@@ -16,6 +16,16 @@ static int cmp_func_t(const void *a, const void *b) {
   return ((func_t *)a)->start > ((func_t *)b)->start;
 }
 
+func_t *get_func(vaddr_t addr) {
+  int l = 0, r = func_table_len - 1;
+  while(l < r) {
+    int mid = l + (r - l) / 2;
+    if(func_table[mid].start < addr)  l = mid + 1;
+    else r = mid;
+  }
+  return &func_table[l];
+}
+
 void init_elf(const char *path) {
   bool success = false;
   FILE *elf_file = fopen(path, "rb");
@@ -68,6 +78,10 @@ void init_elf(const char *path) {
     }
   }
   qsort(func_table, func_table_len, sizeof(func_t), cmp_func_t);
+  for(int i = 0; i < func_table_len; i++) {
+    func_t *f = &func_table[i];
+    printf("%s: 0x%x - 0x%x\n", f->name, f->start, f->start + f->len);
+  } 
   success = true;
 failed:
   for(int i = 0; i < func_table_len; i++) {
@@ -81,14 +95,4 @@ failed_shstrtab:
 failed_nosym:
   if(success) return;
   else Error("Failed reading elf file");
-}
-
-func_t *get_func(vaddr_t addr) {
-  int l = 0, r = func_table_len - 1;
-  while(l < r) {
-    int mid = l + (r - l) / 2;
-    if(func_table[mid].start < addr)  l = mid + 1;
-    else r = mid;
-  }
-  return &func_table[l];
 }
