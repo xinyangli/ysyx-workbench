@@ -17,13 +17,13 @@ static int cmp_func_t(const void *a, const void *b) {
 }
 
 func_t *get_func(vaddr_t addr) {
-  int l = 0, r = func_table_len;
-  while(l < r) {
+  int l = 0, r = func_table_len - 1;
+  while(l <= r) {
     int mid = l + (r - l) / 2;
     if(func_table[mid].start <= addr)  l = mid + 1;
-    else r = mid;
+    else r = mid - 1;
   }
-  return &func_table[r];
+  return &func_table[l];
 }
 
 void init_elf(const char *path) {
