@@ -13,12 +13,13 @@
  * See the Mulan PSL v2 for more details.
  ***************************************************************************************/
 
-#include "common.h"
+#include <common.h>
 #include "local-include/reg.h"
 #include <cpu/cpu.h>
 #include <cpu/ifetch.h>
 #include <cpu/decode.h>
 #include <ftrace.h>
+#include <utils.h>
 
 #define R(i) gpr(i)
 #define Mr vaddr_read

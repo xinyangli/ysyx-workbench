@@ -1,9 +1,8 @@
-#include "debug.h"
-#include "macro.h"
 #include <assert.h>
 #include <common.h>
 #include <elf.h>
 #include <ftrace.h>
+#include <utils.h>
 
 // Put this into another file
 #ifdef CONFIG_FTRACE
