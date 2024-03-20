@@ -83,7 +83,7 @@ void init_elf(const char *path) {
     printf("%s: 0x%x - 0x%x\n", f->name, f->start, f->start + f->len);
   } 
   printf("%s\n", get_func(0x80000010)->name);
-  printf("%s\n", get_func(0x80000027)->name);
+  printf("%s\n", get_func(0x80000026)->name);
   success = true;
 failed:
   for(int i = 0; i < func_table_len; i++) {
