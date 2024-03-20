@@ -18,7 +18,7 @@ void init_elf(const char *path) {
   Elf32_Ehdr header;
   Elf32_Shdr section_header[200], *psh;
 
-  func_table = (func_t *)malloc(func_table_size);
+  func_table = (func_t *)calloc(func_table_size, sizeof(func_t));
   FAILED_GOTO(failed_nosym, func_table == NULL);
 
   FAILED_GOTO(failed_nosym, fread(&header, sizeof(Elf32_Ehdr), 1, elf_file) <= 0);
