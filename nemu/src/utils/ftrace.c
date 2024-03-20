@@ -8,7 +8,7 @@
 // Put this into another file
 #ifdef CONFIG_FTRACE
 static vaddr_t ftrace_stack[CONFIG_FTRACE_STACK_SIZE] = {0};
-static vaddr_t ftrace_stack_pos = 0;
+static vaddr_t ftrace_stack_len = 0;
 func_t *func_table = NULL;
 int func_table_len = 0, func_table_size = 8;
 #endif
@@ -101,16 +101,20 @@ failed_nosym:
 }
 
 void ftrace_call(vaddr_t pc, vaddr_t addr) {
-  Assert(ftrace_stack_pos < CONFIG_FTRACE_STACK_SIZE, "Ftrace stack exceed limit, consider turn off ftrace or increse FTRACE_STACK_SIZE.");
-  ftrace_stack[ftrace_stack_pos++] = pc + 4;
-  Trace("%*s0x%x call [%s@0x%x]", ftrace_stack_pos, "", pc, get_func_name(addr), addr);
+  Assert(ftrace_stack_len < CONFIG_FTRACE_STACK_SIZE,
+         "Ftrace stack exceed size limit, consider turn off ftrace or increase "
+         "FTRACE_STACK_SIZE.");
+  ftrace_stack[ftrace_stack_len] = pc + 4;
+  Trace("%*s0x%x call [%s@0x%x]", ftrace_stack_len, "", pc, get_func_name(addr),
+        addr);
+  ftrace_stack_len++;
 }
 
 void ftrace_return(vaddr_t pc, vaddr_t addr) {
-
-  for (; addr != ftrace_stack[ftrace_stack_pos] && ftrace_stack_pos >= 0;
-       ftrace_stack_pos--) {
-    Trace("%*s0x%x ret [%s@0x%x] ", ftrace_stack_pos, "", pc, get_func_name(addr), addr);
+  --ftrace_stack_len;
+  for (; addr != ftrace_stack[ftrace_stack_len] && ftrace_stack_len >= 0;
+       ftrace_stack_len--) {
+    Trace("%*s0x%x ret [%s@0x%x] ", ftrace_stack_len, "", pc, get_func_name(addr), addr);
   }
   // Trace("%*s0x%x ret [%s@0x%x]", ftrace_stack_pos, "", pc, get_func_name(addr), addr);
 }
