@@ -12,6 +12,11 @@ func_t *func_table = NULL;
 int func_table_len = 0, func_table_size = 8;
 #endif
 
+static int cmp_func_t(const void *a, const void *b) {
+
+  return ((func_t *)a)->start > ((func_t *)b)->start;
+}
+
 void init_elf(const char *path) {
   bool success = false;
   FILE *elf_file = fopen(path, "rb");
@@ -65,6 +70,7 @@ void init_elf(const char *path) {
       Assert(func_table, "Function table exceed memory limit");
     }
   }
+  qsort(func_table, func_table_len, sizeof(func_t), cmp_func_t);
   success = true;
 failed:
   for(int i = 0; i < func_table_len; i++) {
