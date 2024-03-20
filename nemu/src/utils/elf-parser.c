@@ -20,8 +20,8 @@ func_t *get_func(vaddr_t addr) {
   int l = 0, r = func_table_len - 1;
   while(l < r) {
     int mid = l + (r - l) / 2;
-    if(func_table[mid].start <= addr)  l = mid + 1;
-    else r = mid;
+    if(func_table[mid].start <= addr)  l = mid ;
+    else r = mid - 1;
   }
   return &func_table[l-1];
 }
