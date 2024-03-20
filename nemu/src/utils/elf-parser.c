@@ -82,6 +82,8 @@ void init_elf(const char *path) {
     func_t *f = &func_table[i];
     printf("%s: 0x%x - 0x%x\n", f->name, f->start, f->start + f->len);
   } 
+  printf("%s\n", get_func(0x80000010)->name);
+  printf("%s\n", get_func(0x80000027)->name);
   success = true;
 failed:
   for(int i = 0; i < func_table_len; i++) {
