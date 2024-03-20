@@ -85,6 +85,7 @@ void init_elf(const char *path) {
   printf("%s\n", get_func(0x80000010)->name);
   printf("%s\n", get_func(0x80000012)->name);
   printf("%s\n", get_func(0x7fffffff)->name);
+  printf("%s\n", get_func(0x80000000)->name);
   success = true;
 failed:
   for(int i = 0; i < func_table_len; i++) {
