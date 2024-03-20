@@ -17,15 +17,14 @@ static int cmp_func_t(const void *a, const void *b) {
   return ((func_t *)a)->start > ((func_t *)b)->start;
 }
 
-static const char *get_func_name(vaddr_t addr) {
+static func_t *get_func(vaddr_t addr) {
   int l = 0, r = func_table_len - 1;
   while(l <= r) {
     int mid = (l + r) / 2;
     if(func_table[mid].start <= addr)  l = mid + 1;
     else r = mid - 1;
   }
-  // if(func_table[l].start + func_table[l].len < addr) return "???";
-  return l == 0 ? "???" : func_table[l - 1].name;
+  return l == 0 ? NULL : &func_table[l - 1];
 }
 
 void init_elf(const char *path) {
@@ -101,11 +100,12 @@ failed_nosym:
 }
 
 void ftrace_call(vaddr_t pc, vaddr_t addr) {
+  func_t *f = get_func(addr);
   Assert(ftrace_stack_len < CONFIG_FTRACE_STACK_SIZE,
          "Ftrace stack exceed size limit, consider turn off ftrace or increase "
          "FTRACE_STACK_SIZE.");
   ftrace_stack[ftrace_stack_len] = pc + 4;
-  Trace("%*s0x%x call [%s@0x%x]", ftrace_stack_len, "", pc, get_func_name(addr),
+  Trace("%*s0x%x call <%s@0x%x>", ftrace_stack_len, "", pc, f == NULL ? "???" : f->name,
         addr);
   ftrace_stack_len++;
 }
@@ -115,7 +115,9 @@ void ftrace_return(vaddr_t pc, vaddr_t addr) {
   for (; addr != ftrace_stack[ftrace_stack_len] && ftrace_stack_len >= 0;
        ftrace_stack_len--) {
     vaddr_t tco_addr = ftrace_stack[ftrace_stack_len];
-    Trace("%*s0x%x <TCO> [%s@0x%x] ", ftrace_stack_len, "", pc, get_func_name(tco_addr), tco_addr);
+    func_t *f = get_func(tco_addr);
+    Trace("%*s0x%x <TCO> [%s@0x%x] ", ftrace_stack_len, "", pc, f == NULL ? "???" : f->name, tco_addr - f->start);
   }
-  Trace("%*s0x%x ret [%s@0x%x]", ftrace_stack_len, "", pc, get_func_name(addr), addr);
+  func_t *f = get_func(addr);
+  Trace("%*s0x%x ret <%s+0x%x>", ftrace_stack_len, "", pc, f == NULL ? "???" : f->name, addr - f->start);
 }
