@@ -23,7 +23,7 @@ func_t *get_func(vaddr_t addr) {
     if(func_table[mid].start <= addr)  l = mid + 1;
     else r = mid;
   }
-  return &func_table[l];
+  return &func_table[l-1];
 }
 
 void init_elf(const char *path) {
@@ -84,6 +84,7 @@ void init_elf(const char *path) {
   } 
   printf("%s\n", get_func(0x80000010)->name);
   printf("%s\n", get_func(0x80000012)->name);
+  printf("%s\n", get_func(0x7fffffff)->name);
   success = true;
 failed:
   for(int i = 0; i < func_table_len; i++) {
