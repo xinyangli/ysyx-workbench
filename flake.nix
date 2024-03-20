@@ -52,8 +52,9 @@
           '';
 
           installPhase = ''
-            mkdir -p $out/bin/
-            cp build/riscv32-nemu/*.elf $out/bin/
+            mkdir -p $out/bin
+            ls build/
+            cp build/native/*.elf $out/bin/
           '';
 
           # dontFixup = true;
