@@ -23,7 +23,7 @@ func_t *get_func(vaddr_t addr) {
     if(func_table[mid].start <= addr)  l = mid + 1;
     else r = mid;
   }
-  return &func_table[r-1];
+  return &func_table[r];
 }
 
 void init_elf(const char *path) {
