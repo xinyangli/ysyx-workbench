@@ -1,20 +1,26 @@
+#include "macro.h"
 #include <assert.h>
 #include <common.h>
 #include <elf.h>
+#include <func.h>
 
 // Put this into another file
 #ifdef CONFIG_FTRACE
 // static vaddr_t g_function_stack[CONFIG_FTRACE_STACK_SIZE] = {0};
 // static vaddr_t *g_function_start = NULL;
+func_t *func_table = NULL;
+int func_table_len = 0, func_table_size = 8;
 #endif
-
-#define FAILED_GOTO(tag, exp) do {if((exp)) goto tag;} while(0)
 
 void init_elf(const char *path) {
   bool success = false;
   FILE *elf_file = fopen(path, "rb");
   Elf32_Ehdr header;
   Elf32_Shdr section_header[200], *psh;
+
+  func_table = (func_t *)malloc(func_table_size);
+  FAILED_GOTO(failed_nosym, func_table == NULL);
+
   FAILED_GOTO(failed_nosym, fread(&header, sizeof(Elf32_Ehdr), 1, elf_file) <= 0);
   FAILED_GOTO(failed_nosym, fseek(elf_file, header.e_shoff, SEEK_SET) != 0);
   FAILED_GOTO(failed_nosym, fread(section_header, header.e_shentsize, header.e_shnum, elf_file) <= 0);
@@ -38,19 +44,27 @@ void init_elf(const char *path) {
   FAILED_GOTO(failed_nosym, sym == NULL);
   FAILED_GOTO(failed, fseek(elf_file, symtab->sh_offset, SEEK_SET) != 0);
   FAILED_GOTO(failed, fread(sym, sizeof(Elf32_Sym), sym_length, elf_file) <= 0);
-
-  // Count how many function symbol in elf file
-
+  
   for(int j = 0; j < sym_length; j++) {
     if(ELF32_ST_TYPE(sym[j].st_info) != STT_FUNC) continue;
     // Only read function type symbol
-    char func[30];
+    func_t *f = &func_table[func_table_len];
+    char *func = (char *)malloc(30);
     FAILED_GOTO(failed, fseek(elf_file, strtab->sh_offset + sym[j].st_name, SEEK_SET) != 0);
     FAILED_GOTO(failed, fgets(func, 30, elf_file) <= 0);
+    f->start = sym[j].st_value;
+    f->len = sym[j].st_size;
+    f->name = func;
+    ++func_table_len;
     puts(func);
   }
   success = true;
 failed:
+  for(int i = 0; i < func_table_len; i++) {
+    func_t *f = &func_table[i];
+    if(f->name) { free(f->name); }
+  } 
+  free(func_table);
   free(sym);
 failed_shstrtab:
   free(shstrtab);
