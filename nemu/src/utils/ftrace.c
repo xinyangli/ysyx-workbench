@@ -109,7 +109,7 @@ void ftrace_call(vaddr_t pc, vaddr_t addr) {
 void ftrace_return(vaddr_t pc, vaddr_t addr) {
   for (; addr != ftrace_stack[ftrace_stack_pos] && ftrace_stack_pos >= 0;
        ftrace_stack_pos--) {
-    Trace("%*s0x%x [%s@0x%x] <Tail call>", ftrace_stack_pos, "", pc, get_func_name(addr), addr);
+    Trace("%*s0x%x [%s@0x%x] <TCO>", ftrace_stack_pos, "", pc, get_func_name(addr), addr);
   }
   Trace("%*s0x%x ret [%s@0x%x]", ftrace_stack_pos, "", pc, get_func_name(addr), addr);
 }
