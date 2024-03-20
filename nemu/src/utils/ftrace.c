@@ -99,11 +99,11 @@ failed_nosym:
   return;
 }
 
-void ftrace_call(vaddr_t addr) {
+void ftrace_call(vaddr_t pc, vaddr_t addr) {
   printf("[FTRACE] call [%s@0x%x]\n", get_func_name(addr), addr);
 }
 
-void ftrace_return(vaddr_t addr) {
+void ftrace_return(vaddr_t pc, vaddr_t addr) {
   printf("[FTRACE] ret [%s@0x%x]\n", get_func_name(addr), addr);
 }
 

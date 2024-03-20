@@ -10,8 +10,8 @@ typedef struct {
 } func_t;
 
 extern func_t *func_table;
-void ftrace_call(vaddr_t);
-void ftrace_return(vaddr_t);
+void ftrace_call(vaddr_t, vaddr_t);
+void ftrace_return(vaddr_t, vaddr_t);
 // const char *get_func_name(vaddr_t addr);
 #endif
 
