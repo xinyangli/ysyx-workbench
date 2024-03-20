@@ -13,14 +13,14 @@ int func_table_len = 0, func_table_size = 8;
 #endif
 
 static int cmp_func_t(const void *a, const void *b) {
-  return ((func_t *)a)->start >= ((func_t *)b)->start;
+  return ((func_t *)a)->start > ((func_t *)b)->start;
 }
 
 func_t *get_func(vaddr_t addr) {
   int l = 0, r = func_table_len - 1;
   while(l < r) {
     int mid = l + (r - l) / 2;
-    if(func_table[mid].start < addr)  l = mid + 1;
+    if(func_table[mid].start <= addr)  l = mid + 1;
     else r = mid;
   }
   return &func_table[l];
