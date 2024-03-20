@@ -17,8 +17,6 @@
 #define __DEBUG_H__
 
 #include <stdio.h>
-#include <types.h>
-#include <macro.h>
 #include <utils.h>
 
 IFDEF(CONFIG_ITRACE, void log_itrace_print());
