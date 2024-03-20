@@ -81,8 +81,8 @@ void init_elf(const char *path) {
   goto success;
 
 success:
-  free(sym);
-  free(shstrtab);
+  // free(sym);
+  // free(shstrtab);
   return;
 
 failed:
