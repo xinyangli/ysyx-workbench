@@ -101,10 +101,10 @@ failed_nosym:
 }
 
 void ftrace_call(vaddr_t pc, vaddr_t addr) {
-  Trace("0x%x call [%s@0x%x]", pc, get_func_name(addr), addr);
+  Trace("0x%x(%s) call [%s0x%x]", pc, get_func_name(pc), get_func_name(addr), addr);
 }
 
 void ftrace_return(vaddr_t pc, vaddr_t addr) {
-  Trace("0x%x ret [%s@0x%x]", pc, get_func_name(addr), addr);
+  Trace("0x%x(%s) ret [%s@0x%x]", pc, get_func_name(pc), get_func_name(addr), addr);
 }
 
