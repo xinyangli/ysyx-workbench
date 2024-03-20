@@ -60,7 +60,7 @@ void init_elf(const char *path) {
     if(func_table_len >= func_table_size) {
       Assert(func_table_size * 2 > func_table_size, "Function table exceed memory limit");
       func_table_size *= 2;
-      func_table = realloc(func_table, func_table_size);
+      func_table = realloc(func_table, func_table_size * sizeof(func_t));
       Assert(func_table, "Function table exceed memory limit");
     }
   }
