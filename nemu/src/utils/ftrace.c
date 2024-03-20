@@ -24,7 +24,7 @@ static const char *get_func_name(vaddr_t addr) {
     if(func_table[mid].start <= addr)  l = mid + 1;
     else r = mid - 1;
   }
-  if(func_table[l].start + func_table[l].len < addr) return "???";
+  // if(func_table[l].start + func_table[l].len < addr) return "???";
   return l == 0 ? "???" : func_table[l - 1].name;
 }
 
