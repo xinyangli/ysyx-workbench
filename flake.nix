@@ -20,13 +20,18 @@
         };
       in
       {
-        packages.nemu = pkgs.callPackage ./nemu { am-kernels = self.packages.${system}.am-kernels-rv32; };
+        packages.nemu = pkgs.callPackage ./nemu { am-kernels = self.packages.${system}.am-kernels-cmake; };
 
         packages.abstract-machine = crossPkgs.stdenv.mkDerivation rec {
           pname = "abstract-machine";
           version = "2024.02.18";
 
           src = ./abstract-machine;
+
+          cmakeFlags =  [
+            (pkgs.lib.cmakeFeature "ISA" "riscv")
+            (pkgs.lib.cmakeBool "__PLATFORM_NEMU__" true)
+          ];
 
           nativeBuildInputs = [
             pkgs.cmake
@@ -35,15 +40,11 @@
           buildInputs = [
             # SDL2
           ];
-          cmakeFlags =  [
-            (pkgs.lib.cmakeFeature "ISA" "riscv")
-            (pkgs.lib.cmakeBool "__PLATFORM_NEMU__" true)
-          ];
         };
 
         packages.am-kernels-cmake = crossPkgs.stdenv.mkDerivation rec {
           pname = "am-kernels-cmake";
-          version = "2024.02.19";
+          version = "2024.02.18";
 
           src = ./am-kernels; 
 
@@ -54,7 +55,6 @@
           cmakeFlags = [
             (pkgs.lib.cmakeFeature "ISA" "riscv")
             (pkgs.lib.cmakeFeature "PLATFORM" "nemu")
-
             (pkgs.lib.cmakeFeature "CMAKE_INSTALL_DATADIR" "share")
           ];
 
