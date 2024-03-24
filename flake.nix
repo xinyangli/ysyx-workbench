@@ -12,7 +12,10 @@
           localSystem = system;
           crossSystem = {
             config = "riscv32-none-elf";
-            abi = "ilp32";
+            gcc = {
+              abi = "ilp32";
+              arch = "rv32if";
+            };
           };
         };
       in
@@ -40,12 +43,19 @@
 
         packages.am-kernels-cmake = crossPkgs.stdenv.mkDerivation rec {
           pname = "am-kernels-cmake";
-          version = "2024.02.18";
+          version = "2024.02.19";
 
-          src = /home/xin/repo/am-kernels;
+          src = ./am-kernels; 
 
           nativeBuildInputs = [
             pkgs.cmake
+          ];
+
+          cmakeFlags = [
+            (pkgs.lib.cmakeFeature "ISA" "riscv")
+            (pkgs.lib.cmakeFeature "PLATFORM" "nemu")
+
+            (pkgs.lib.cmakeFeature "CMAKE_INSTALL_DATADIR" "share")
           ];
 
           buildInputs = [

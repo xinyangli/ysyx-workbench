@@ -1,4 +1,5 @@
 include(nemu-settings)
+include(riscv-settings)
 
 add_library(am-${ISA}-nemu
     cte.c
@@ -16,6 +17,12 @@ target_link_options(am-${ISA}-nemu PRIVATE
     ${RISCV_LINK_OPTIONS})
 target_include_directories(am-${ISA}-nemu PRIVATE
     ${NEMU_INCLUDE_DIRECTORIES})
+target_link_options(am-${ISA}-nemu INTERFACE
+    LINKER:--defsym=_pmem_start=0x80000000
+    LINKER:--defsym=_entry_offset=0x0
+    LINKER:--gc-sections
+    LINKER:-e _start
+    -nostartfiles)
 
 target_compile_definitions(am-${ISA}-nemu PUBLIC
     ARCH_H="arch/riscv.h")

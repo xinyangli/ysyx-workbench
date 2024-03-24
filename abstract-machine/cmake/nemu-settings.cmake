@@ -8,4 +8,4 @@ set(NEMU_INCLUDE_DIRECTORIES
     ${CMAKE_SOURCE_DIR}/am/src/platform/nemu/include)
 file(GLOB_RECURSE NEMU_SOURCES
     ${CMAKE_SOURCE_DIR}/am/src/platform/nemu/*.[cS])
-set(INCLUDE_LINKER_SCRIPT true)
+set(INCLUDE_LINKER_SCRIPT ON)

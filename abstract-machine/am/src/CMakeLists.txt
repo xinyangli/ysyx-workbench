@@ -14,9 +14,11 @@ target_include_directories(am-${ARCH}
 target_link_libraries(am-${ARCH}
     PUBLIC klib_interface
     INTERFACE m)
-if(INCLUDE_LINKER_SCRIPT)
-    target_link_options(am-${ARCH} INTERFACE -T${LINKER_SCRIPT})
-endif()
+
+# TODO: Check
+target_link_options(am-${ARCH} INTERFACE
+    $<BUILD_INTERFACE:-T${CMAKE_SOURCE_DIR}/scripts/${LINKER_SCRIPT}>
+    $<INSTALL_INTERFACE:-T${CMAKE_INSTALL_LIBDIR}/cmake/am-${ARCH}/${LINKER_SCRIPT}>)
 
 # Interface compile flags
 target_link_options(am-${ARCH} INTERFACE
@@ -44,4 +46,8 @@ configure_package_config_file(${CMAKE_SOURCE_DIR}/cmake/am-config.cmake.in
   INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/am-${ARCH})
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/am-${ARCH}-config.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/am-${ARCH})
+
+# TODO: check
+install(FILES ${CMAKE_SOURCE_DIR}/scripts/${LINKER_SCRIPT}
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/am-${ARCH})

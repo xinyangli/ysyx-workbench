@@ -76,9 +76,12 @@ add_link_options(
 )
 
 # -- Include linker script here. Use this linker script at link time if INCLUDE_LINKER_SCRIPT is set to true
-set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/scripts/linker.ld)
+set(LINKER_SCRIPT linker.ld)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+
+add_compile_options(-march=rv32if -mabi=ilp32)
+add_link_options(-march=rv32if -mabi=ilp32)
 
 add_subdirectory(klib)
 add_subdirectory(am)
