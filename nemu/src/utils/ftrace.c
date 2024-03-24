@@ -10,7 +10,6 @@ static vaddr_t ftrace_stack[CONFIG_FTRACE_STACK_SIZE] = {0};
 static vaddr_t ftrace_stack_len = 0;
 func_t *func_table = NULL;
 int func_table_len = 0, func_table_size = 8;
-#endif
 
 static int cmp_func_t(const void *a, const void *b) {
   return ((func_t *)a)->start > ((func_t *)b)->start;
@@ -122,3 +121,4 @@ void ftrace_return(vaddr_t pc, vaddr_t addr) {
   Trace("%*s0x%x ret 0x%x <%s+0x%x>", ftrace_stack_len, "", pc, addr, 
         f == NULL ? "???" : f->name, addr - f->start);
 }
+#endif

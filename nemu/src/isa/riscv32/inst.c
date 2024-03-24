@@ -62,6 +62,7 @@ static void do_branch(Decode *s, bool condition, word_t offset) {
   }
 }
 
+#ifdef CONFIG_FTRACE
 static void ftrace_jalr(Decode *s, int rd, vaddr_t dst) {
   uint32_t i = s->isa.inst.val;
   int rs1 = BITS(i, 19, 15);
@@ -71,6 +72,7 @@ static void ftrace_jalr(Decode *s, int rd, vaddr_t dst) {
     ftrace_call(s->pc, dst);
   }
 }
+#endif
 
 static int decode_exec(Decode *s) {
   int rd = 0;

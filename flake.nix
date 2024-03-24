@@ -19,12 +19,47 @@
       {
         packages.nemu = pkgs.callPackage ./nemu { am-kernels = self.packages.${system}.am-kernels-rv32; };
 
+        packages.abstract-machine = crossPkgs.stdenv.mkDerivation rec {
+          pname = "abstract-machine";
+          version = "2024.02.18";
+
+          src = ./abstract-machine;
+
+          nativeBuildInputs = [
+            pkgs.cmake
+          ];
+
+          buildInputs = [
+            # SDL2
+          ];
+          cmakeFlags =  [
+            (pkgs.lib.cmakeFeature "ISA" "riscv")
+            (pkgs.lib.cmakeBool "__PLATFORM_NEMU__" true)
+          ];
+        };
+
+        packages.am-kernels-cmake = crossPkgs.stdenv.mkDerivation rec {
+          pname = "am-kernels-cmake";
+          version = "2024.02.18";
+
+          src = /home/xin/repo/am-kernels;
+
+          nativeBuildInputs = [
+            pkgs.cmake
+          ];
+
+          buildInputs = [
+            # SDL2
+            self.packages.${system}.abstract-machine
+          ];
+        };
+
         packages.am-kernels = pkgs.stdenv.mkDerivation rec {
           pname = "am-kernels";
           version = "2024.02.18";
 
-          buildInputs = [
-            pkgs.SDL2
+          buildInputs = with pkgs; [
+            SDL2
           ];
 
           src = pkgs.fetchFromGitHub {
@@ -53,11 +88,9 @@
 
           installPhase = ''
             mkdir -p $out/bin
-            ls build/
-            cp build/native/* $out/bin/
+            rm -r build/native/src build/native/tests
+            cp -r build/native/* $out/bin/
           '';
-
-          # dontFixup = true;
         };
 
         packages.am-kernels-rv32 = crossPkgs.stdenv.mkDerivation rec {
@@ -90,8 +123,10 @@
 
           installPhase = ''
             mkdir -p $out/share/images $out/share/dump
+            mkdir -p $out/bin
             cp build/riscv32-nemu/*.bin $out/share/images
             cp build/riscv32-nemu/*.txt $out/share/dump
+            cp build/riscv32-nemu/*.elf $out/bin
           '';
 
           dontFixup = true;
@@ -112,7 +147,16 @@
             self.packages.${system}.nemu
           ];
         };
+
+        devShells.abstract-machine-shell = pkgs.mkShell {
+          packages = with pkgs; [
+            clang-tools
+            cmake
+            check
+            pkg-config
+            SDL2
+          ];
+        };
       }
     );
 }
-
