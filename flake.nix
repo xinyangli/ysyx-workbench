@@ -20,10 +20,10 @@
         };
       in
       {
-        packages.nemu = pkgs.callPackage ./nemu { am-kernels = self.packages.${system}.am-kernels-cmake; };
+        packages.nemu = pkgs.callPackage ./nemu { am-kernels = self.packages.${system}.am-kernels; };
         packages.abstract-machine = crossPkgs.callPackage ./abstract-machine { isa = "riscv"; platform = "nemu"; };
 
-        packages.am-kernels-cmake = crossPkgs.stdenv.mkDerivation rec {
+        packages.am-kernels = crossPkgs.stdenv.mkDerivation rec {
           pname = "am-kernels-cmake";
           version = "2024.02.18";
 

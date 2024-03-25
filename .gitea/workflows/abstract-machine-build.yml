@@ -1,0 +1,22 @@
+name: Build abstract machine with nix
+on: [push]
+
+jobs:
+  build-abstract-machine:
+    runs-on: nix
+    steps:
+      - uses: https://github.com/cachix/cachix-action@v14
+        with:
+          name: ysyx
+          signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
+      - uses: actions/checkout@v4
+        sparse-checkout: |
+          flake.nix
+          abstract-machine
+      - name: Build abstract-machine
+        run: |
+          nix build .#abstract-machine
+      - name: Build nemu
+        run: |
+          nix build .#nemu
+
