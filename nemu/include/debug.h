@@ -18,6 +18,7 @@
 
 #include <stdio.h>
 #include <utils.h>
+#include <macro.h>
 
 IFDEF(CONFIG_ITRACE, void log_itrace_print());
 

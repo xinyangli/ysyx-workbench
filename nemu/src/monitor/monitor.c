@@ -133,8 +133,12 @@ void init_monitor(int argc, char *argv[]) {
 
   // printf("elf_file: %s\n", elf_file);
   if(elf_file != NULL) {
+#ifdef CONFIG_FTRACE
     void init_elf(const char *path);
     init_elf(elf_file);
+#else
+    Warning("Elf file provided, but ftrace not turned on. Ignoring elf file.");
+#endif
   }
 
 #ifndef CONFIG_ISA_loongarch32r
