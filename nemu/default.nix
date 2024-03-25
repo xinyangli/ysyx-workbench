@@ -1,7 +1,8 @@
 { pkgs,
   lib,
   stdenv,
-  am-kernels
+  am-kernels,
+  dtc
 }:
 
 stdenv.mkDerivation rec {
@@ -15,6 +16,7 @@ stdenv.mkDerivation rec {
     pkg-config
     flex
     bison
+    dtc
   ];
 
   buildInputs = with pkgs; [
