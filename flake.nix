@@ -12,54 +12,37 @@
           localSystem = system;
           crossSystem = {
             config = "riscv32-none-elf";
-            abi = "ilp32";
+            gcc = {
+              abi = "ilp32";
+              arch = "rv32if";
+            };
           };
         };
       in
       {
-        packages.nemu = pkgs.callPackage ./nemu { am-kernels = self.packages.${system}.am-kernels; };
+        packages.nemu = pkgs.callPackage ./nemu { am-kernels = self.packages.${system}.am-kernels-cmake; };
+        packages.abstract-machine = crossPkgs.callPackage ./abstract-machine { isa = "riscv"; platform = "nemu"; };
 
-        packages.am-kernels = crossPkgs.stdenv.mkDerivation rec {
-          pname = "am-kernels";
+        packages.am-kernels-cmake = crossPkgs.stdenv.mkDerivation rec {
+          pname = "am-kernels-cmake";
           version = "2024.02.18";
 
-          src = pkgs.fetchFromGitHub {
-            owner = "NJU-ProjectN";
-            repo = "am-kernels";
-            rev = "bb725d6f8223dd7de831c3b692e8c4531e9d01af";
-            hash = "sha256-ZHdrw28TN8cMvhhzM469OV7cp0Yp+8yao855HP4+P4A=";
-          };
+          src = ./am-kernels; 
 
-          AM_HOME = pkgs.fetchFromGitHub {
-            owner = "xinyangli";
-            repo = "abstract-machine";
-            rev = "788595aac61c6b2f3b78ca8aa7d08dc33911bca4";
-            hash = "sha256-YvWHIBP9tz3HL2TyibftvvQrpkWUDPnviCF4oyLmdjg=";
-          };
+          nativeBuildInputs = [
+            pkgs.cmake
+          ];
 
-          ARCH = "riscv32-nemu";
+          cmakeFlags = [
+            (pkgs.lib.cmakeFeature "ISA" "riscv")
+            (pkgs.lib.cmakeFeature "PLATFORM" "nemu")
+            (pkgs.lib.cmakeFeature "CMAKE_INSTALL_DATADIR" "share")
+          ];
 
-          patchPhase = ''
-            sed -i 's/\/bin\/echo/echo/' tests/cpu-tests/Makefile
-          '';
-
-          buildPhase = ''
-            AS=$CC make -C tests/cpu-tests BUILD_DIR=$(pwd)/build ARCH=$ARCH
-          '';
-
-          installPhase = ''
-            mkdir -p $out/share/images $out/share/dump
-            cp build/riscv32-nemu/*.bin $out/share/images
-            cp build/riscv32-nemu/*.txt $out/share/dump
-          '';
-
-          dontFixup = true;
-        };
-
-        devShells.default = pkgs.mkShell {
-          packages = with pkgs; [
-            gdb
-          ] ++ builtins.attrValues self.packages.${system};
+          buildInputs = [
+            # SDL2
+            self.packages.${system}.abstract-machine
+          ];
         };
         
         devShells.nemu = pkgs.mkShell {
@@ -74,4 +57,3 @@
       }
     );
 }
-
