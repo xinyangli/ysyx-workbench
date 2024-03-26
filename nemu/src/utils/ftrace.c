@@ -104,7 +104,7 @@ void ftrace_call(vaddr_t pc, vaddr_t addr) {
          "FTRACE_STACK_SIZE.");
   ftrace_stack[ftrace_stack_len] = pc + 4;
   Trace("%*s0x%x call 0x%x <%s+0x%x>", ftrace_stack_len, "", pc, addr,
-        f == NULL ? "???" : f->name, addr - f->start);
+        f == NULL ? "???" : f->name, f == NULL ? addr : addr - f->start);
   ftrace_stack_len++;
 }
 
