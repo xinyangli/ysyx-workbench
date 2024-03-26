@@ -119,6 +119,6 @@ void ftrace_return(vaddr_t pc, vaddr_t addr) {
   }
   func_t *f = get_func(addr);
   Trace("%*s0x%x ret 0x%x <%s+0x%x>", ftrace_stack_len, "", pc, addr, 
-        f == NULL ? "???" : f->name, addr - f->start);
+        f == NULL ? "???" : f->name, f == NULL ? addr : addr - f->start);
 }
 #endif
