@@ -180,12 +180,12 @@ config MTRACE_RANGE_MAX
 config FTRACE
   depends on TRACE && TARGET_NATIVE_ELF && ENGINE_INTERPRETER
   bool "Enable function tracing"
-  default y
+  default n
 
 config FTRACE_STACK_SIZE
   depends on FTRACE
   int "Max function track stack size"
-  default 100
+  default 256
 
 config FTRACE_LOG
   depends on FTRACE
