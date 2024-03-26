@@ -4,7 +4,8 @@ import chisel3._
 import chisel3.util.{MuxLookup, Fill, Decoupled, Counter, Queue, Reverse}
 import chisel3.util.{SRAM}
 import chisel3.stage.ChiselOption
-import npc.util.{ KeyboardSegController, RegisterFile }
+import npc.util.KeyboardSegController
+import flowpc.components.RegisterFile
 import flowpc.components.ProgramCounter
 
 class Switch extends Module {
