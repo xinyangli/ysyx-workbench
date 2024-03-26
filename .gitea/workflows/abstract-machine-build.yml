@@ -8,7 +8,7 @@ jobs:
       - uses: https://github.com/cachix/cachix-action@v14
         with:
           name: ysyx
-          signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
+          authToken: '${{ secrets.CACHIX_SIGNING_KEY }}'
       - uses: actions/checkout@v4
         with:
           submodules: true
