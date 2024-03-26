@@ -115,7 +115,7 @@ void ftrace_return(vaddr_t pc, vaddr_t addr) {
     vaddr_t tco_addr = ftrace_stack[ftrace_stack_len];
     func_t *f = get_func(tco_addr);
     Trace("%*s0x%x ret 0x%x <%s+0x%x> (TCO)", ftrace_stack_len, "", pc, tco_addr,
-          f == NULL ? "???" : f->name, tco_addr - f->start);
+          f == NULL ? "???" : f->name, f == NULL ? addr : addr - f->start);
   }
   func_t *f = get_func(addr);
   Trace("%*s0x%x ret 0x%x <%s+0x%x>", ftrace_stack_len, "", pc, addr, 
