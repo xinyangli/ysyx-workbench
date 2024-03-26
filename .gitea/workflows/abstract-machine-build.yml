@@ -14,8 +14,8 @@ jobs:
           submodules: true
       - name: Build abstract-machine
         run: |
-          nix build .#abstract-machine
+          nix build .?submodules=1#abstract-machine
       - name: Build nemu
         run: |
-          nix build .#nemu
+          nix build .?submodules=1#nemu
 
