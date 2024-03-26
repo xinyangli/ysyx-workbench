@@ -1,6 +1,7 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-circt162.url = "github:NixOS/nixpkgs/7995cae3ad60e3d6931283d650d7f43d31aaa5c7";
     flake-utils.url = "github:numtide/flake-utils";
     nur-xin = {
       url = "git+https://git.xinyang.life/xin/nur.git";
@@ -11,14 +12,17 @@
   outputs = { self, ... }@inputs: with inputs;
     flake-utils.lib.eachDefaultSystem (system:
       let
-        pkgs = nixpkgs.legacyPackages.${system} //
+        pkgs = import nixpkgs { inherit system; config.allowUnfree = true; }//
           { nur.xin = nur-xin.legacyPackages.${system}; };
       in
       {
         devShells.default = with pkgs; mkShell {
+          CHISEL_FIRTOOL_PATH = "${nixpkgs-circt162.legacyPackages.${system}.circt}/bin";
           packages = [
             clang-tools
-            rnix-lsp
+            # rnix-lsp
+            coursier
+            espresso
 
             gdb
             jre
@@ -36,7 +40,7 @@
             cmake
             sbt
             nur.xin.nvboard
-            self.packages.${system}.circt
+            nixpkgs-circt162.legacyPackages.${system}.circt
             yosys
           ];
           buildInputs = [
