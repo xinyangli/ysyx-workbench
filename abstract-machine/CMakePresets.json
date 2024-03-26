@@ -1,0 +1,29 @@
+{
+    "version": 6,
+    "configurePresets": [
+        {
+            "name": "native",
+            "displayName": "Native",
+            "generator": "Unix Makefiles",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "ISA": "native",
+                "__PLATFORM_NATIVE__": true,
+                "NATIVE_USE_KLIB": true
+            }
+        },
+        {
+            "name": "riscv-nemu",
+            "displayName": "Riscv32 NEMU",
+            "generator": "Unix Makefiles",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "installDir": "/home/xin/repo/ysyx-workbench/abstract-machine/out/install",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "ISA": "riscv",
+                "__PLATFORM_NEMU__": true
+            }
+        }
+    ]
+}

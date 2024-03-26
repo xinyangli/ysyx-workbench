@@ -6,10 +6,11 @@ val chiselVersion = "5.1.0"
 
 lazy val root = (project in file("."))
   .settings(
-    name := "ChiselLearning",
+    name := "flow",
     libraryDependencies ++= Seq(
       "org.chipsalliance" %% "chisel" % chiselVersion,
-      "edu.berkeley.cs" %% "chiseltest" % "5.0.2" % "test"
+      "edu.berkeley.cs" %% "chiseltest" % "5.0.2" % "test",
+      "com.chuusai" %% "shapeless" % "2.3.3"
     ),
     scalacOptions ++= Seq(
       "-language:reflectiveCalls",

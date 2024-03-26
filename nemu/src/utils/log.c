@@ -14,6 +14,7 @@
 ***************************************************************************************/
 
 #include <common.h>
+#include <utils.h>
 
 extern uint64_t g_nr_guest_inst;
 
@@ -33,5 +34,20 @@ void init_log(const char *log_file) {
 bool log_enable() {
   return MUXDEF(CONFIG_TRACE, (g_nr_guest_inst >= CONFIG_TRACE_START) &&
          (g_nr_guest_inst <= CONFIG_TRACE_END), false);
+}
+#endif
+
+IFDEF(CONFIG_ITRACE, char logbuf[CONFIG_ITRACE_BUFFER][128]);
+IFDEF(CONFIG_ITRACE, int logbuf_rear);
+
+#ifdef CONFIG_ITRACE
+void log_itrace_print() {
+  puts("ITRACE buffer:");
+  for (int i = (logbuf_rear + 1) % CONFIG_ITRACE_BUFFER; i != logbuf_rear; i = (i + 1) % CONFIG_ITRACE_BUFFER) {
+    if (logbuf[i][0] == '\0') continue;
+    puts(logbuf[i]);
+  }
+  puts("Current command:");
+  puts(logbuf[logbuf_rear]);
 }
 #endif

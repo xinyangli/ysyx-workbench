@@ -92,6 +92,8 @@
 
 #define PG_ALIGN __attribute((aligned(4096)))
 
+#define FAILED_GOTO(tag, exp) do {if((exp)) goto tag;} while(0)
+
 #if !defined(likely)
 #define likely(cond)   __builtin_expect(cond, 1)
 #define unlikely(cond) __builtin_expect(cond, 0)

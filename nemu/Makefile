@@ -64,12 +64,34 @@ include $(NEMU_HOME)/scripts/native.mk
 endif
 
 include $(NEMU_HOME)/tests/Makefile
-all-tests: TEST_OBJS = $(filter-out $(OBJ_DIR)/src/nemu-main.o, $(OBJS))
-all-tests: CFLAGS += $(shell pkg-config --cflags check)
-all-tests: LDFLAGS += $(shell pkg-config --libs check)
-all-tests: $(TEST_SRCS:%.c=$(OBJ_DIR)/%)
+unit-tests: TEST_OBJS = $(filter-out $(OBJ_DIR)/src/nemu-main.o, $(OBJS))
+unit-tests: CFLAGS += $(shell pkg-config --cflags check)
+unit-tests: LDFLAGS += $(shell pkg-config --libs check)
+unit-tests: $(TEST_SRCS:%.c=$(OBJ_DIR)/%)
 
-test: all-tests
-	@$(OBJ_DIR)/tests/expr_test
+IMAGES = $(patsubst %.bin, %, $(shell find $(IMAGES_PATH) -type f -name '*.bin'))
 
-.PHONY: test
+COLOR_RED   = \033[1;31m
+COLOR_GREEN = \033[1;32m
+COLOR_BLUE = \033[1;34m
+COLOR_NONE  = \033[0m
+
+RESULT = .result.tmp
+$(shell > $(RESULT)) 	# Clear result file
+
+$(IMAGES): %: %.bin $(BINARY)
+	@echo + TEST $(notdir $<)
+	@$(BINARY) -b $< >/dev/null 2>&1 || printf "\t%14s\n" $(notdir $<) >> $(RESULT)
+
+integration-tests: $(IMAGES) 
+	@printf "$(COLOR_BLUE)INTEGRATION TEST:$(COLOR_NONE)\n\tALL: %s\n\tFAILED: %s\n" $(words $(IMAGES)) $(shell wc -l $(RESULT) | cut -f1 -d' ')
+	@test ! -s $(RESULT) || printf "$(COLOR_RED)FAILED:$(COLOR_NONE)\n"
+	@cat $(RESULT)
+	@test ! -s $(RESULT); \
+	 r=$$?; \
+	 $(RM) $(RESULT); \
+	 test $$r -eq 0
+
+test: unit-tests integration-tests
+
+.PHONY: test unit-tests integration-tests
