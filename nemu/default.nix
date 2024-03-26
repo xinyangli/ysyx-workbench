@@ -1,7 +1,8 @@
 { pkgs,
   lib,
   stdenv,
-  am-kernels
+  am-kernels,
+  dtc
 }:
 
 stdenv.mkDerivation rec {
@@ -15,6 +16,7 @@ stdenv.mkDerivation rec {
     pkg-config
     flex
     bison
+    dtc
   ];
 
   buildInputs = with pkgs; [
@@ -38,7 +40,7 @@ stdenv.mkDerivation rec {
 
   doCheck = true;
   checkPhase = ''
-    export IMAGES_PATH=${am-kernels}/share/images
+    export IMAGES_PATH=${am-kernels}/share/binary
     make test
   '';
 
@@ -49,7 +51,7 @@ stdenv.mkDerivation rec {
 
   shellHook = ''
     export NEMU_HOME=$(pwd)
-    export IMAGES_PATH=${am-kernels}/share/images
+    export IMAGES_PATH=${am-kernels}/share/binary
   '';
 
   meta = with lib; {

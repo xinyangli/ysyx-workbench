@@ -7,6 +7,7 @@
 }
 %{
     #include <common.h>
+    #include <utils.h>
     #include <isa.h>
     #include <stdio.h>
     #include <stdlib.h>

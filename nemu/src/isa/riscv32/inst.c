@@ -13,11 +13,14 @@
  * See the Mulan PSL v2 for more details.
  ***************************************************************************************/
 
-#include "common.h"
+#include <common.h>
 #include "local-include/reg.h"
+#include "macro.h"
 #include <cpu/cpu.h>
 #include <cpu/ifetch.h>
 #include <cpu/decode.h>
+#include <ftrace.h>
+#include <utils.h>
 
 #define R(i) gpr(i)
 #define Mr vaddr_read
@@ -54,10 +57,22 @@ static void decode_operand(Decode *s, int *rd, word_t *src1, word_t *src2,
 
 static void do_branch(Decode *s, bool condition, word_t offset) {
   if (condition) {
-    puts(s->logbuf);
+    // puts(s->logbuf[s->logbuf_rear]);
     s->dnpc = s->pc + offset;
   }
 }
+
+#ifdef CONFIG_FTRACE
+static void ftrace_jalr(Decode *s, int rd, vaddr_t dst) {
+  uint32_t i = s->isa.inst.val;
+  int rs1 = BITS(i, 19, 15);
+  if(rs1 == 1 && rd == 0) {
+    ftrace_return(s->pc, dst);
+  } else {
+    ftrace_call(s->pc, dst);
+  }
+}
+#endif
 
 static int decode_exec(Decode *s) {
   int rd = 0;
@@ -74,8 +89,12 @@ static int decode_exec(Decode *s) {
   INSTPAT("??????? ????? ????? ??? ????? 01101 11", lui    , U, R(rd) = imm);
   INSTPAT("??????? ????? ????? ??? ????? 00101 11", auipc  , U, R(rd) = s->pc + imm);
 
-  INSTPAT("??????? ????? ????? ??? ????? 11011 11", jal    , J, do {s->dnpc = s->pc + imm; R(rd) = s->pc + 4; } while(0));
-  INSTPAT("??????? ????? ????? ??? ????? 11001 11", jalr   , I, do {s->dnpc = src1 + imm; R(rd) = s->pc + 4; } while(0));
+  INSTPAT("??????? ????? ????? ??? ????? 11011 11", jal    , J, do {
+    s->dnpc = s->pc + imm; R(rd) = s->pc + 4;
+    IFDEF(CONFIG_FTRACE, ftrace_call(s->pc, s->pc + imm)); } while(0));
+  INSTPAT("??????? ????? ????? ??? ????? 11001 11", jalr   , I, do {
+    s->dnpc = src1 + imm; R(rd) = s->pc + 4; 
+    IFDEF(CONFIG_FTRACE, ftrace_jalr(s, rd, src1 + imm)); } while(0));
   INSTPAT("??????? ????? ????? 000 ????? 11000 11", beq    , B, do_branch(s, src1 == src2, imm));
   INSTPAT("??????? ????? ????? 001 ????? 11000 11", bne    , B, do_branch(s, src1 != src2, imm));
   INSTPAT("??????? ????? ????? 100 ????? 11000 11", blt    , B, do_branch(s, (sword_t)src1 < (sword_t)src2, imm));

@@ -16,9 +16,14 @@
 #ifndef __DEBUG_H__
 #define __DEBUG_H__
 
-#include <common.h>
 #include <stdio.h>
 #include <utils.h>
+#include <macro.h>
+
+IFDEF(CONFIG_ITRACE, void log_itrace_print());
+
+#define Trace(format, ...) \
+    _Log("[TRACE] " format "\n", ## __VA_ARGS__)
 
 #define Log(format, ...) \
     _Log(ANSI_FMT("[INFO] %s:%d %s() ", ANSI_FG_BLUE) format "\n", \
@@ -38,6 +43,7 @@
       MUXDEF(CONFIG_TARGET_AM, printf(ANSI_FMT(format, ANSI_FG_RED) "\n", ## __VA_ARGS__), \
         (fflush(stdout), fprintf(stderr, ANSI_FMT(format, ANSI_FG_RED) "\n", ##  __VA_ARGS__))); \
       IFNDEF(CONFIG_TARGET_AM, extern FILE* log_fp; fflush(log_fp)); \
+      IFDEF(CONFIG_ITRACE, log_itrace_print()); \
       extern void assert_fail_msg(); \
       assert_fail_msg(); \
       assert(cond); \
