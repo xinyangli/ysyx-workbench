@@ -52,7 +52,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
 #ifdef CONFIG_ITRACE
   logbuf_rear = (logbuf_rear + 1) % CONFIG_ITRACE_BUFFER;
   char *p = logbuf[logbuf_rear];
-  p += snprintf(p, sizeof(logbuf), FMT_WORD ":", s->pc);
+  p += snprintf(p, sizeof(logbuf[logbuf_rear]), FMT_WORD ":", s->pc);
   int ilen = s->snpc - s->pc;
   int i;
   uint8_t *inst = (uint8_t *)&s->isa.inst.val;
