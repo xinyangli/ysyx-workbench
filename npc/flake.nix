@@ -20,7 +20,7 @@
           CHISEL_FIRTOOL_PATH = "${nixpkgs-circt162.legacyPackages.${system}.circt}/bin";
           packages = [
             clang-tools
-            # rnix-lsp
+            cmake
             coursier
             espresso
 
