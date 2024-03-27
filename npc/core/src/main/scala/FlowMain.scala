@@ -74,7 +74,7 @@ class Control(width: Int) extends Module {
     })
 }
 
-import flow.components.{RegisterFile, RegFileInterface, ProgramCounter, ALU}
+import flow.components.{RegisterFile, ProgramCounter, ALU}
 import chisel3.util.experimental.loadMemoryFromFileInline
 class Flow extends Module {
   val dataType = UInt(32.W)
@@ -88,7 +88,7 @@ class Flow extends Module {
     memoryFile = HexMemoryFile("./resource/addi.txt")
   )
   val control = Module(new Control(32))
-  val reg = RegisterFile(32, dataType, 2, 2)
+  val reg = Module(new RegisterFile(dataType, 32, 2))
   val pc = Module(new ProgramCounter(dataType))
   val alu = Module(new ALU(dataType))
 

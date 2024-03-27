@@ -1,5 +1,4 @@
 #include <cstdlib>
-#include <cassert>
 #include <cstdlib>
 #include <verilated.h>
 #include <verilated_vcd_c.h>
