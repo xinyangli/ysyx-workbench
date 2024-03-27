@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <verilated.h>
 #include <verilated_vcd_c.h>
+#include <verilated_vpi.h>
 #include <VFlow.h>
 #define MAX_SIM_TIME 100
 #define VERILATOR_TRACE
