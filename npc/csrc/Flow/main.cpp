@@ -42,7 +42,7 @@ int main(int argc, char **argv, char **env) {
   for (sim_time = 10; sim_time < MAX_SIM_TIME; sim_time++) {
     top->eval();
     top->clock = !top->clock;
-    int o = vpiGetInt("TOP.Flow.reg_0.regFile_3");
+    int o = vpiGetInt("TOP.Flow.reg_0.regFile_2");
     printf("%d\n", o);
 #ifdef VERILATOR_TRACE
     m_trace->dump(sim_time);

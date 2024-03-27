@@ -84,8 +84,8 @@ object VerilogMain extends App {
     )
   )
   val dut = annos.collectFirst { case DesignAnnotation(dut) => dut }.get.asInstanceOf[Flow]
-  println(verilatorTemplate(Seq(dut.reg.regFile(3)), annos))
-  val target = finalTarget(annos)(dut.reg.regFile(3)).head
+  println(verilatorTemplate(Seq(dut.reg.regFile(2)), annos))
+  val target = finalTarget(annos)(dut.reg.regFile(2)).head
   println(s"""public_flat_rd -module "${target.tokens.collectFirst {
                 case OfModule(m) => m
               }.get}" -var "${target.tokens.collectFirst { case Ref(r) => r }.get}"""")
