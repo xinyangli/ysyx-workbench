@@ -74,7 +74,7 @@ object VerilogMain extends App {
     }
   // Config(enableDifftest = true)
   val annos = (new ChiselStage).execute(
-    Array("--target-dir", "/home/xin/repo/ysyx-workbench/npc/build/Flow/vsrc", "--target", "systemverilog"),
+    Array("--target-dir", "/home/xin/repo/ysyx-workbench/npc/build/Flow/vsrc", "--target", "systemverilog", "--split-verilog"),
     Seq(
       ChiselGeneratorAnnotation(() => new Flow)
     )
