@@ -10,6 +10,10 @@ import circt.stage.ChiselStage
 import firrtl.AnnotationSeq
 import firrtl.annotations.TargetToken.{Instance, OfModule, Ref}
 
+
+// TODO: Generate verilator config file
+
+
 object VerilogMain extends App {
   val topName = "Flow"
   def verilatorTemplate(data: Seq[Data], annos: AnnotationSeq): String = {
@@ -81,4 +85,8 @@ object VerilogMain extends App {
   )
   val dut = annos.collectFirst { case DesignAnnotation(dut) => dut }.get.asInstanceOf[Flow]
   println(verilatorTemplate(Seq(dut.reg.regFile(3)), annos))
+  val target = finalTarget(annos)(dut.reg.regFile(3)).head
+  println(s"""public_flat_rd -module "${target.tokens.collectFirst {
+                case OfModule(m) => m
+              }.get}" -var "${target.tokens.collectFirst { case Ref(r) => r }.get}"""")
 }
