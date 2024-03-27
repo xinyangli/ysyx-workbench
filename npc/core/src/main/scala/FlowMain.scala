@@ -5,7 +5,6 @@ import chisel3._
 import chisel3.util.{MuxLookup, Fill, Decoupled, Counter, Queue, Reverse}
 import chisel3.util.{SRAM}
 import chisel3.util.experimental.decode.{decoder, TruthTable}
-import chisel3.stage.ChiselOption
 import chisel3.util.log2Ceil
 import chisel3.util.BitPat
 import chisel3.util.Enum
@@ -14,6 +13,8 @@ import shapeless.{HNil, ::}
 import shapeless.HList
 import shapeless.ops.coproduct.Prepend
 import chisel3.util.{ BinaryMemoryFile, HexMemoryFile }
+
+import chisel3.experimental.Trace
 
 object RV32Inst {
   private val bp = BitPat
@@ -94,6 +95,9 @@ class Flow extends Module {
   ram.readPorts(0).enable := true.B
   ram.readPorts(0).address := pc.out - 0x80000000L.U
   val inst = ram.readPorts(0).data
+
+  Trace.traceName(reg.control.writeEnable)
+  dontTouch(reg.control.writeEnable)
 
   import control.pc.SrcSelect._
 
