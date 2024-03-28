@@ -19,6 +19,7 @@ class RegControl extends Bundle {
   def ctrlBindPorts: CtrlTypes = {
     writeEnable :: writeSelect :: HNil
   }
+  traceName(writeEnable)
 }
 
 class RegisterFile[T <: Data](tpe: T, regCount: Int, numReadPorts: Int) extends Module {

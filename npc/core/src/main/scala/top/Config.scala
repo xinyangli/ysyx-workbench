@@ -1,8 +1,16 @@
-package top
+package flow
 
-import java.io.File
+import io.circe.generic.JsonCodec
 
-case class Config(
+// Which group of signals to trace
+@JsonCodec case class TraceConfig (
+  enable: Boolean = false,
+  registers: Array[Int] = Array(),
+  mem: Array[(Int, Int)] = Array(),
+)
+
+@JsonCodec case class Config(
   // Whether to enable Difftest
-  enableDifftest: Boolean = true
+  enableDifftest: Boolean = true,
+  traceConfig: TraceConfig = TraceConfig(),
 )

@@ -51,8 +51,8 @@ $timescale 1ps $end
     $var wire 32 % out_src_1 [31:0] $end
     $var wire 32 . regFile_0 [31:0] $end
     $var wire 32 / regFile_1 [31:0] $end
-    $var wire 32 0 regFile_2 [31:0] $end
-    $var wire 32 O regFile_3 [31:0] $end
+    $var wire 32 O regFile_2 [31:0] $end
+    $var wire 32 0 regFile_3 [31:0] $end
     $var wire 32 1 regFile_4 [31:0] $end
     $var wire 32 2 regFile_5 [31:0] $end
     $var wire 32 3 regFile_6 [31:0] $end

@@ -1,4 +1,4 @@
-package top
+package flow
 
 import flow._
 
@@ -9,84 +9,57 @@ import chisel3.util.experimental.InlineInstance
 import circt.stage.ChiselStage
 import firrtl.AnnotationSeq
 import firrtl.annotations.TargetToken.{Instance, OfModule, Ref}
+import java.io.PrintWriter
+import scala.io.Source
 
 
 // TODO: Generate verilator config file
 
-
 object VerilogMain extends App {
+  val opt = CliOptions().parse(args)
   val topName = "Flow"
-  def verilatorTemplate(data: Seq[Data], annos: AnnotationSeq): String = {
-    val vpiNames = data.flatMap(finalTarget(annos)).map { ct =>
-      s"""TOP.${ct.circuit}.${ct.path.map { case (Instance(i), _) => i }.mkString(".")}.${ct.tokens.collectFirst {
-        case Ref(r) => r
-      }.get}"""
+
+  val config: Config = opt.configFile match {
+    case Some(f) => {
+      val source = Source.fromFile(f)
+      val jsonString = source.mkString
+      source.close()
+      io.circe.parser.decode[Config](jsonString) match {
+        case Right(x) => x
+        case Left(e) => throw e
+      }
     }
-    s"""
-        |#include "V${topName}.h"
-        |#include "verilated_vpi.h"
-        |#include <memory>
-        |#include <verilated.h>
-        |
-        |int vpiGetInt(const char name[]) {
-        |  vpiHandle vh1 = vpi_handle_by_name((PLI_BYTE8 *)name, NULL);
-        |  if (!vh1)
-        |    vl_fatal(__FILE__, __LINE__, "sim_main", "No handle found");
-        |  s_vpi_value v;
-        |  v.format = vpiIntVal;
-        |  vpi_get_value(vh1, &v);
-        |  return v.value.integer;
-        |}
-        |
-        |int main(int argc, char **argv) {
-        |  const std::unique_ptr<VerilatedContext> contextp{new VerilatedContext};
-        |  contextp->commandArgs(argc, argv);
-        |  const std::unique_ptr<V$topName> top{new V$topName{contextp.get(), "TOP"}};
-        |  top->reset = 0;
-        |  top->clock = 0;
-        |  int a_b = 1;
-        |  top->i_a_b = a_b;
-        |  bool started = false;
-        |  int ticks = 20;
-        |  while (ticks--) {
-        |    contextp->timeInc(1);
-        |    top->clock = !top->clock;
-        |    if (!top->clock) {
-        |      if (contextp->time() > 1 && contextp->time() < 10) {
-        |        top->reset = 1;
-        |      } else {
-        |        top->reset = 0;
-        |        started = true;
-        |      }
-        |      a_b = a_b ? 0 : 1;
-        |      top->i_a_b = a_b;
-        |    }
-        |    top->eval();
-        |    VerilatedVpi::callValueCbs();
-        |    if (started && !top->clock) {
-        |      const int i = top->i_a_b;
-        |      const int o = vpiGetInt("${vpiNames.head}");
-        |      if (i == o)
-        |        vl_fatal(__FILE__, __LINE__, "sim_main", "${vpiNames.head} should be the old value of Module1.i_a_b");
-        |      printf("${vpiNames.head}=%d Module1.m0.o_a_b=%d\\n", i, o);
-        |    }
-        |  }
-        |  top->final();
-        |  return 0;
-        |}
-        |""".stripMargin
-    }
-  // Config(enableDifftest = true)
+    case None => Config(traceConfig = TraceConfig(enable = true))
+  }
+
   val annos = (new ChiselStage).execute(
     Array("--target-dir", "/home/xin/repo/ysyx-workbench/npc/build/Flow/vsrc", "--target", "systemverilog", "--split-verilog"),
     Seq(
-      ChiselGeneratorAnnotation(() => new Flow)
-    )
+
+    ) ++ (if(config.traceConfig.enable) Seq(ChiselGeneratorAnnotation(() => new Flow)) else Seq())
   )
-  val dut = annos.collectFirst { case DesignAnnotation(dut) => dut }.get.asInstanceOf[Flow]
-  println(verilatorTemplate(Seq(dut.reg.regFile(2)), annos))
-  val target = finalTarget(annos)(dut.reg.regFile(2)).head
-  println(s"""public_flat_rd -module "${target.tokens.collectFirst {
-                case OfModule(m) => m
-              }.get}" -var "${target.tokens.collectFirst { case Ref(r) => r }.get}"""")
+
+  if(config.traceConfig.enable) {
+    val dut = annos.collectFirst { case DesignAnnotation(dut) => dut }.get.asInstanceOf[Flow]
+
+    val verilatorConfigSeq = finalTargetMap(annos)
+      .values
+      .flatten
+      .map(ct =>
+        s"""public_flat_rd -module "${ct.tokens.collectFirst {
+              case OfModule(m) => m
+            }.get}" -var "${ct.tokens.collectFirst { case Ref(r) => r }.get}"
+         """ )
+    
+    val verilatorConfigWriter = new PrintWriter(opt.targetDir.sp
+    verilatorConfigWriter.write("`verilator_config")
+    for(ct <- verilatorConfigSeq) {
+      try {
+        verilatorConfigWriter.println(ct)
+      } finally {
+        verilatorConfigWriter.close()
+      }
+    }
+    
+  }
 }
