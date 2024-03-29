@@ -5,15 +5,16 @@ import chisel3._
 import chisel3.util.{MuxLookup, Fill, Decoupled, Counter, Queue, Reverse}
 import chisel3.util.{SRAM}
 import chisel3.util.experimental.decode.{decoder, TruthTable}
-import chisel3.stage.ChiselOption
 import chisel3.util.log2Ceil
 import chisel3.util.BitPat
 import chisel3.util.Enum
-import chisel3.experimental.prefix
+import chisel3.experimental.Trace._
 import shapeless.{HNil, ::}
 import shapeless.HList
 import shapeless.ops.coproduct.Prepend
 import chisel3.util.{ BinaryMemoryFile, HexMemoryFile }
+
+import chisel3.experimental.Trace
 
 object RV32Inst {
   private val bp = BitPat
@@ -73,7 +74,7 @@ class Control(width: Int) extends Module {
     })
 }
 
-import flow.components.{RegisterFile, RegFileInterface, ProgramCounter, ALU}
+import flow.components.{RegisterFile, ProgramCounter, ALU}
 import chisel3.util.experimental.loadMemoryFromFileInline
 class Flow extends Module {
   val dataType = UInt(32.W)
@@ -87,13 +88,16 @@ class Flow extends Module {
     memoryFile = HexMemoryFile("./resource/addi.txt")
   )
   val control = Module(new Control(32))
-  val reg = RegisterFile(32, dataType, 2, 2)
+  val reg = Module(new RegisterFile(dataType, 32, 2))
   val pc = Module(new ProgramCounter(dataType))
   val alu = Module(new ALU(dataType))
 
   ram.readPorts(0).enable := true.B
   ram.readPorts(0).address := pc.out - 0x80000000L.U
   val inst = ram.readPorts(0).data
+
+  Trace.traceName(reg.control.writeEnable)
+  dontTouch(reg.control.writeEnable)
 
   import control.pc.SrcSelect._
 
@@ -124,6 +128,7 @@ class Flow extends Module {
   alu.in.a(aSrcRs1.litValue.toInt) := reg.out.src(0)
   alu.in.a(aSrcImm.litValue.toInt) := inst(31, 20)
   alu.in.b := reg.out.src(1)
+
 
   dontTouch(control.out)
 }
