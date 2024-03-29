@@ -8,7 +8,7 @@ import chisel3.util.experimental.decode.{decoder, TruthTable}
 import chisel3.util.log2Ceil
 import chisel3.util.BitPat
 import chisel3.util.Enum
-import chisel3.experimental.prefix
+import chisel3.experimental.Trace._
 import shapeless.{HNil, ::}
 import shapeless.HList
 import shapeless.ops.coproduct.Prepend
@@ -128,6 +128,7 @@ class Flow extends Module {
   alu.in.a(aSrcRs1.litValue.toInt) := reg.out.src(0)
   alu.in.a(aSrcImm.litValue.toInt) := inst(31, 20)
   alu.in.b := reg.out.src(1)
+
 
   dontTouch(control.out)
 }

@@ -11,6 +11,7 @@ import firrtl.AnnotationSeq
 import firrtl.annotations.TargetToken.{Instance, OfModule, Ref}
 import java.io.PrintWriter
 import scala.io.Source
+import java.io.File
 
 
 // TODO: Generate verilator config file
@@ -33,7 +34,7 @@ object VerilogMain extends App {
   }
 
   val annos = (new ChiselStage).execute(
-    Array("--target-dir", "/home/xin/repo/ysyx-workbench/npc/build/Flow/vsrc", "--target", "systemverilog", "--split-verilog"),
+    Array("--target-dir", opt.targetDir.toString, "--target", "systemverilog", "--split-verilog"),
     Seq(
 
     ) ++ (if(config.traceConfig.enable) Seq(ChiselGeneratorAnnotation(() => new Flow)) else Seq())
@@ -46,20 +47,26 @@ object VerilogMain extends App {
       .values
       .flatten
       .map(ct =>
-        s"""public_flat_rd -module "${ct.tokens.collectFirst {
-              case OfModule(m) => m
-            }.get}" -var "${ct.tokens.collectFirst { case Ref(r) => r }.get}"
-         """ )
+        s"""public_flat_rd -module "${
+          ct.tokens.collectFirst { case OfModule(m) => m }.get
+        }" -var "${ct.tokens.collectFirst { case Ref(r) => r }.get}"""")
+    finalTargetMap(annos)
+      .values
+      .flatten
+      .foreach(
+        ct => println(s"""TOP.${ct.circuit}.${ct.path.map { case (Instance(i), _) => i }.mkString(".")}.${ct.tokens.collectFirst {
+          case Ref(r) => r
+        }.get}""") 
+      )
     
-    val verilatorConfigWriter = new PrintWriter(opt.targetDir.sp
-    verilatorConfigWriter.write("`verilator_config")
-    for(ct <- verilatorConfigSeq) {
-      try {
+    val verilatorConfigWriter = new PrintWriter(new File(opt.targetDir, opt.verilatorConfigFileOut.toString()))
+    verilatorConfigWriter.write("`verilator_config\n")
+    try {
+      for(ct <- verilatorConfigSeq) {
         verilatorConfigWriter.println(ct)
-      } finally {
-        verilatorConfigWriter.close()
       }
+    } finally {
+      verilatorConfigWriter.close()
     }
-    
   }
 }

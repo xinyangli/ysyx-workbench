@@ -1,49 +1,80 @@
-#include "vpi_user.h"
+#include "VFlow___024root.h"
+#include <vpi_user.h>
 #include <VFlow.h>
 #include <cstdlib>
+#include <vector>
+#include <memory>
 #include <verilated.h>
 #include <verilated_vcd_c.h>
 #include <verilated_vpi.h>
+#include <string>
 #define MAX_SIM_TIME 100
-#define VERILATOR_TRACE
 
-int vpiGetInt(const char *name) {
-  vpiHandle vh1 = vpi_handle_by_name((PLI_BYTE8 *)name, NULL);
-  if(!vh1)
-    vl_fatal(__FILE__, __LINE__, "sim_main", "No handle found");
+std::vector<vpiHandle> regsHandle;
+int regs[32];
+
+static void init_vpi_regs() {
+  std::string regfile = "TOP.Flow.reg_0.regFile_";
+  for(int i = 0; i < 32; i++) {
+    std::string regname = regfile + std::to_string(i);
+    vpiHandle vh = vpi_handle_by_name((PLI_BYTE8 *)regname.c_str(), NULL);
+    regsHandle.push_back(vh);
+  }
+}
+
+static void init_vpi() {
+  init_vpi_regs();
+}
+
+static int vpi_get_int(vpiHandle vh) {
   s_vpi_value v;
   v.format = vpiIntVal;
-  vpi_get_value(vh1, &v);
+  vpi_get_value(vh, &v);
   return v.value.integer;
 }
-  
+
+static void update_regs() {
+  for(int i = 0; i < 32; i++) {
+    regs[i] = vpi_get_int(regsHandle[i]);
+  }
+}
+
+static void print_regs() {
+  for(int i = 0; i < 32; i++) {
+    printf("%d: %d\t", i, regs[i]);
+    if(i % 8 == 7) putchar('\n');
+  }
+  putchar('\n');
+}
+
+static int sim_time = 0;
 
 int main(int argc, char **argv, char **env) {
   int sim_time = 0;
+  int posedge_cnt = 0;
   Verilated::commandArgs(argc, argv);
 
-  VFlow *top = new VFlow;
-
+  std::unique_ptr<VFlow> top{new VFlow};
+#ifdef VERILATOR_TRACE
   Verilated::traceEverOn(true);
   VerilatedVcdC *m_trace = new VerilatedVcdC;
-#ifdef VERILATOR_TRACE
   top->trace(m_trace, 5);
   m_trace->open("waveform.vcd");
 #endif
-  for (sim_time = 0; sim_time < 10; sim_time++) {
-    top->eval();
-    top->clock = !top->clock;
-    top->reset = 1;
-#ifdef VERILATOR_TRACE
-    m_trace->dump(sim_time);
-#endif
-  }
+
+  init_vpi();
+
   top->reset = 0;
   for (sim_time = 10; sim_time < MAX_SIM_TIME; sim_time++) {
     top->eval();
     top->clock = !top->clock;
-    int o = vpiGetInt("TOP.Flow.reg_0.regFile_2");
-    printf("%d\n", o);
+    if(top->clock == 1) {
+      // Posedge
+      ++posedge_cnt;
+      update_regs();
+      print_regs();
+    }
+
 #ifdef VERILATOR_TRACE
     m_trace->dump(sim_time);
 #endif
@@ -51,6 +82,5 @@ int main(int argc, char **argv, char **env) {
 #ifdef VERILATOR_TRACE
   m_trace->close();
 #endif
-  delete top;
   exit(EXIT_SUCCESS);
 }

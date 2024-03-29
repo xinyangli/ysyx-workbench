@@ -23,6 +23,7 @@
             cmake
             coursier
             espresso
+            bloop
 
             gdb
             jre
