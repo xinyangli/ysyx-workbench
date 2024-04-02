@@ -85,19 +85,58 @@ class _RegistersVPI : public _RegistersBase<T, nr> {
 };
 
 typedef _RegistersVPI<uint32_t, 32> Registers;
-
 template <typename T, std::size_t n>
 class Memory {
   std::array<T, n> mem;
   size_t addr_to_index(size_t addr) {
     // Linear mapping
-    return addr - 0x80000000;
+    return (addr >> 2) - 0x20000000;
+  }
+  uint32_t expand_bits(uint8_t bits) {
+      uint32_t x = bits;
+      x = (x | (x << 7) | (x << 14) | (x << 21)) & 0x01010101;
+      x = x * 0xFF;
+      // printf("expand: %hhx->%x\n", bits, x);
+      return x;
   }
   public:
     const T& operator[](size_t addr) {
-      return mem[addr_to_index(index)];
+      return this->read(addr);
+    }
+    /**
+     * Always reads and returns 4 bytes from the address raddr & ~0x3u.
+     */
+    T read(int raddr) {
+      return mem[addr_to_index(raddr)];
+    }
+    /**
+     * Always writes to the 4 bytes at the address `waddr` & ~0x3u.
+     * Each bit in `wmask` represents a mask for one byte in wdata.
+     * For example, wmask = 0x3 means only the lowest 2 bytes are written,
+     * and the other bytes in memory remain unchanged.
+     */
+    void write(int waddr, T wdata, char wmask) {
+      mem[addr_to_index((uint32_t)waddr)] = expand_bits(wmask) & wdata;
     }
 };
+
+extern "C" {
+  void *pmem_get() {
+    static auto pmem = new Memory<int, 128 * 1024>;
+    return pmem;
+  }
+  int pmem_read(int raddr) {
+    void *pmem = pmem_get();
+    auto mem = static_cast<Memory<int, 128 * 1024>*>(pmem);
+    return mem->read(raddr);
+  }
+
+  void pmem_write(int waddr, int wdata, char wmask) {
+    void *pmem = pmem_get();
+    auto mem = static_cast<Memory<int, 128 * 1024>*>(pmem);
+    return mem->write((size_t)waddr, wdata, wmask);
+  }
+} 
 
 template <typename T>
 class VlModuleInterfaceCommon : public T {
