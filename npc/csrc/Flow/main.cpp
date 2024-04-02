@@ -1,12 +1,11 @@
-#include "VFlow___024root.h"
-#include "tracer.h"
 #include <array>
 #include <cstddef>
+#include <cstdint>
 #include <filesystem>
+#include <sys/types.h>
 #include <vpi_user.h>
 #include <VFlow.h>
 #include <cstdlib>
-#include <vector>
 #include <memory>
 #include <verilated.h>
 #include <verilated_vcd_c.h>
@@ -15,18 +14,15 @@
 #define MAX_SIM_TIME 100
 #define VERILATOR_TRACE
 
-std::vector<vpiHandle> regsHandle;
-int regs[32];
-
 template <class T>
 class Tracer {
 #ifdef VERILATOR_TRACE
   std::shared_ptr<T> top;
   std::unique_ptr<VerilatedVcdC> m_trace;
-  uint64_t time = 0;
+  uint64_t cycle = 0;
 #endif
   public:
-    Tracer(std::shared_ptr<T> top,  std::filesystem::path wavefile) {
+    Tracer(T *top, std::filesystem::path wavefile) {
 #ifdef VERILATOR_TRACE
       top = top;
       Verilated::traceEverOn(true);
@@ -46,7 +42,7 @@ class Tracer {
      */
     void update() {
 #ifdef VERILATOR_TRACE
-      m_trace->dump(time++);
+      m_trace->dump(cycle++);
 #endif
     }
 };
@@ -88,6 +84,8 @@ class _RegistersVPI : public _RegistersBase<T, nr> {
     }
 };
 
+typedef _RegistersVPI<uint32_t, 32> Registers;
+
 template <typename T, std::size_t n>
 class Memory {
   std::array<T, n> mem;
@@ -101,30 +99,57 @@ class Memory {
     }
 };
 
-typedef _RegistersVPI<uint32_t, 32> Registers;
-static int sim_time = 0;
+template <typename T>
+class VlModuleInterfaceCommon : public T {
+  uint64_t sim_time = 0;
+  uint64_t posedge_cnt = 0;
+  std::unique_ptr<Tracer<T>> tracer;
+  public:
+    VlModuleInterfaceCommon<T>(bool do_trace, std::filesystem::path wavefile = "waveform.vcd") {
+      if(do_trace) tracer = std::make_unique<Tracer<T>>(this, wavefile);
+    } 
+    void eval() {
+      if(this->is_posedge()) {
+        posedge_cnt++;
+      }
+      T::clock = !T::clock;
+      sim_time++;
+      T::eval();
+      if(tracer) tracer->update();
+    }
+    void eval(int n) {
+      for(int i = 0; i < n; i++) {
+        this->eval();
+      }
+    }
+    void reset_eval(int n) {
+      this->reset = 1;
+      this->eval(n);
+      this->reset = 0;
+    }
+    bool is_posedge() {
+      // Will be posedge when eval is called
+      return T::clock == 0;
+    }
+};
+
+typedef VlModuleInterfaceCommon<VFlow> VlModule;
 
 int main(int argc, char **argv, char **env) {
-  int sim_time = 0;
-  int posedge_cnt = 0;
   Verilated::commandArgs(argc, argv);
 
-  auto top = std::make_shared<VFlow>();
-  auto top_tracer = std::make_unique<Tracer<VFlow>>(top, "waveform.vcd");
+  auto top = std::make_shared<VlModule>(false, "waveform.vcd");
 
   Registers regs("TOP.Flow.reg_0.regFile_");
 
-  top->reset = 0;
-  top->eval();
-  for (sim_time = 10; sim_time < MAX_SIM_TIME; sim_time++) {
-    top->clock = !top->clock;
-    if(top->clock == 1) {
+  top->reset_eval(10);
+  for (int i = 0; i < MAX_SIM_TIME; i++) {
+    if(top->is_posedge()) {
       // Posedge
-      ++posedge_cnt;
       regs.update();
       regs.print_regs();
     }
     top->eval();
   }
-  exit(EXIT_SUCCESS);
+  return 0;
 }
