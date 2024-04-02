@@ -83,7 +83,7 @@ static void execute(uint64_t n) {
     g_nr_guest_inst ++;
     trace_and_difftest(&s, cpu.pc);
     if (wp_eval_all()) { 
-      puts(logbuf[logbuf_rear]);
+      IFDEF(CONFIG_ITRACE, puts(logbuf[logbuf_rear]));
       break;
     }
     if (nemu_state.state != NEMU_RUNNING) break;
@@ -132,7 +132,7 @@ void cpu_exec(uint64_t n) {
             ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED))),
           nemu_state.halt_pc);
       if(nemu_state.halt_ret != 0) {
-        log_itrace_print();
+        IFDEF(CONFIG_ITRACE, log_itrace_print());
       }
     } // fall through
     case NEMU_QUIT: statistic();
