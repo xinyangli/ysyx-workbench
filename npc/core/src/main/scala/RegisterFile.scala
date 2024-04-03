@@ -12,7 +12,7 @@ class RegControl extends Bundle {
     val rAluOut, rMemOut = Value
   }
 
-  val writeEnable = Input(Bool()) 
+  val writeEnable = Input(Bool())
   val writeSelect = Input(WriteSelect())
 
   type CtrlTypes = Bool :: WriteSelect.Type :: HNil
@@ -25,7 +25,7 @@ class RegControl extends Bundle {
 class RegisterFile[T <: Data](tpe: T, regCount: Int, numReadPorts: Int) extends Module {
   require(numReadPorts >= 0)
   val control = IO(new RegControl)
-  val dataAddrWidth = log2Ceil(tpe.getWidth).W
+  val dataAddrWidth = log2Ceil(regCount).W
   val in = IO(new Bundle {
     val writeAddr = Input(UInt(dataAddrWidth))
     val writeData = Input(Vec(control.WriteSelect.all.length, tpe))

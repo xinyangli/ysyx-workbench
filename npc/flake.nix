@@ -3,6 +3,10 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-circt162.url = "github:NixOS/nixpkgs/7995cae3ad60e3d6931283d650d7f43d31aaa5c7";
     flake-utils.url = "github:numtide/flake-utils";
+    pre-commit-hooks = {
+      url = "github:cachix/pre-commit-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nur-xin = {
       url = "git+https://git.xinyang.life/xin/nur.git";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -16,7 +20,21 @@
           { nur.xin = nur-xin.legacyPackages.${system}; };
       in
       {
+        checks = {
+          pre-commit-check = pre-commit-hooks.lib.${system}.run {
+            src = ./.;
+            hooks = {
+              trim-trailing-whitespace.enable = true;
+              clang-format = {
+                enable = true;
+                types_or = pkgs.lib.mkForce [ "c" "c++" ];
+              };
+            };
+          };
+        };
         devShells.default = with pkgs; mkShell {
+          inherit (self.checks.${system}.pre-commit-check) shellHook;
+          buildInputs = self.checks.${system}.pre-commit-check.enabledPackages;
           CHISEL_FIRTOOL_PATH = "${nixpkgs-circt162.legacyPackages.${system}.circt}/bin";
           packages = [
             clang-tools
@@ -43,6 +61,7 @@
             nur.xin.nvboard
             nixpkgs-circt162.legacyPackages.${system}.circt
             yosys
+            cli11
           ];
           buildInputs = [
             verilator
@@ -51,7 +70,7 @@
 
           NEMU_HOME="/home/xin/repo/ysyx-workbench/nemu";
         };
-        
+
         # This version (1.43.0) of circt does not exist in nixpkgs
         # and Chisel 5.1.0 specifically build against it, so here we are.
         # Ref: https://github.com/NixOS/nixpkgs/blob/b6465c8/pkgs/development/compilers/circt/default.nix

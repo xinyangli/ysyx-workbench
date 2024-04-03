@@ -74,27 +74,18 @@ class Control(width: Int) extends Module {
     })
 }
 
-import flow.components.{RegisterFile, ProgramCounter, ALU}
+import flow.components.{RegisterFile, ProgramCounter, ALU, RamDpi}
 import chisel3.util.experimental.loadMemoryFromFileInline
 class Flow extends Module {
   val dataType = UInt(32.W)
-
-  val ram = SRAM(
-    size = 1024,
-    tpe = dataType,
-    numReadPorts = 2,
-    numWritePorts = 1,
-    numReadwritePorts = 0,
-    memoryFile = HexMemoryFile("./resource/addi.txt")
-  )
+  val ram = Module(new RamDpi)
   val control = Module(new Control(32))
   val reg = Module(new RegisterFile(dataType, 32, 2))
   val pc = Module(new ProgramCounter(dataType))
   val alu = Module(new ALU(dataType))
 
-  ram.readPorts(0).enable := true.B
-  ram.readPorts(0).address := pc.out - 0x80000000L.U
-  val inst = ram.readPorts(0).data
+  ram.io.readAddr := pc.out
+  val inst = ram.io.readData
 
   Trace.traceName(reg.control.writeEnable)
   dontTouch(reg.control.writeEnable)
@@ -111,18 +102,20 @@ class Flow extends Module {
 
   import control.reg.WriteSelect._
   reg.in.writeData(rAluOut.litValue.toInt) := alu.out.result
+
   // TODO: Read address in load command goes here
-  ram.readPorts(1).enable := false.B
-  ram.readPorts(1).address := 0.U
-  reg.in.writeData(rMemOut.litValue.toInt) := ram.readPorts(1).data
+  reg.in.writeData(rMemOut.litValue.toInt) := DontCare
+
   reg.in.writeAddr := inst(11, 7)
   reg.in.rs(0) := inst(19, 15)
   reg.in.rs(1) := inst(24, 20)
 
   // TODO: Memory write goes here
-  ram.writePorts(0).address := 1.U
-  ram.writePorts(0).data := 1.U
-  ram.writePorts(0).enable := false.B
+  ram.io.writeAddr := DontCare
+  ram.io.writeData := DontCare
+  ram.io.writeMask := DontCare
+  ram.io.writeEnable := false.B
+  ram.io.valid := true.B
 
   import control.alu.SrcSelect._
   alu.in.a(aSrcRs1.litValue.toInt) := reg.out.src(0)

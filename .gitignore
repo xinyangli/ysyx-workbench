@@ -12,3 +12,4 @@
 /nvboard
 **/.cache
 **/result
+/.pre-commit-config.yaml
