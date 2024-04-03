@@ -30,16 +30,17 @@ if(BUILD_SIM_NVBOARD_TARGET)
   find_package(SDL2 REQUIRED)
   find_package(SDL2_image REQUIRED)
 endif()
+find_package(CLI11 CONFIG REQUIRED)
 
 find_library(NVBOARD_LIBRARY NAMES nvboard)
 find_path(NVBOARD_INCLUDE_DIR NAMES nvboard.h)
 
-# FIXME: all scala source file are tracked here, cause all files to rebuild 
-# after a source update. 
+# FIXME: all scala source file are tracked here, cause all files to rebuild
+# after a source update.
 set(SCALA_CORE "${CMAKE_CURRENT_SOURCE_DIR}/core")
 set(CHISEL_MODULE_CLASS "${CMAKE_PROJECT_NAME}.${TOPMODULE}")
 
-# Verilog files are generted in CHISEL_OUTPUT_TMP_DIR and copy to 
+# Verilog files are generted in CHISEL_OUTPUT_TMP_DIR and copy to
 # CHISEL_OUTPUT_DIR if content changes
 set(CHISEL_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/vsrc/)
 set(CHISEL_OUTPUT_TMP_DIR ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/vsrc_tmp/)
@@ -52,8 +53,8 @@ set(CHISEL_EMIT_ARGS "--target-dir ${CHISEL_OUTPUT_TMP_DIR}")
 #    as we don't know if the result files will be different from cmake
 # NOTE: Must reconfigure if we add new files in SCALA_CORE directory
 file(GLOB_RECURSE SCALA_CORE_SOURCES "${SCALA_CORE}/src/main/scala/*.scala")
-file(GLOB_RECURSE SCALA_CORE_RESOURCES "${SCALA_CORE}/src/resource/*")
-set(CHISEL_DEPENDENCY ${SCALA_CORE_SOURCES} ${SCALA_CORE_RESOURCE} ${SCALA_CORE}/build.sbt)
+file(GLOB_RECURSE SCALA_CORE_RESOURCES "${SCALA_CORE}/src/main/resource/*")
+set(CHISEL_DEPENDENCY ${SCALA_CORE_SOURCES} ${SCALA_CORE_RESOURCES} ${SCALA_CORE}/build.sbt)
 
 if(BUILD_USE_BLOOP)
   set(CHISEL_TARGET bloop_${TOPMODULE})
@@ -105,7 +106,7 @@ if(NOT EXISTS ${CHISEL_OUTPUT_TOPMODULE})
     WORKING_DIRECTORY ${SCALA_CORE}
   )
   execute_process(
-    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different ${CHISEL_OUTPUT_TMP_DIR} ${CHISEL_OUTPUT_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CHISEL_OUTPUT_TMP_DIR} ${CHISEL_OUTPUT_DIR}
   )
 endif()
 
@@ -114,7 +115,7 @@ if(BUILD_SIM_NVBOARD_TARGET)
   add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/auto_bind.cpp
     COMMAND auto_pin_bind ${CMAKE_SOURCE_DIR}/constr/${TOPMODULE}.nxdc ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/auto_bind.cpp
-    DEPENDS ${CMAKE_SOURCE_DIR}/constr/${TOPMODULE}.nxdc 
+    DEPENDS ${CMAKE_SOURCE_DIR}/constr/${TOPMODULE}.nxdc
   )
 
   file(GLOB_RECURSE SOURCES csrc_nvboard/${TOPMODULE}/*.cpp)
@@ -144,7 +145,6 @@ verilate(V${TOPMODULE} TRACE COVERAGE THREADS
   INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/vsrc
   VERILATOR_ARGS
     "--vpi"   # Enable VPI
-    
 )
 
 
