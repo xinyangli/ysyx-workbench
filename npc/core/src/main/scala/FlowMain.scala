@@ -87,7 +87,6 @@ class Flow extends Module {
   ram.io.readAddr := pc.out
   val inst = ram.io.readData
 
-  Trace.traceName(reg.control.writeEnable)
   dontTouch(reg.control.writeEnable)
 
   import control.pc.SrcSelect._
@@ -122,6 +121,6 @@ class Flow extends Module {
   alu.in.a(aSrcImm.litValue.toInt) := inst(31, 20)
   alu.in.b := reg.out.src(1)
 
-
+  Trace.traceName(pc.out);
   dontTouch(control.out)
 }
