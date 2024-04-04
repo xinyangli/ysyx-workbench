@@ -22,14 +22,14 @@
 
 IFDEF(CONFIG_ITRACE, void log_itrace_print());
 
-#if CONFIG_LOG_LEVEL >= 4
+#if (CONFIG_LOG_LEVEL >= 4)
 #define Trace(format, ...) \
     _Log("[TRACE] " format "\n", ## __VA_ARGS__)
 #else
 #define Trace(format, ...)
 #endif
 
-#if CONFIG_LOG_LEVEL >= 3
+#if (CONFIG_LOG_LEVEL >= 3)
 #define Log(format, ...) \
     _Log(ANSI_FMT("[INFO] %s:%d %s() ", ANSI_FG_BLUE) format "\n", \
         __FILE__, __LINE__, __func__, ## __VA_ARGS__)
@@ -37,7 +37,7 @@ IFDEF(CONFIG_ITRACE, void log_itrace_print());
 #define Log(format, ...)
 #endif
 
-#if CONFIG_LOG_LEVEL >= 2
+#if (CONFIG_LOG_LEVEL >= 2)
 #define Warning(format, ...) \
     _Log(ANSI_FMT("[WARNING] %s:%d %s() ", ANSI_FG_YELLOW) format "\n", \
         __FILE__, __LINE__, __func__, ## __VA_ARGS__)
@@ -45,7 +45,7 @@ IFDEF(CONFIG_ITRACE, void log_itrace_print());
 #define Warning(format, ...)
 #endif
 
-#if CONFIG_LOG_LEVEL >= 1
+#if (CONFIG_LOG_LEVEL >= 1)
 #define Error(format, ...) \
     _Log(ANSI_FMT("[ERROR] %s:%d %s() ", ANSI_FG_RED) format "\n", \
         __FILE__, __LINE__, __func__, ## __VA_ARGS__)
