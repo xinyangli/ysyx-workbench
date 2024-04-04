@@ -13,6 +13,7 @@
 * See the Mulan PSL v2 for more details.
 ***************************************************************************************/
 
+#include "types.h"
 #include <isa.h>
 #include <cpu/cpu.h>
 #include <cpu/decode.h>
@@ -32,11 +33,8 @@ __EXPORT void difftest_regcpy(void *dut, bool direction) {
 }
 
 __EXPORT void difftest_exec(uint64_t n) {
-  Decode s;
-  extern void exec_once(Decode *);
-  while(n--) {
-    exec_once(&s);
-  }
+  extern void execute(uint64_t);
+  execute(n);
 }
 
 __EXPORT void difftest_raise_intr(word_t NO) {
