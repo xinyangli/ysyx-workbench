@@ -2,8 +2,10 @@
 #ifndef _NPC_COMPONENTS_H_
 #define _NPC_COMPONENTS_H_
 #include <array>
+#include <cstdlib>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 #include <verilated_vpi.h>
 
 template <typename T, std::size_t nr> class _RegistersBase {
@@ -11,6 +13,9 @@ template <typename T, std::size_t nr> class _RegistersBase {
   virtual T fetch_reg(std::size_t id);
 
 public:
+  T operator[] (size_t id) {
+    return fetch_reg(id);
+  }
   void update() {
     for (int i = 0; i < regs.size(); i++) {
       regs[i] = fetch_reg(i);
@@ -41,13 +46,16 @@ public:
     for (int i = 0; i < nr; i++) {
       std::string regname = regs_prefix + std::to_string(i);
       vpiHandle vh = vpi_handle_by_name((PLI_BYTE8 *)regname.c_str(), NULL);
+      if(vh == nullptr) {
+        std::cerr << "vpiHandle " << regname.c_str() << " not found" << std::endl;
+        exit(EXIT_FAILURE);
+      }
       reg_handles[i] = vh;
     }
   }
 };
 
 template <typename T, std::size_t n> class Memory {
-  std::array<T, n> mem;
   std::size_t addr_to_index(std::size_t addr) {
     if (addr < 0x80000000) {
       return 0;
@@ -64,12 +72,13 @@ template <typename T, std::size_t n> class Memory {
   }
 
 public:
+  std::array<T, n> mem;
   Memory(std::filesystem::path filepath, bool is_binary = true) {
     assert(std::filesystem::exists(filepath));
     if (is_binary) {
       std::ifstream file(filepath, std::ios::binary);
       char *pmem = reinterpret_cast<char *>(mem.data());
-      file.read(pmem, mem.size() / sizeof(mem[0]));
+      file.read(pmem, mem.size() * sizeof(mem[0]));
     } else {
       std::string line;
       std::ifstream file(filepath);
