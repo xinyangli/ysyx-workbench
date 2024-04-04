@@ -87,9 +87,9 @@ void execute(uint64_t n) {
       IFDEF(CONFIG_ITRACE, puts(logbuf[logbuf_rear]));
       break;
     }
+    puts("No exit");
     if (nemu_state.state != NEMU_RUNNING) break;
     IFDEF(CONFIG_DEVICE, device_update());
-    puts("No exit");
   }
 }
 
