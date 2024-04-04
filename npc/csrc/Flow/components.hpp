@@ -1,53 +1,61 @@
 
 #ifndef _NPC_COMPONENTS_H_
 #define _NPC_COMPONENTS_H_
+#include "vpi_user.h"
 #include <array>
+#include <cstdlib>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 #include <verilated_vpi.h>
 
 template <typename T, std::size_t nr> class _RegistersBase {
   std::array<T, nr> regs;
+  T pc;
+  virtual T fetch_pc();
   virtual T fetch_reg(std::size_t id);
 
 public:
+  T operator[](size_t id) { return fetch_reg(id); }
+  T get_pc() { return fetch_pc(); }
   void update() {
     for (int i = 0; i < regs.size(); i++) {
       regs[i] = fetch_reg(i);
     }
-  }
-  void print_regs() {
-    for (int i = 0; i < regs.size(); i++) {
-      printf("%d: %d\t", i, regs[i]);
-      if (i % 8 == 7)
-        putchar('\n');
-    }
-    putchar('\n');
   }
 };
 
 template <typename T, std::size_t nr>
 class _RegistersVPI : public _RegistersBase<T, nr> {
   std::array<vpiHandle, nr> reg_handles;
-  T fetch_reg(std::size_t id) {
+  vpiHandle pc_handle;
+  T vpi_get(vpiHandle vh) {
     s_vpi_value v;
     v.format = vpiIntVal;
-    vpi_get_value(reg_handles[id], &v);
+    vpi_get_value(vh, &v);
     return v.value.integer;
   }
+  T fetch_pc(void) { return vpi_get(pc_handle); }
+  T fetch_reg(std::size_t id) { return vpi_get(reg_handles[id]); }
 
 public:
-  _RegistersVPI<T, nr>(const std::string regs_prefix) {
+  _RegistersVPI<T, nr>(const std::string regs_prefix,
+                       const std::string pcname) {
     for (int i = 0; i < nr; i++) {
       std::string regname = regs_prefix + std::to_string(i);
-      vpiHandle vh = vpi_handle_by_name((PLI_BYTE8 *)regname.c_str(), NULL);
+      vpiHandle vh = vpi_handle_by_name((PLI_BYTE8 *)regname.c_str(), nullptr);
+      if (vh == nullptr) {
+        std::cerr << "vpiHandle " << regname.c_str() << " not found"
+                  << std::endl;
+        exit(EXIT_FAILURE);
+      }
       reg_handles[i] = vh;
     }
+    pc_handle = vpi_handle_by_name((PLI_BYTE8 *)pcname.c_str(), nullptr);
   }
 };
 
 template <typename T, std::size_t n> class Memory {
-  std::array<T, n> mem;
   std::size_t addr_to_index(std::size_t addr) {
     if (addr < 0x80000000) {
       return 0;
@@ -64,12 +72,13 @@ template <typename T, std::size_t n> class Memory {
   }
 
 public:
+  std::array<T, n> mem;
   Memory(std::filesystem::path filepath, bool is_binary = true) {
     assert(std::filesystem::exists(filepath));
     if (is_binary) {
       std::ifstream file(filepath, std::ios::binary);
       char *pmem = reinterpret_cast<char *>(mem.data());
-      file.read(pmem, mem.size() / sizeof(mem[0]));
+      file.read(pmem, mem.size() * sizeof(mem[0]));
     } else {
       std::string line;
       std::ifstream file(filepath);
@@ -84,7 +93,7 @@ public:
    * Always reads and returns 4 bytes from the address raddr & ~0x3u.
    */
   T read(int raddr) {
-    printf("raddr: 0x%x\n", raddr);
+    // printf("raddr: 0x%x\n", raddr);
     return mem[addr_to_index((uint32_t)raddr)];
   }
   /**
@@ -94,7 +103,7 @@ public:
    * and the other bytes in memory remain unchanged.
    */
   void write(int waddr, T wdata, char wmask) {
-    printf("waddr: 0x%x\n", waddr);
+    // printf("waddr: 0x%x\n", waddr);
     mem[addr_to_index((uint32_t)waddr)] = expand_bits(wmask) & wdata;
   }
 };

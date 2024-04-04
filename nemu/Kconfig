@@ -126,6 +126,26 @@ endmenu
 
 menu "Testing and Debugging"
 
+choice
+  prompt "Choose log level"
+  default LOG_TRACE
+config LOG_TRACE
+  bool "trace"
+config LOG_INFO
+  bool "info"
+config LOG_WARNING
+  bool "warning"
+config LOG_ERROR
+  bool "error"
+endchoice
+
+config LOG_LEVEL
+  int
+  default 1 if LOG_ERROR
+  default 2 if LOG_WARNING
+  default 3 if LOG_INFO
+  default 4 if LOG_TRACE
+  default 0
 
 config TRACE
   bool "Enable tracer"
