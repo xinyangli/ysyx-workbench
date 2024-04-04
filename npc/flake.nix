@@ -39,6 +39,7 @@
           packages = [
             clang-tools
             cmake
+            ninja
             coursier
             espresso
             bloop
