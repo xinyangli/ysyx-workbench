@@ -106,8 +106,8 @@ class Flow extends Module {
   reg.in.writeData(rMemOut.litValue.toInt) := DontCare
 
   reg.in.writeAddr := inst(11, 7)
-  reg.in.rs(0) := inst(19, 15)
-  reg.in.rs(1) := inst(24, 20)
+  reg.in.rs(0) := inst(19, 15) // rs1
+  reg.in.rs(1) := inst(24, 20) // rs2
 
   // TODO: Memory write goes here
   ram.io.writeAddr := DontCare
@@ -117,9 +117,9 @@ class Flow extends Module {
   ram.io.valid := true.B
 
   import control.alu.SrcSelect._
-  alu.in.a(aSrcRs1.litValue.toInt) := reg.out.src(0)
+  alu.in.a(aSrcRs2.litValue.toInt) := reg.out.src(1)
   alu.in.a(aSrcImm.litValue.toInt) := inst(31, 20)
-  alu.in.b := reg.out.src(1)
+  alu.in.b := reg.out.src(0)
 
   Trace.traceName(pc.out);
   dontTouch(control.out)

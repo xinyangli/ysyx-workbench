@@ -9,7 +9,7 @@ class ALUControlInterface extends Bundle {
     val aOpAdd, aOpSub, aOpNot, aOpAnd, aOpOr, aOpXor, aOpSlt, aOpEq, aOpNop = Value
   }
   object SrcSelect extends ChiselEnum {
-    val aSrcRs1, aSrcImm = Value
+    val aSrcRs2, aSrcImm = Value
   }
   val op = Input(OpSelect())
   val src = Input(SrcSelect())
