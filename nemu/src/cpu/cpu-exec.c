@@ -79,7 +79,6 @@ static void exec_once(Decode *s, vaddr_t pc) {
 static void execute(uint64_t n) {
   Decode s;
   for (;n > 0; n --) {
-    printf("n: %lu\n", n);
     exec_once(&s, cpu.pc);
     g_nr_guest_inst ++;
     trace_and_difftest(&s, cpu.pc);
@@ -87,7 +86,6 @@ static void execute(uint64_t n) {
       IFDEF(CONFIG_ITRACE, puts(logbuf[logbuf_rear]));
       break;
     }
-    printf("nemu_state: %d\n", nemu_state.state);
     if (nemu_state.state != NEMU_RUNNING) break;
     IFDEF(CONFIG_DEVICE, device_update());
   }
