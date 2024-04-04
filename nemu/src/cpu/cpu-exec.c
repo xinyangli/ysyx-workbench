@@ -76,7 +76,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
 #endif
 }
 
-void execute(uint64_t n) {
+static void execute(uint64_t n) {
   Decode s;
   for (;n > 0; n --) {
     printf("n: %lu\n", n);
