@@ -152,7 +152,7 @@ static int decode_exec(Decode *s) {
 }
 
 int isa_exec_once(Decode *s) {
-  printf("inst: %x\n", s->isa.inst.val);
   s->isa.inst.val = inst_fetch(&s->snpc, 4);
+  printf("inst: %x\n", s->isa.inst.val);
   return decode_exec(s);
 }
