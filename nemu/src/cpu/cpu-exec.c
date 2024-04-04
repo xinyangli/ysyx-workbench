@@ -81,9 +81,9 @@ void execute(uint64_t n) {
   for (;n > 0; n --) {
     printf("n: %lu\n", n);
     exec_once(&s, cpu.pc);
-    puts("Exit");
     g_nr_guest_inst ++;
     trace_and_difftest(&s, cpu.pc);
+    puts("No exit");
     if (wp_eval_all()) { 
       IFDEF(CONFIG_ITRACE, puts(logbuf[logbuf_rear]));
       break;
