@@ -49,6 +49,7 @@
             };
           };
         };
+
         packages.nemu = pkgs.callPackage ./nemu { am-kernels = self.packages.${system}.am-kernels; };
         packages.nemu-lib = pkgs.callPackage ./nemu { am-kernels = self.packages.${system}.am-kernels; defconfig = "riscv32-lib_defconfig"; };
         packages.abstract-machine = crossPkgs.callPackage ./abstract-machine { isa = "riscv"; platform = "nemu"; };
