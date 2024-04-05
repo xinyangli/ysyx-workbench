@@ -9,3 +9,9 @@ verilate(V${TOPMODULE} TRACE COVERAGE THREADS
   VERILATOR_ARGS
     "--vpi"   # Enable VPI
 )
+
+add_test(
+  NAME V${TOPMODULE}
+  COMMAND V${TOPMODULE}
+    --no-bin -m ${PROJECT_SOURCE_DIR}/resource/addi.txt
+    --diff-lib ${DIFFTEST_LIB})

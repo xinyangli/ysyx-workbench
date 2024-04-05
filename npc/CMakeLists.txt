@@ -15,6 +15,7 @@ option(BUILD_SIM_TARGET "Whether to build verilator simulation binary" ON)
 cmake_dependent_option(BUILD_SIM_NVBOARD_TARGET "Whether to build nvboard target" OFF "BUILD_SIM_TARGET" OFF)
 option(ENABLE_YSYX_GIT_TRACKER "Ysyx tracker support" OFF)
 set(TOPMODULE "Flow" CACHE STRING "Topmodule name in chisel")
+set(DIFFTEST_LIB "" CACHE STRING "Dynamic library file used as difftest reference")
 
 # -- Ysyx tracker, configure
 if(ENABLE_YSYX_GIT_TRACKER)
@@ -60,12 +61,6 @@ endif()
 include_directories(include)
 
 add_subdirectory(csrc)
-
-add_test(
-  NAME V${TOPMODULE}
-  COMMAND V${TOPMODULE}
-    --no-bin -m ${PROJECT_SOURCE_DIR}/resource/addi.txt
-    --diff-lib /home/xin/repo/ysyx-workbench/nemu/build/riscv32-nemu-interpreter-so)
 
 # -- Add build tracking
 if(ENABLE_YSYX_GIT_TRACKER)

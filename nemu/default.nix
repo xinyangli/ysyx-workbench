@@ -2,7 +2,8 @@
   lib,
   stdenv,
   am-kernels,
-  dtc
+  dtc,
+  defconfig ? "alldefconfig",
 }:
 
 stdenv.mkDerivation rec {
@@ -31,27 +32,27 @@ stdenv.mkDerivation rec {
 
   configurePhase = ''
     export NEMU_HOME=$(pwd)
-    make alldefconfig
+    make ${defconfig}
   '';
 
   buildPhase = ''
     make
   '';
 
-  doCheck = true;
-  checkPhase = ''
+  doCheck = (defconfig == "alldefconfig");
+  checkPhase = if doCheck then ''
     export IMAGES_PATH=${am-kernels}/share/binary
     make test
-  '';
+  '' else "";
 
   installPhase = ''
     mkdir -p $out/bin
+    mkdir -p $out/lib
     make PREFIX=$out install
   '';
 
   shellHook = ''
     export NEMU_HOME=$(pwd)
-    export IMAGES_PATH=${am-kernels}/share/binary
   '';
 
   meta = with lib; {

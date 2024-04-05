@@ -50,6 +50,7 @@
           };
         };
         packages.nemu = pkgs.callPackage ./nemu { am-kernels = self.packages.${system}.am-kernels; };
+        packages.nemu-lib = pkgs.callPackage ./nemu { am-kernels = self.packages.${system}.am-kernels; defconfig = "riscv32-lib_defconfig"; };
         packages.abstract-machine = crossPkgs.callPackage ./abstract-machine { isa = "riscv"; platform = "nemu"; };
 
         packages.am-kernels = crossPkgs.stdenv.mkDerivation rec {
@@ -82,6 +83,7 @@
           inputsFrom = [
             self.packages.${system}.nemu
           ];
+          IMAGES_PATH = "${self.packages.${system}.am-kernels}/share/binary";
         };
 
         devShells.npc = with pkgs; mkShell {
@@ -113,7 +115,12 @@
           buildInputs = [
             verilator
             nvboard
+            openssl
           ] ++ self.checks.${system}.pre-commit-check.enabledPackages;
+
+          cmakeFlags = [
+            "-DDIFFTEST_LIB:string=${self.packages.${system}.nemu-lib}/lib/riscv32-nemu-interpreter-so"
+          ];
         };
       }
     );
