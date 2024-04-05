@@ -1,0 +1,45 @@
+name: Run CTests within npc
+on: [push]
+
+jobs:
+  npc-test:
+    runs-on: nix
+    steps:
+      - uses: https://github.com/cachix/cachix-action@v14
+        with:
+          name: ysyx
+          authToken: '${{ secrets.CACHIX_SIGNING_KEY }}'
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Cache develop environment
+        id: cache-nix-develop
+        uses: actions/cache@v4
+        with:
+          path: /nix/store
+          key: nix-develop-${{ hashFiles('flake.*') }}
+      - name: Fetch nix store
+        if: steps.cache-nix-develop.outputs.cache-hit != 'true'
+        run: nix develop .#npc
+      - name: Use develop environment
+        uses: https://git.xinyang.life/xin/nix-develop@main
+        with:
+          arguments: .#npc
+      - name: Cache sbt dependencies
+        id: cache-sbt-dependency
+        uses: actions/cache@v4
+        with:
+          path: npc/core
+          key: core-${{ hashFiles('npc/core/build.sbt') }}
+      - name: Fetch sbt dependencies
+        if: steps.cache-sbt-dependency.outputs.cache-hit != 'true'
+        run: |
+          cd npc/core
+          sbt update
+      - name: Run difftests
+        run: |
+          mkdir -p npc/build
+          cd npc/build
+          cmake $cmakeFlags ../
+          make -j8
+          ctest -V

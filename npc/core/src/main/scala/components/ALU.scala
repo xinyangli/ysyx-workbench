@@ -9,7 +9,7 @@ class ALUControlInterface extends Bundle {
     val aOpAdd, aOpSub, aOpNot, aOpAnd, aOpOr, aOpXor, aOpSlt, aOpEq, aOpNop = Value
   }
   object SrcSelect extends ChiselEnum {
-    val aSrcRs1, aSrcImm = Value
+    val aSrcRs2, aSrcImm = Value
   }
   val op = Input(OpSelect())
   val src = Input(SrcSelect())
@@ -33,7 +33,7 @@ class ALU[T <: UInt](tpe: T) extends Module {
   val a = in.a(control.src.asUInt)
 
   // val adder_b = (Fill(tpe.getWidth, io.op(0)) ^ io.b) + io.op(0)  // take (-b) if sub
-  val add = a + in.b 
+  val add = a + in.b
   val sub = a - in.b
   val and = a & in.b
   val not = ~a

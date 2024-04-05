@@ -16,41 +16,59 @@
 #ifndef __DEBUG_H__
 #define __DEBUG_H__
 
+#include <macro.h>
 #include <stdio.h>
 #include <utils.h>
-#include <macro.h>
 
 IFDEF(CONFIG_ITRACE, void log_itrace_print());
 
-#define Trace(format, ...) \
-    _Log("[TRACE] " format "\n", ## __VA_ARGS__)
+#if (CONFIG_LOG_LEVEL >= 4)
+#define Trace(format, ...) _Log("[TRACE] " format "\n", ##__VA_ARGS__)
+#else
+#define Trace(format, ...)
+#endif
 
-#define Log(format, ...) \
-    _Log(ANSI_FMT("[INFO] %s:%d %s() ", ANSI_FG_BLUE) format "\n", \
-        __FILE__, __LINE__, __func__, ## __VA_ARGS__)
+#if (CONFIG_LOG_LEVEL >= 3)
+#define Log(format, ...)                                                       \
+  _Log(ANSI_FMT("[INFO] %s:%d %s() ", ANSI_FG_BLUE) format "\n", __FILE__,     \
+       __LINE__, __func__, ##__VA_ARGS__)
+#else
+#define Log(format, ...)
+#endif
 
-#define Warning(format, ...) \
-    _Log(ANSI_FMT("[WARNING] %s:%d %s() ", ANSI_FG_YELLOW) format "\n", \
-        __FILE__, __LINE__, __func__, ## __VA_ARGS__)
+#if (CONFIG_LOG_LEVEL >= 2)
+#define Warning(format, ...)                                                   \
+  _Log(ANSI_FMT("[WARNING] %s:%d %s() ", ANSI_FG_YELLOW) format "\n",          \
+       __FILE__, __LINE__, __func__, ##__VA_ARGS__)
+#else
+#define Warning(format, ...)
+#endif
 
-#define Error(format, ...) \
-    _Log(ANSI_FMT("[ERROR] %s:%d %s() ", ANSI_FG_RED) format "\n", \
-        __FILE__, __LINE__, __func__, ## __VA_ARGS__)
+#if (CONFIG_LOG_LEVEL >= 1)
+#define Error(format, ...)                                                     \
+  _Log(ANSI_FMT("[ERROR] %s:%d %s() ", ANSI_FG_RED) format "\n", __FILE__,     \
+       __LINE__, __func__, ##__VA_ARGS__)
+#else
+#define Error(format, ...)
+#endif
 
-#define Assert(cond, format, ...) \
-  do { \
-    if (!(cond)) { \
-      MUXDEF(CONFIG_TARGET_AM, printf(ANSI_FMT(format, ANSI_FG_RED) "\n", ## __VA_ARGS__), \
-        (fflush(stdout), fprintf(stderr, ANSI_FMT(format, ANSI_FG_RED) "\n", ##  __VA_ARGS__))); \
-      IFNDEF(CONFIG_TARGET_AM, extern FILE* log_fp; fflush(log_fp)); \
-      IFDEF(CONFIG_ITRACE, log_itrace_print()); \
-      extern void assert_fail_msg(); \
-      assert_fail_msg(); \
-      assert(cond); \
-    } \
+#define Assert(cond, format, ...)                                              \
+  do {                                                                         \
+    if (!(cond)) {                                                             \
+      MUXDEF(                                                                  \
+          CONFIG_TARGET_AM,                                                    \
+          printf(ANSI_FMT(format, ANSI_FG_RED) "\n", ##__VA_ARGS__),           \
+          (fflush(stdout), fprintf(stderr, ANSI_FMT(format, ANSI_FG_RED) "\n", \
+                                   ##__VA_ARGS__)));                           \
+      IFNDEF(CONFIG_TARGET_AM, extern FILE *log_fp; fflush(log_fp));           \
+      IFDEF(CONFIG_ITRACE, log_itrace_print());                                \
+      extern void assert_fail_msg();                                           \
+      assert_fail_msg();                                                       \
+      assert(cond);                                                            \
+    }                                                                          \
   } while (0)
 
-#define panic(format, ...) Assert(0, format, ## __VA_ARGS__)
+#define panic(format, ...) Assert(0, format, ##__VA_ARGS__)
 
 #define TODO() panic("please implement me")
 
