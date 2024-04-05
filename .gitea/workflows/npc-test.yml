@@ -1,0 +1,20 @@
+name: Run CTests within npc
+on: [push]
+
+jobs:
+  build-abstract-machine:
+    runs-on: nix
+    steps:
+      - uses: https://github.com/cachix/cachix-action@v14
+        with:
+          name: ysyx
+          authToken: '${{ secrets.CACHIX_SIGNING_KEY }}'
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Run tests
+        run: |
+          nix develop .#npc
+          mkdir -p npc/build
+          cd npc/build
+          cmake ../

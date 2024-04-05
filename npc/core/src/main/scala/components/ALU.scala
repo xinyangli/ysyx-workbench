@@ -33,7 +33,7 @@ class ALU[T <: UInt](tpe: T) extends Module {
   val a = in.a(control.src.asUInt)
 
   // val adder_b = (Fill(tpe.getWidth, io.op(0)) ^ io.b) + io.op(0)  // take (-b) if sub
-  val add = a + in.b 
+  val add = a + in.b
   val sub = a - in.b
   val and = a & in.b
   val not = ~a

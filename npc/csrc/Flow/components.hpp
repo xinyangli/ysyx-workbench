@@ -16,12 +16,8 @@ template <typename T, std::size_t nr> class _RegistersBase {
   virtual T fetch_reg(std::size_t id);
 
 public:
-  T operator[] (size_t id) {
-    return fetch_reg(id);
-  }
-  T get_pc() {
-    return fetch_pc();
-  }
+  T operator[](size_t id) { return fetch_reg(id); }
+  T get_pc() { return fetch_pc(); }
   void update() {
     for (int i = 0; i < regs.size(); i++) {
       regs[i] = fetch_reg(i);
@@ -39,20 +35,18 @@ class _RegistersVPI : public _RegistersBase<T, nr> {
     vpi_get_value(vh, &v);
     return v.value.integer;
   }
-  T fetch_pc(void) {
-    return vpi_get(pc_handle);
-  }
-  T fetch_reg(std::size_t id) {
-    return vpi_get(reg_handles[id]);
-  }
+  T fetch_pc(void) { return vpi_get(pc_handle); }
+  T fetch_reg(std::size_t id) { return vpi_get(reg_handles[id]); }
 
 public:
-  _RegistersVPI<T, nr>(const std::string regs_prefix, const std::string pcname) {
+  _RegistersVPI<T, nr>(const std::string regs_prefix,
+                       const std::string pcname) {
     for (int i = 0; i < nr; i++) {
       std::string regname = regs_prefix + std::to_string(i);
       vpiHandle vh = vpi_handle_by_name((PLI_BYTE8 *)regname.c_str(), nullptr);
-      if(vh == nullptr) {
-        std::cerr << "vpiHandle " << regname.c_str() << " not found" << std::endl;
+      if (vh == nullptr) {
+        std::cerr << "vpiHandle " << regname.c_str() << " not found"
+                  << std::endl;
         exit(EXIT_FAILURE);
       }
       reg_handles[i] = vh;
@@ -60,7 +54,6 @@ public:
     pc_handle = vpi_handle_by_name((PLI_BYTE8 *)pcname.c_str(), nullptr);
   }
 };
-
 
 template <typename T, std::size_t n> class Memory {
   std::size_t addr_to_index(std::size_t addr) {
