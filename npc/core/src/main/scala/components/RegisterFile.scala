@@ -5,18 +5,17 @@ import chisel3.util.log2Ceil
 import chisel3.util.UIntToOH
 import chisel3.util.MuxLookup
 import chisel3.experimental.Trace._
-import shapeless.{ HNil, :: }
+import shapeless.{ HList, HNil, :: }
 
 class RegControl extends Bundle {
   object WriteSelect extends ChiselEnum {
-    val rAluOut, rMemOut = Value
+    val rAluOut, rMemOut, rNpc = Value
   }
 
   val writeEnable = Input(Bool())
   val writeSelect = Input(WriteSelect())
 
-  type CtrlTypes = Bool :: WriteSelect.Type :: HNil
-  def ctrlBindPorts: CtrlTypes = {
+  def ctrlBindPorts = {
     writeEnable :: writeSelect :: HNil
   }
   traceName(writeEnable)
@@ -40,7 +39,8 @@ class RegisterFile[T <: Data](tpe: T, regCount: Int, numReadPorts: Int) extends 
   val writeAddrOH = UIntToOH(in.writeAddr)
 
   for ((reg, i) <- regFile.zipWithIndex.tail) {
-    reg := Mux(writeAddrOH(i.U(log2Ceil(regCount).W)) && control.writeEnable, in.writeData(control.writeSelect.asUInt), reg)
+    reg := Mux(
+      writeAddrOH(i.U(log2Ceil(regCount).W)) && control.writeEnable, in.writeData(control.writeSelect.asUInt), reg)
   }
   regFile(0) := 0.U
 

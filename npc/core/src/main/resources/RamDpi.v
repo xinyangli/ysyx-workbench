@@ -8,7 +8,9 @@ module RamDpi (
   input [31:0] writeData,
   input [3:0] writeMask,
   input reg [31:0] readAddr,
-  output reg [31:0] readData
+  output reg [31:0] readData,
+  input reg [31:0] pc,
+  output reg [31:0] inst
 );
   always @(*) begin
     if (valid) begin // 有读写请求时
@@ -20,5 +22,6 @@ module RamDpi (
     else begin
       readData = 0;
     end
+    inst = pmem_read(pc);
   end
 endmodule
