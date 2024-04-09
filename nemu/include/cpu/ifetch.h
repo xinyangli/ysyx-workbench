@@ -20,7 +20,7 @@
 static inline uint32_t inst_fetch(vaddr_t *pc, int len) {
   uint32_t inst = vaddr_ifetch(*pc, len);
   (*pc) += len;
-  printf("Inst fetch: %p %d %x\n", pc, len, inst);
+  printf("Inst fetch: %x %d %x\n", *pc, len, inst);
   return inst;
 }
 
