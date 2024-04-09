@@ -25,11 +25,17 @@ __EXPORT void difftest_memcpy(paddr_t addr, void *buf, size_t n,
                               bool direction) {
   if (direction == DIFFTEST_TO_REF) {
     Log("Copy 0x%08x, %p, %lu, %d\n", addr, buf, n, direction);
+    puts("buf");
     for(int i = 0; i < 32; i++) {
       printf("%4x ", ((uint8_t *)buf)[i]);
       if (i % 4 == 3) putchar('\n');
     }
     memcpy(guest_to_host(addr), buf, n);
+    puts("0x80000000");
+    for(int i = 0; i < 32; i++) {
+      printf("%4x ", ((uint8_t *)guest_to_host(addr))[i]);
+      if (i % 4 == 3) putchar('\n');
+    }
   } else {
     assert(0);
   }
