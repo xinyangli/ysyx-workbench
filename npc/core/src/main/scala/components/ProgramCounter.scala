@@ -6,33 +6,42 @@ import shapeless.{HNil, ::}
 
 class PcControlInterface extends Bundle {
   object SrcSelect extends ChiselEnum {
-    val pStaticNpc, pBranchResult = Value
+    val pStaticNpc, pExeOut = Value
   }
 
+  val useImmB = Input(Bool())
   val srcSelect = Input(SrcSelect())
 
-  type CtrlTypes = SrcSelect.Type :: HNil
-  def ctrlBindPorts: CtrlTypes = {
-    srcSelect :: HNil
+  def ctrlBindPorts = {
+    useImmB :: srcSelect :: HNil
   }
 }
 
-class ProgramCounter[T <: Data](tpe: T) extends Module {
+class ProgramCounter[T <: UInt](tpe: T) extends Module {
 
   val control = IO(new PcControlInterface)
   val in = IO(new Bundle {
-    val pcSrcs = Input(Vec(control.SrcSelect.all.length, tpe))
+    val immB = Input(tpe)
+    val exeOut = Input(tpe)
   })
   val out = IO(Output(tpe))
 
-  private val pc = RegInit(0x80000000L.U)
+  private val pc_reg = RegInit(0x80000000L.U)
 
-  pc := in.pcSrcs(control.srcSelect.asUInt)
-  out := pc
+//   pc := in.pcSrcs(control.srcSelect.asUInt)
+  import control.SrcSelect._
+  when( control.useImmB === true.B ) {
+    pc_reg := pc_reg + in.immB
+  }. elsewhen( control.srcSelect === pStaticNpc) {
+    pc_reg := pc_reg + 4.U
+  }. elsewhen( control.srcSelect === pExeOut) {
+    pc_reg := in.exeOut
+  }
+  out := pc_reg
 }
 
 object ProgramCounter {
-  def apply[T <: Data](tpe: T): ProgramCounter[T] = {
+  def apply[T <: UInt](tpe: T): ProgramCounter[T] = {
     val pc = Module(new ProgramCounter(tpe))
     pc
   }

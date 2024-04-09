@@ -1,13 +1,23 @@
 
 #ifndef _NPC_COMPONENTS_H_
 #define _NPC_COMPONENTS_H_
-#include "vpi_user.h"
 #include <array>
 #include <cstdlib>
+#include <exception>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <verilated_vpi.h>
+#include <map>
+#include <stdexcept>
+#include <string>
+
+const std::map<std::string, int> riscv32_regs_by_name{
+    {"$0", 0},  {"ra", 1},  {"sp", 2},   {"gp", 3},   {"tp", 4},  {"t0", 5},
+    {"t1", 6},  {"t2", 7},  {"s0", 8},   {"s1", 9},   {"a0", 10}, {"a1", 11},
+    {"a2", 12}, {"a3", 13}, {"a4", 14},  {"a5", 15},  {"a6", 16}, {"a7", 17},
+    {"s2", 18}, {"s3", 19}, {"s4", 20},  {"s5", 21},  {"s6", 22}, {"s7", 23},
+    {"s8", 24}, {"s9", 25}, {"s10", 26}, {"s11", 27}, {"t3", 28}, {"t4", 29},
+    {"t5", 30}, {"t6", 31}};
 
 template <typename T, std::size_t nr> class _RegistersBase {
   std::array<T, nr> regs;
@@ -22,36 +32,6 @@ public:
     for (int i = 0; i < regs.size(); i++) {
       regs[i] = fetch_reg(i);
     }
-  }
-};
-
-template <typename T, std::size_t nr>
-class _RegistersVPI : public _RegistersBase<T, nr> {
-  std::array<vpiHandle, nr> reg_handles;
-  vpiHandle pc_handle;
-  T vpi_get(vpiHandle vh) {
-    s_vpi_value v;
-    v.format = vpiIntVal;
-    vpi_get_value(vh, &v);
-    return v.value.integer;
-  }
-  T fetch_pc(void) { return vpi_get(pc_handle); }
-  T fetch_reg(std::size_t id) { return vpi_get(reg_handles[id]); }
-
-public:
-  _RegistersVPI<T, nr>(const std::string regs_prefix,
-                       const std::string pcname) {
-    for (int i = 0; i < nr; i++) {
-      std::string regname = regs_prefix + std::to_string(i);
-      vpiHandle vh = vpi_handle_by_name((PLI_BYTE8 *)regname.c_str(), nullptr);
-      if (vh == nullptr) {
-        std::cerr << "vpiHandle " << regname.c_str() << " not found"
-                  << std::endl;
-        exit(EXIT_FAILURE);
-      }
-      reg_handles[i] = vh;
-    }
-    pc_handle = vpi_handle_by_name((PLI_BYTE8 *)pcname.c_str(), nullptr);
   }
 };
 
@@ -74,7 +54,8 @@ template <typename T, std::size_t n> class Memory {
 public:
   std::array<T, n> mem;
   Memory(std::filesystem::path filepath, bool is_binary = true) {
-    assert(std::filesystem::exists(filepath));
+    if (!std::filesystem::exists(filepath))
+      throw std::runtime_error("Memory file not found");
     if (is_binary) {
       std::ifstream file(filepath, std::ios::binary);
       char *pmem = reinterpret_cast<char *>(mem.data());

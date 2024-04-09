@@ -76,8 +76,13 @@ $(BINARY):: $(OBJS) $(ARCHIVES)
 	@$(LD) -o $@ $(OBJS) $(LDFLAGS) $(ARCHIVES) $(LIBS)
 
 install: $(BINARY)
+ifeq ($(SHARE),1)
+	@mkdir -p $(PREFIX)/lib
+	@cp $(BINARY) $(PREFIX)/lib/
+else
 	@mkdir -p $(PREFIX)/bin
 	@cp $(BINARY) $(PREFIX)/bin/
+endif
 
 clean:
 	-rm -rf $(BUILD_DIR)

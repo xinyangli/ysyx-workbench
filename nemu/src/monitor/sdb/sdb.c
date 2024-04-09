@@ -18,13 +18,14 @@
 #include "sys/types.h"
 #include <addrexp.h>
 #include <addrexp_lex.h>
-#include <cpu/cpu.h>
 #include <errno.h>
 #include <isa.h>
-#include <memory/vaddr.h>
 #include <readline/history.h>
 #include <readline/readline.h>
 #include <stdint.h>
+
+extern void cpu_exec(uint64_t);
+extern word_t vaddr_read(vaddr_t addr, int len);
 
 static int is_batch_mode = false;
 

@@ -1,18 +1,20 @@
 #ifndef _DIFFTEST_DIFFTEST_H_
 #define _DIFFTEST_DIFFTEST_H_
 #include <cassert>
+#include <components.hpp>
 #include <cstdint>
 #include <cstdlib>
 #include <dlfcn.h>
 #include <filesystem>
 #include <functional>
 #include <iostream>
+#include <map>
 #include <memory>
 
 using paddr_t = uint32_t;
-enum { DIFFTEST_FROM_REF, DIFFTEST_TO_REF };
+enum { TRM_FROM_MACHINE, TRM_TO_MACHINE };
 
-struct DifftestInterface {
+struct TrmInterface {
   using memcpy_t = void (*)(paddr_t, void *, size_t, bool);
   using regcpy_t = void (*)(void *, bool);
   using exec_t = void (*)(uint64_t);
@@ -21,33 +23,16 @@ struct DifftestInterface {
   std::function<void(void *, bool)> regcpy;
   std::function<void(uint64_t)> exec;
   std::function<void(int)> init;
-
-  DifftestInterface(memcpy_t memcpy, regcpy_t regcpy, exec_t exec, init_t init)
-      : memcpy(memcpy), regcpy(regcpy), exec(exec), init(init){};
-
-  // using fs = std::filesystem::path;
-  DifftestInterface(std::filesystem::path lib_file) {
-    void *handle = dlopen(lib_file.c_str(), RTLD_LAZY);
-    assert(handle != nullptr);
-    memcpy = (memcpy_t)dlsym(handle, "difftest_memcpy");
-    assert(memcpy);
-    regcpy = (regcpy_t)dlsym(handle, "difftest_regcpy");
-    assert(regcpy);
-    exec = (exec_t)dlsym(handle, "difftest_exec");
-    assert(exec);
-    init = (init_t)dlsym(handle, "difftest_init");
-    assert(init);
-  }
 };
 
 template <typename S> class Difftest {
-  const DifftestInterface &ref;
+  const TrmInterface &ref;
   std::unique_ptr<S> ref_state;
-  const DifftestInterface &dut;
+  const TrmInterface &dut;
   std::unique_ptr<S> dut_state;
 
 public:
-  Difftest(const DifftestInterface &dut, const DifftestInterface &ref,
+  Difftest(const TrmInterface &dut, const TrmInterface &ref,
            void *mem, size_t n, std::unique_ptr<S> ref_state = nullptr,
            std::unique_ptr<S> dut_state = nullptr)
       : ref(ref), dut(dut), ref_state(std::move(ref_state)),
@@ -56,27 +41,46 @@ public:
       this->ref_state = std::make_unique<S>();
     if (dut_state == nullptr)
       this->dut_state = std::make_unique<S>();
-    ref.init(0);
-    dut.init(0);
-    fetch_state();
     paddr_t reset_vector = 0x80000000;
-    ref.memcpy(reset_vector, mem, n, DIFFTEST_TO_REF);
-    dut.memcpy(reset_vector, mem, n, DIFFTEST_TO_REF);
+    ref.memcpy(reset_vector, mem, n, TRM_TO_MACHINE);
+    dut.memcpy(reset_vector, mem, n, TRM_TO_MACHINE);
+    std::cout << "Memcpy\n";
   };
 
-  void fetch_state() {
-    ref.regcpy(ref_state.get(), DIFFTEST_FROM_REF);
-    dut.regcpy(dut_state.get(), DIFFTEST_FROM_REF);
+  void init(int n) {
+    ref.init(n);
+    dut.init(n);
+    fetch_state();
   }
 
-  void step(uint64_t n) {
-    ref.exec(n);
-    dut.exec(n);
-    fetch_state();
-    if (*ref_state != *dut_state) {
-      std::cout << *this;
-      exit(EXIT_FAILURE);
+  void fetch_state(void *pref = nullptr, void *pdut = nullptr) {
+    ref.regcpy(pref ? pref : ref_state.get(), TRM_FROM_MACHINE);
+    dut.regcpy(pdut ? pdut : dut_state.get(), TRM_FROM_MACHINE);
+  }
+
+  void push_state(void *pref = nullptr, void *pdut = nullptr) {
+    ref.regcpy(pref ? pref : ref_state.get(), TRM_TO_MACHINE);
+    dut.regcpy(pdut ? pdut : dut_state.get(), TRM_TO_MACHINE);
+  }
+
+  void push_mem(paddr_t paddr, void * p, size_t n) {
+    ref.memcpy(paddr, p, n, TRM_TO_MACHINE);
+    dut.memcpy(paddr, p, n, TRM_TO_MACHINE);
+  }
+
+  bool step(uint64_t n) {
+    std::cout << "REF state:\n"
+       << *ref_state << "DUT state:\n"
+       << *dut_state << std::endl;
+    while(n--) {
+      ref.exec(1);
+      dut.exec(1);
+      fetch_state();
+      // uint32_t inst = 0;
+      // ref.memcpy(&inst, ref_state->get_pc(), 4, TRM_FROM_MACHINE);
+      if(*ref_state == *dut_state) return false;
     }
+    return true;
   }
 
   friend std::ostream &operator<<(std::ostream &os, const Difftest<S> &d) {
@@ -87,9 +91,46 @@ public:
   }
 };
 
+template <typename S> struct DifftestTrmInterface : TrmInterface{
+  Difftest<S> diff;
+  S cpu_state;
+
+  DifftestTrmInterface<S>() {}
+  DifftestTrmInterface<S>(const TrmInterface &dut, const TrmInterface &ref,
+                          void *mem, size_t n, S cpu_state,
+                          std::unique_ptr<S> ref_state = nullptr,
+                          std::unique_ptr<S> dut_state = nullptr)
+      : diff(Difftest<S>{dut, ref, mem, n, std::move(ref_state),
+                         std::move(dut_state)}),
+        cpu_state(cpu_state) {
+    init = [this](int n) { diff.init(n); };
+    exec = [this](uint64_t n) { diff.step(n); };
+
+    // NOTE: Different from normal Trm, we copy 2 * sizeof(CPUState) to/from p,
+    // which represents ref_state and dut state
+    regcpy = [this](void *p, bool direction) {
+          if (direction == TRM_FROM_MACHINE) {
+            diff.push_state(p, (uint8_t *)p + sizeof(S));
+          } else if (direction == TRM_TO_MACHINE) {
+            diff.fetch_state(p, (uint8_t *)p + sizeof(S));
+          }
+        };
+
+    memcpy = [this](paddr_t paddr, void * p, size_t n, bool direction) {
+          if (direction == TRM_FROM_MACHINE) {
+            diff.push_mem(paddr, p, n);
+          } else if (direction == TRM_TO_MACHINE) {
+            throw std::runtime_error("Not implemented");
+          }
+        };
+  }
+};
+
 template <typename R, size_t nr_reg> struct CPUStateBase {
   R reg[nr_reg] = {0};
   paddr_t pc = 0x80000000;
+  static const std::map<std::string, int> inline regs_by_name =
+      riscv32_regs_by_name;
   CPUStateBase() {
     for (int i = 0; i < nr_reg; i++)
       reg[i] = 0;
@@ -105,6 +146,19 @@ template <typename R, size_t nr_reg> struct CPUStateBase {
   }
   bool operator!=(const CPUStateBase &other) const {
     return !(*this == other); // Reuse the == operator for != implementation
+  }
+
+  /* This does not update the register!!! */
+  R at(std::string name) { return reg[regs_by_name.at(name)]; }
+
+  uint32_t reg_str2val(const char *name, bool *success) {
+    try {
+      *success = true;
+      return this->at(name);
+    } catch (std::runtime_error) {
+      *success = false;
+      return 0;
+    }
   }
 };
 

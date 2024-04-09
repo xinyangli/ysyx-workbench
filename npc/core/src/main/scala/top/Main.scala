@@ -34,7 +34,7 @@ object VerilogMain extends App {
   }
 
   val annos = (new ChiselStage).execute(
-    Array("--target-dir", opt.targetDir.toString, "--target", "systemverilog", "--split-verilog"),
+    Array("--target-dir", opt.targetDir.toString, "--target", "systemverilog", "--split-verilog", "--full-stacktrace"),
     Seq(
 
     ) ++ (if(config.traceConfig.enable) Seq(ChiselGeneratorAnnotation(() => new Flow)) else Seq())
@@ -56,9 +56,9 @@ object VerilogMain extends App {
       .foreach(
         ct => println(s"""TOP.${ct.circuit}.${ct.path.map { case (Instance(i), _) => i }.mkString(".")}.${ct.tokens.collectFirst {
           case Ref(r) => r
-        }.get}""") 
+        }.get}""")
       )
-    
+
     val verilatorConfigWriter = new PrintWriter(new File(opt.targetDir, opt.verilatorConfigFileOut.toString()))
     verilatorConfigWriter.write("`verilator_config\n")
     try {
