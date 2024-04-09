@@ -1,5 +1,6 @@
 include(ChiselBuild)
 add_executable(V${TOPMODULE} config.cpp main.cpp)
+target_link_libraries(V${TOPMODULE} PRIVATE disasm sdb)
 
 verilate(V${TOPMODULE} TRACE COVERAGE THREADS
   TOP_MODULE ${TOPMODULE}
@@ -8,6 +9,7 @@ verilate(V${TOPMODULE} TRACE COVERAGE THREADS
   INCLUDE_DIRS ${CHISEL_OUTPUT_DIR}
   VERILATOR_ARGS
     "--vpi"   # Enable VPI
+    "-Wno-UNOPTFLAT"
 )
 
 add_test(

@@ -111,12 +111,17 @@
             nixpkgs-circt162.legacyPackages.${system}.circt
             yosys
             cli11
+            flex
+            bison
+            verilator
           ];
 
           buildInputs = [
-            verilator
             nvboard
             openssl
+            libllvm
+            libxml2
+            readline
           ] ++ self.checks.${system}.pre-commit-check.enabledPackages;
 
           cmakeFlags = [

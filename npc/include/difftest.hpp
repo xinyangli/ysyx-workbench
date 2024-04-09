@@ -1,12 +1,14 @@
 #ifndef _DIFFTEST_DIFFTEST_H_
 #define _DIFFTEST_DIFFTEST_H_
 #include <cassert>
+#include <components.hpp>
 #include <cstdint>
 #include <cstdlib>
 #include <dlfcn.h>
 #include <filesystem>
 #include <functional>
 #include <iostream>
+#include <map>
 #include <memory>
 
 using paddr_t = uint32_t;
@@ -69,14 +71,11 @@ public:
     dut.regcpy(dut_state.get(), DIFFTEST_FROM_REF);
   }
 
-  void step(uint64_t n) {
+  bool step(uint64_t n) {
     ref.exec(n);
     dut.exec(n);
     fetch_state();
-    if (*ref_state != *dut_state) {
-      std::cout << *this;
-      exit(EXIT_FAILURE);
-    }
+    return *ref_state == *dut_state;
   }
 
   friend std::ostream &operator<<(std::ostream &os, const Difftest<S> &d) {
@@ -90,6 +89,8 @@ public:
 template <typename R, size_t nr_reg> struct CPUStateBase {
   R reg[nr_reg] = {0};
   paddr_t pc = 0x80000000;
+  static const std::map<std::string, int> inline regs_by_name =
+      riscv32_regs_by_name;
   CPUStateBase() {
     for (int i = 0; i < nr_reg; i++)
       reg[i] = 0;
@@ -106,6 +107,9 @@ template <typename R, size_t nr_reg> struct CPUStateBase {
   bool operator!=(const CPUStateBase &other) const {
     return !(*this == other); // Reuse the == operator for != implementation
   }
+
+  /* This does not update the register!!! */
+  R at(std::string name) { return reg[regs_by_name.at(name)]; }
 };
 
 template <typename R, size_t nr_reg>

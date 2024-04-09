@@ -1,10 +1,15 @@
-#include "components.hpp"
+#include "VFlow___024root.h"
 #include "config.hpp"
+#include "disasm.hpp"
 #include "vl_wrapper.hpp"
 #include "vpi_user.h"
+#include "vpi_wrapper.hpp"
 #include <VFlow.h>
 #include <cstdint>
+#include <cstdlib>
 #include <difftest.hpp>
+#include <sdb.hpp>
+#include <types.h>
 
 using VlModule = VlModuleInterfaceCommon<VFlow>;
 using Registers = _RegistersVPI<uint32_t, 32>;
@@ -31,9 +36,10 @@ void pmem_write(int waddr, int wdata, char wmask) {
 }
 }
 
+Disassembler d{"riscv32-pc-linux-gnu"};
+
 VlModule *top;
 Registers *regs;
-using CPUState = CPUStateBase<uint32_t, 32>;
 vpiHandle pc = nullptr;
 void difftest_memcpy(paddr_t, void *, size_t, bool){};
 
@@ -58,6 +64,8 @@ void difftest_exec(uint64_t n) {
     }
   }
 }
+// std::cout << d.disassemble(top->rootp->Flow__DOT__pc__DOT__pc_reg, (uint8_t *)&top->rootp->Flow__DOT___ram_inst, 4) << std::endl;
+
 void difftest_init(int port) {
   //   top = std::make_unique<VlModule>(config.do_trace, config.wavefile);
   top = new VlModule{config.do_trace, config.wavefile};
@@ -65,20 +73,34 @@ void difftest_init(int port) {
   top->reset_eval(10);
 }
 
+DifftestInterface dut_interface = DifftestInterface{
+    &difftest_memcpy, &difftest_regcpy, &difftest_exec, &difftest_init};
+
+SDB::SDB<dut_interface> sdb_dut;
+extern "C" {
+word_t reg_str2val(const char *name, bool *success) {
+  return sdb_dut.reg_str2val(name, success);
+}
+}
+
 int main(int argc, char **argv, char **env) {
   config.cli_parse(argc, argv);
 
   /* -- Difftest -- */
   std::filesystem::path ref{config.lib_ref};
-  DifftestInterface dut_interface = DifftestInterface{
-      &difftest_memcpy, &difftest_regcpy, &difftest_exec, &difftest_init};
   DifftestInterface ref_interface = DifftestInterface{ref};
 
   Difftest<CPUStateBase<uint32_t, 32>> diff{dut_interface, ref_interface,
                                             pmem_get(), 128};
   int t = 8;
+  sdb_dut.main_loop();
   while (t--) {
-    diff.step(1);
+    if (!diff.step(1)) {
+      uint32_t pc = regs->get_pc();
+      uint32_t inst = pmem_read(pc);
+      std::cout << diff << d.disassemble(pc, (uint8_t *)&inst, 4) << std::endl;
+      return EXIT_FAILURE;
+    }
   }
 
   return 0;
