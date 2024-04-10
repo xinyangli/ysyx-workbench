@@ -7,13 +7,19 @@
 #include <VFlow.h>
 #include <cstdint>
 #include <cstdlib>
-#include <difftest.hpp>
+#include <filesystem>
+#include <fstream>
 #include <sdb.hpp>
+#include <trm_difftest.hpp>
+#include <trm_interface.hpp>
 #include <types.h>
 
 using VlModule = VlModuleInterfaceCommon<VFlow>;
 using Registers = _RegistersVPI<uint32_t, 32>;
 
+// SDB::SDB<NPC::npc_interface> sdb_dut;
+using CPUState = CPUStateBase<uint32_t, 32>;
+CPUState npc_cpu;
 extern "C" {
 void *pmem_get() {
   static auto pmem = new Memory<int, 128 * 1024>(config.memory_file,
@@ -36,16 +42,21 @@ void pmem_write(int waddr, int wdata, char wmask) {
 }
 }
 
-Disassembler d{"riscv32-pc-linux-gnu"};
-
 VlModule *top;
 Registers *regs;
 vpiHandle pc = nullptr;
-void difftest_memcpy(paddr_t, void *, size_t, bool){};
 
-void difftest_regcpy(void *p, bool direction) {
+namespace NPC {
+void npc_memcpy(paddr_t addr, void *buf, size_t sz, bool direction) {
+  if (direction == TRM_FROM_MACHINE) {
+    memcpy(buf, static_cast<Memory<int, 128 * 1024> *>(pmem_get())->mem.data(),
+           sz);
+  }
+};
 
-  if (direction == DIFFTEST_FROM_REF) {
+void npc_regcpy(void *p, bool direction) {
+
+  if (direction == TRM_FROM_MACHINE) {
     ((CPUState *)p)->pc = regs->get_pc();
     for (int i = 0; i < 32; i++) {
       ((CPUState *)p)->reg[i] = (*regs)[i];
@@ -53,7 +64,7 @@ void difftest_regcpy(void *p, bool direction) {
   }
 }
 
-void difftest_exec(uint64_t n) {
+void npc_exec(uint64_t n) {
   while (n--) {
     for (int i = 0; i < 2; i++) {
       if (top->is_posedge()) {
@@ -64,22 +75,38 @@ void difftest_exec(uint64_t n) {
     }
   }
 }
-// std::cout << d.disassemble(top->rootp->Flow__DOT__pc__DOT__pc_reg, (uint8_t *)&top->rootp->Flow__DOT___ram_inst, 4) << std::endl;
 
-void difftest_init(int port) {
+void npc_init(int port) {
   //   top = std::make_unique<VlModule>(config.do_trace, config.wavefile);
   top = new VlModule{config.do_trace, config.wavefile};
   regs = new Registers("TOP.Flow.reg_0.regFile_", "TOP.Flow.pc.out");
   top->reset_eval(10);
 }
 
-DifftestInterface dut_interface = DifftestInterface{
-    &difftest_memcpy, &difftest_regcpy, &difftest_exec, &difftest_init};
+class DutTrmInterface : public TrmInterface {
+public:
+  DutTrmInterface(memcpy_t f_memcpy, regcpy_t f_regcpy, exec_t f_exec,
+                  init_t f_init, void *cpu_state)
+      : TrmInterface{f_memcpy, f_regcpy, f_exec, f_init, cpu_state} {}
+  word_t at(std::string name) const override {
+    return ((CPUState *)cpu_state)->at(name);
+  }
 
-SDB::SDB<dut_interface> sdb_dut;
+  word_t at(paddr_t addr) const override {
+    word_t buf;
+    this->memcpy(addr, &buf, sizeof(word_t), TRM_FROM_MACHINE);
+    return buf;
+  }
+  void print(std::ostream &os) const override {}
+};
+
+DutTrmInterface npc_interface =
+    DutTrmInterface{&npc_memcpy, &npc_regcpy, &npc_exec, &npc_init, &npc_cpu};
+}; // namespace NPC
+
 extern "C" {
 word_t reg_str2val(const char *name, bool *success) {
-  return sdb_dut.reg_str2val(name, success);
+  return npc_cpu.reg_str2val(name, success);
 }
 }
 
@@ -88,20 +115,13 @@ int main(int argc, char **argv, char **env) {
 
   /* -- Difftest -- */
   std::filesystem::path ref{config.lib_ref};
-  DifftestInterface ref_interface = DifftestInterface{ref};
+  RefTrmInterface ref_interface{ref};
+  DifftestTrmInterface diff_interface{NPC::npc_interface, ref_interface,
+                                      pmem_get(), 128};
+  SDB::SDB sdb_diff{diff_interface};
 
-  Difftest<CPUStateBase<uint32_t, 32>> diff{dut_interface, ref_interface,
-                                            pmem_get(), 128};
   int t = 8;
-  sdb_dut.main_loop();
-  while (t--) {
-    if (!diff.step(1)) {
-      uint32_t pc = regs->get_pc();
-      uint32_t inst = pmem_read(pc);
-      std::cout << diff << d.disassemble(pc, (uint8_t *)&inst, 4) << std::endl;
-      return EXIT_FAILURE;
-    }
-  }
+  sdb_diff.main_loop();
 
   return 0;
 }

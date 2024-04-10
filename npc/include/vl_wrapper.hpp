@@ -19,8 +19,7 @@ public:
   ~Tracer() { m_trace->close(); }
 
   /**
-   * Dump signals to waveform file. Must be called once after every top->eval()
-   * call.
+   * @brief: Dump signals to waveform file. Must be called once after every top->eval() call.
    */
   void update() { m_trace->dump(cycle++); }
 };

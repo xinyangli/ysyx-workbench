@@ -1,6 +1,6 @@
 include(ChiselBuild)
 add_executable(V${TOPMODULE} config.cpp main.cpp)
-target_link_libraries(V${TOPMODULE} PRIVATE disasm sdb)
+target_link_libraries(V${TOPMODULE} PRIVATE sdb)
 
 verilate(V${TOPMODULE} TRACE COVERAGE THREADS
   TOP_MODULE ${TOPMODULE}

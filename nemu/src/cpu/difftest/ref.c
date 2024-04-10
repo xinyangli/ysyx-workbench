@@ -25,7 +25,7 @@ __EXPORT void difftest_memcpy(paddr_t addr, void *buf, size_t n,
   if (direction == DIFFTEST_TO_REF) {
     memcpy(guest_to_host(addr), buf, n);
   } else {
-    assert(0);
+    memcpy(buf, guest_to_host(addr), n);
   }
 }
 
