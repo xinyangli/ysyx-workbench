@@ -31,14 +31,14 @@ template <typename S> class Difftest {
   const TrmInterface &dut;
   std::unique_ptr<S> dut_state;
   void *mem;
-  size_t n;
+  size_t memsize;
 
 public:
   Difftest(const TrmInterface &dut, const TrmInterface &ref, void *mem,
            size_t n, std::unique_ptr<S> ref_state = nullptr,
            std::unique_ptr<S> dut_state = nullptr)
       : ref(ref), dut(dut), ref_state(std::move(ref_state)),
-        dut_state(std::move(dut_state)), mem(mem), n(n) {
+        dut_state(std::move(dut_state)), mem(mem), memsize(n) {
     if (ref_state == nullptr)
       this->ref_state = std::make_unique<S>();
     if (dut_state == nullptr)
@@ -49,8 +49,8 @@ public:
     ref.init(n);
     dut.init(n);
     paddr_t reset_vector = 0x80000000;
-    ref.memcpy(reset_vector, mem, n, TRM_TO_MACHINE);
-    dut.memcpy(reset_vector, mem, n, TRM_TO_MACHINE);
+    ref.memcpy(reset_vector, mem, memsize, TRM_TO_MACHINE);
+    dut.memcpy(reset_vector, mem, memsize, TRM_TO_MACHINE);
     fetch_state();
   }
 
