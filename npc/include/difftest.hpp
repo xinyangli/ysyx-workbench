@@ -70,9 +70,6 @@ public:
   }
 
   bool step(uint64_t n) {
-    std::cout << "REF state:\n"
-       << *ref_state << "DUT state:\n"
-       << *dut_state << std::endl;
     while(n--) {
       ref.exec(1);
       dut.exec(1);
