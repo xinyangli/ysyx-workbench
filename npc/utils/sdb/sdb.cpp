@@ -4,6 +4,10 @@
 #include <trm_interface.hpp>
 #include <sdb.hpp>
 #include <types.h>
+extern "C" {
+#include <addrexp.h>
+#include <addrexp_lex.h>
+}
 
 namespace cr = CppReadline;
 using ret = cr::Console::ReturnCode;
@@ -40,12 +44,25 @@ int SDBHandlers::cmd_info_registers(const std::vector<std::string> &input) {
   return SDB_SUCCESS;
 }
 
+word_t parse_expr(const char *arg) {
+  if (arg == NULL) {
+    puts("Invalid expr argument.");
+    return 0;
+  } else {
+    word_t res;
+    yy_scan_string(arg);
+    yyparse(&res);
+    yylex_destroy();
+    return res;
+  }
+}
+
 int SDBHandlers::cmd_print(const std::vector<std::string> &input) {
   word_t buf[2];
-  paddr_t addr = std::stoul(input[1]);
+  word_t addr = parse_expr(input[1].c_str());
   this->funcs.memcpy(addr, &buf, sizeof(word_t), TRM_FROM_MACHINE);
   // TODO: Difftest only
-  std::cout << buf[0] << ' ' << buf[1] << std::endl;
+  std::cout << std::hex << buf[0] << ' ' << buf[1] << std::dec << std::endl;
   return SDB_SUCCESS;
 }
 
