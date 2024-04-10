@@ -1,11 +1,18 @@
+#include <disasm.hpp>
 #include <components.hpp>
 #include <console.hpp>
-#include <difftest.hpp>
+#include <trm_interface.hpp>
 #include <sdb.hpp>
 #include <types.h>
 
 namespace cr = CppReadline;
 using ret = cr::Console::ReturnCode;
+Disassembler d{"riscv32-pc-linux-gnu"};
+
+std::ostream& operator<<(std::ostream &os, const TrmInterface &d) {
+  d.print(os);
+  return os;
+};
 
 namespace SDB {
 
@@ -22,18 +29,24 @@ int SDBHandlers::cmd_step(const std::vector<std::string> &input) {
   }
   uint64_t step_count = input.size() == 2 ? std::stoull(input[1]) : 1;
   this->funcs.exec(step_count);
+  std::cout << funcs << std::endl;
   return SDB_SUCCESS;
 }
 
 int SDBHandlers::cmd_info_registers(const std::vector<std::string> &input) {
   if (input.size() > 1)
     return SDB_WRONG_ARGUMENT;
-  std::cout << cpu << std::endl;
+  std::cout << this->funcs << std::endl;
   return SDB_SUCCESS;
 }
 
 int SDBHandlers::cmd_print(const std::vector<std::string> &input) {
-  exit(1);
+  word_t buf[2];
+  paddr_t addr = std::stoul(input[1]);
+  this->funcs.memcpy(addr, &buf, sizeof(word_t), TRM_FROM_MACHINE);
+  // TODO: Difftest only
+  std::cout << buf[0] << ' ' << buf[1] << std::endl;
+  return SDB_SUCCESS;
 }
 
 void SDBHandlers::registerHandlers(cr::Console *c) {

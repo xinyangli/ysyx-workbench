@@ -3,7 +3,7 @@
 
 #include <components.hpp>
 #include <console.hpp>
-#include <difftest.hpp>
+#include <trm_interface.hpp>
 #include <memory>
 #include <stdexcept>
 #include <types.h>
@@ -27,13 +27,13 @@ struct Handler {
 };
 
 class SDBHandlers {
-  using CPUState = CPUStateBase<uint32_t, 32>;
-
 private:
   const TrmInterface &funcs;
   std::vector<Handler> all_handlers = {
       Handler{{"c", "continue"}, &SDBHandlers::cmd_continue},
       Handler{{"si", "step-instruction"}, &SDBHandlers::cmd_step},
+      Handler{{"info-r"}, &SDBHandlers::cmd_info_registers},
+      Handler{{"p", "print"}, &SDBHandlers::cmd_print},
   };
   int cmd_continue(const cr::Console::Arguments &input);
   int cmd_step(const std::vector<std::string> &input);
@@ -41,7 +41,6 @@ private:
   int cmd_print(const std::vector<std::string> &input);
 
 public:
-  CPUState cpu;
   SDBHandlers(const TrmInterface &funcs)
       : funcs(funcs){};
   void registerHandlers(cr::Console *c);
@@ -50,11 +49,11 @@ public:
 class SDB {
 private:
   std::unique_ptr<CppReadline::Console> c;
-  TrmInterface func;
+  const TrmInterface &funcs;
   SDBHandlers handlers;
 public:
-  SDB(TrmInterface func, std::string const &greeting = "\033[1;34m(npc)\033[0m ") :
-  handlers(SDBHandlers(func)), func(func) {
+  SDB(const TrmInterface &funcs, std::string const &greeting = "\033[1;34m(npc)\033[0m ") :
+  handlers(SDBHandlers{funcs}), funcs(funcs) {
     c = std::make_unique<CppReadline::Console>(greeting);
     
     handlers.registerHandlers(c.get());
@@ -62,7 +61,7 @@ public:
 
   int main_loop() {
     int retCode;
-    func.init(0);
+    funcs.init(0);
     do {
       retCode = c->readLine();
       // We can also change the prompt based on last return value:
