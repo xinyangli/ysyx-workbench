@@ -124,6 +124,7 @@ template <typename S> struct DifftestTrmInterface : TrmInterface{
           }
         };
   }
+  
 };
 
 template <typename R, size_t nr_reg> struct CPUStateBase {

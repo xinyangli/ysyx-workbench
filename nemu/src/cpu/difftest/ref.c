@@ -32,6 +32,7 @@ __EXPORT void difftest_memcpy(paddr_t addr, void *buf, size_t n,
     }
     memcpy(guest_to_host(addr), buf, n);
     puts("0x80000000");
+    printf("addr: %p\n",guest_to_host(addr));
     for(int i = 0; i < 32; i++) {
       printf("%4x ", ((uint8_t *)guest_to_host(addr))[i]);
       if (i % 4 == 3) putchar('\n');
