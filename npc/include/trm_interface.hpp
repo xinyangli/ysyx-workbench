@@ -6,6 +6,9 @@
 #include <stdexcept>
 #include <string>
 #include <types.h>
+#include <disasm.hpp>
+
+extern Disassembler d;
 
 template <typename R, size_t nr_reg> struct CPUStateBase {
   R reg[nr_reg] = {0};
@@ -96,6 +99,21 @@ public:
   virtual void print(std::ostream &os) const = 0;
 };
 
+class TrmRuntimeException : public std::exception {
+private:
+  const char *msg_;
+  int code_;
+
+public:
+  enum { EBREAK, DIFFTEST_FAILED };
+  TrmRuntimeException(int code, const char *message)
+      : code_(code), msg_(message) {}
+
+  virtual const char *what() const throw() { return msg_; }
+
+  int error_code() const { return code_; }
+};
+
 struct RefTrmInterface : TrmInterface {
   RefTrmInterface(std::filesystem::path lib_file) {
     void *handle = dlopen(lib_file.c_str(), RTLD_LAZY);
@@ -133,9 +151,7 @@ struct RefTrmInterface : TrmInterface {
     return buf;
   }
 
-  void print(std::ostream &os) const override {
-    os << *(CPUState *)cpu_state;
-  }
+  void print(std::ostream &os) const override { os << *(CPUState *)cpu_state; }
 };
 
 #endif

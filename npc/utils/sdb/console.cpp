@@ -83,6 +83,12 @@ void Console::registerCommand(const std::string &s, CommandFunction f) {
   pimpl_->commands_[s] = f;
 }
 
+void Console::removeCommands(const std::vector<std::string> sv) {
+  for (auto const &s : sv) {
+    pimpl_->commands_.erase(s);
+  }
+}
+
 std::vector<std::string> Console::getRegisteredCommands() const {
   std::vector<std::string> allCommands;
   for (auto &pair : pimpl_->commands_)

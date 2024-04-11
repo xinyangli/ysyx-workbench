@@ -79,5 +79,8 @@ public:
     // printf("waddr: 0x%x\n", waddr);
     mem[addr_to_index((uint32_t)waddr)] = expand_bits(wmask) & wdata;
   }
+  void *guest_to_host(std::size_t addr) {
+    return mem.data() + addr_to_index(addr);
+  }
 };
 #endif

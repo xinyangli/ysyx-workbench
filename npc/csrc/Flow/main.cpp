@@ -49,8 +49,10 @@ vpiHandle pc = nullptr;
 namespace NPC {
 void npc_memcpy(paddr_t addr, void *buf, size_t sz, bool direction) {
   if (direction == TRM_FROM_MACHINE) {
-    memcpy(buf, static_cast<Memory<int, 128 * 1024> *>(pmem_get())->mem.data(),
-           sz);
+    memcpy(
+        buf,
+        static_cast<Memory<int, 128 * 1024> *>(pmem_get())->guest_to_host(addr),
+        sz);
   }
 };
 
@@ -72,8 +74,6 @@ void npc_exec(uint64_t n) {
         regs->update();
       }
       top->eval();
-      word_t inst = pmem_read(regs->get_pc());
-      if(inst == 0x1048691)  // ebreak
     }
   }
 }
@@ -119,7 +119,7 @@ int main(int argc, char **argv, char **env) {
   std::filesystem::path ref{config.lib_ref};
   RefTrmInterface ref_interface{ref};
   DifftestTrmInterface diff_interface{NPC::npc_interface, ref_interface,
-                                      pmem_get(), 128};
+                                      pmem_get(), 1024};
   SDB::SDB sdb_diff{diff_interface};
 
   int t = 8;

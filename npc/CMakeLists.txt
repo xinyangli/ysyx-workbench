@@ -13,7 +13,7 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 option(BUILD_USE_BLOOP "Whether to use bloop to speed up elaborate" ON)
 option(BUILD_SIM_TARGET "Whether to build verilator simulation binary" ON)
 cmake_dependent_option(BUILD_SIM_NVBOARD_TARGET "Whether to build nvboard target" OFF "BUILD_SIM_TARGET" OFF)
-option(ENABLE_YSYX_GIT_TRACKER "Ysyx tracker support" OFF)
+option(ENABLE_YSYX_GIT_TRACKER "Ysyx tracker support" ON)
 set(TOPMODULE "Flow" CACHE STRING "Topmodule name in chisel")
 set(DIFFTEST_LIB "" CACHE STRING "Dynamic library file used as difftest reference")
 

@@ -5,6 +5,7 @@
 #include <console.hpp>
 #include <memory>
 #include <stdexcept>
+#include <string>
 #include <trm_interface.hpp>
 #include <types.h>
 
@@ -13,7 +14,12 @@ using ret = cr::Console::ReturnCode;
 
 namespace SDB {
 
-enum SDBStatus { SDB_SUCCESS, SDB_WRONG_ARGUMENT, SDB_DIFFTEST_FAILED };
+enum SDBStatus {
+  SDB_SUCCESS,
+  SDB_EBREAK = 2,
+  SDB_WRONG_ARGUMENT,
+  SDB_DIFFTEST_FAILED
+};
 
 class SDBHandlers;
 
@@ -31,15 +37,18 @@ private:
       Handler{{"si", "step-instruction"}, &SDBHandlers::cmd_step},
       Handler{{"info-r"}, &SDBHandlers::cmd_info_registers},
       Handler{{"p", "print"}, &SDBHandlers::cmd_print},
+      Handler{{"disas", "disassemble"}, &SDBHandlers::cmd_disassemble},
   };
   int cmd_continue(const cr::Console::Arguments &input);
   int cmd_step(const std::vector<std::string> &input);
   int cmd_info_registers(const std::vector<std::string> &input);
   int cmd_print(const std::vector<std::string> &input);
+  int cmd_disassemble(const std::vector<std::string> &input);
+  int exec_catch(uint64_t);
 
 public:
   SDBHandlers(const TrmInterface &funcs) : funcs(funcs){};
-  void registerHandlers(cr::Console *c);
+  void register_handlers(cr::Console *c);
 };
 
 class SDB {
@@ -54,24 +63,34 @@ public:
       : handlers(SDBHandlers{funcs}), funcs(funcs) {
     c = std::make_unique<CppReadline::Console>(greeting);
 
-    handlers.registerHandlers(c.get());
+    handlers.register_handlers(c.get());
   };
 
   int main_loop() {
-    int retCode;
+    int ret_code;
     funcs.init(0);
+    std::vector<std::string> step_commands{"c", "continue", "si",
+                                           "step-instruction"};
     do {
-      retCode = c->readLine();
+      ret_code = c->readLine();
       // We can also change the prompt based on last return value:
-      if (retCode == ret::Ok)
+      if (ret_code == SDB_SUCCESS || ret_code == SDB_EBREAK)
         c->setGreeting("\033[1;34m(npc)\033[0m ");
       else
         c->setGreeting("\033[1;31m(npc)\033[0m ");
 
-      if (retCode == SDB_WRONG_ARGUMENT) {
-        std::cout << "Wrong argument give to command\n";
+      switch (ret_code) {
+      case SDB_EBREAK: {
+        std::cout << "\033[1;31m=== ebreak ===\033[0m" << std::endl;
+        c->removeCommands(step_commands);
+        break;
       }
-    } while (retCode != ret::Quit);
+      case SDB_WRONG_ARGUMENT: {
+        std::cout << "Wrong argument(s) is given to command handler\n";
+        break;
+      }
+      }
+    } while (ret_code != ret::Quit);
     return 0;
   }
 };

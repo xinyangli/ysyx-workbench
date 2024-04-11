@@ -1,5 +1,6 @@
 #include <components.hpp>
 #include <console.hpp>
+#include <cstdint>
 #include <disasm.hpp>
 #include <sdb.hpp>
 #include <stdexcept>
@@ -18,13 +19,32 @@ std::ostream &operator<<(std::ostream &os, const TrmInterface &d) {
   return os;
 };
 
+Disassembler d{"riscv32-linux-pc-gnu"};
+
 namespace SDB {
+
+int SDBHandlers::exec_catch(uint64_t n) {
+  try {
+    this->funcs.exec(n);
+  } catch (TrmRuntimeException &e) {
+    switch (e.error_code()) {
+    case TrmRuntimeException::EBREAK:
+      return SDB_EBREAK;
+    case TrmRuntimeException::DIFFTEST_FAILED:
+      std::cout << "Difftest Failed" << std::endl << funcs << std::endl;
+      return SDB_DIFFTEST_FAILED;
+    default:
+      std::cerr << "Unknown error code" << std::endl;
+      exit(1);
+    }
+  }
+  return SDB_SUCCESS;
+}
 
 int SDBHandlers::cmd_continue(const cr::Console::Arguments &input) {
   if (input.size() > 1)
     return SDB_WRONG_ARGUMENT;
-  this->funcs.exec(-1);
-  return SDB_SUCCESS;
+  return exec_catch(-1);
 }
 
 int SDBHandlers::cmd_step(const std::vector<std::string> &input) {
@@ -32,14 +52,8 @@ int SDBHandlers::cmd_step(const std::vector<std::string> &input) {
     return SDB_WRONG_ARGUMENT;
   }
   uint64_t step_count = input.size() == 2 ? std::stoull(input[1]) : 1;
-  try {
-    this->funcs.exec(step_count);
-  } catch (std::runtime_error) {
-    std::cout << "Difftest Failed" << std::endl << funcs << std::endl;
-    return SDB_DIFFTEST_FAILED;
-  }
+  return exec_catch(step_count);
   // std::cout << funcs << std::endl;
-  return SDB_SUCCESS;
 }
 
 int SDBHandlers::cmd_info_registers(const std::vector<std::string> &input) {
@@ -72,7 +86,22 @@ int SDBHandlers::cmd_print(const std::vector<std::string> &input) {
   return SDB_SUCCESS;
 }
 
-void SDBHandlers::registerHandlers(cr::Console *c) {
+int SDBHandlers::cmd_disassemble(const std::vector<std::string> &input) {
+  word_t buf[2];
+  word_t addr = parse_expr(input[1].c_str());
+  this->funcs.memcpy(addr, &buf, sizeof(word_t), TRM_FROM_MACHINE);
+  // TODO: Difftest only
+  std::cout << "dut: \n"
+            << d.disassemble(addr, (uint8_t *)&buf[0], sizeof(word_t))
+            << std::endl
+            << "ref: \n"
+            << d.disassemble(addr, (uint8_t *)&buf[0], sizeof(word_t))
+            << std::endl;
+  ;
+  return SDB_SUCCESS;
+}
+
+void SDBHandlers::register_handlers(cr::Console *c) {
   for (auto &h : this->all_handlers) {
     for (auto &name : h.names) {
       std::function<int(std::vector<std::string>)> f{
@@ -81,4 +110,5 @@ void SDBHandlers::registerHandlers(cr::Console *c) {
     }
   }
 }
+
 } // namespace SDB
