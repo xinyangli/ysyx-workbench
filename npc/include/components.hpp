@@ -13,6 +13,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 template <typename T, std::size_t nr> class _RegistersBase {
   std::array<T, nr> regs;
@@ -53,6 +54,7 @@ template <typename T, std::size_t n> class Memory {
 
 public:
   std::array<T, n> mem;
+  std::vector<std::array<uint64_t, 2>> trace_range;
   Memory(std::filesystem::path filepath, bool is_binary = true) {
     if (!std::filesystem::exists(filepath))
       throw std::runtime_error("Memory file not found");
