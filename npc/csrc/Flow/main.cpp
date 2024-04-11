@@ -8,10 +8,11 @@
 #include <cstdint>
 #include <cstdlib>
 #include <filesystem>
-#include <trm_difftest.hpp>
-#include <trm_interface.hpp>
 #include <fstream>
 #include <sdb.hpp>
+#include <stdexcept>
+#include <trm_difftest.hpp>
+#include <trm_interface.hpp>
 #include <types.h>
 
 using VlModule = VlModuleInterfaceCommon<VFlow>;
@@ -42,15 +43,15 @@ void pmem_write(int waddr, int wdata, char wmask) {
 }
 }
 
-
 VlModule *top;
 Registers *regs;
 vpiHandle pc = nullptr;
 
 namespace NPC {
-void npc_memcpy(paddr_t addr, void *buf, size_t sz, bool direction){
+void npc_memcpy(paddr_t addr, void *buf, size_t sz, bool direction) {
   if (direction == TRM_FROM_MACHINE) {
-    memcpy(buf, static_cast<Memory<int, 128 * 1024> *>(pmem_get())->mem.data(), sz);
+    memcpy(buf, static_cast<Memory<int, 128 * 1024> *>(pmem_get())->mem.data(),
+           sz);
   }
 };
 
@@ -64,7 +65,7 @@ void npc_regcpy(void *p, bool direction) {
   }
 }
 
-void npc_exec(uint64_t n) {
+int npc_exec(uint64_t n) {
   while (n--) {
     for (int i = 0; i < 2; i++) {
       if (top->is_posedge()) {
@@ -72,6 +73,9 @@ void npc_exec(uint64_t n) {
         regs->update();
       }
       top->eval();
+      word_t inst = pmem_read(regs->get_pc());
+      if(inst == 0x1048691)  // ebreak
+        throw std::
     }
   }
 }
@@ -86,21 +90,23 @@ void npc_init(int port) {
 class DutTrmInterface : public TrmInterface {
 public:
   DutTrmInterface(memcpy_t f_memcpy, regcpy_t f_regcpy, exec_t f_exec,
-               init_t f_init, void *cpu_state)
+                  init_t f_init, void *cpu_state)
       : TrmInterface{f_memcpy, f_regcpy, f_exec, f_init, cpu_state} {}
-  word_t at(std::string name) const override { return ((CPUState *)cpu_state)->at(name); }
+  word_t at(std::string name) const override {
+    return ((CPUState *)cpu_state)->at(name);
+  }
 
   word_t at(paddr_t addr) const override {
     word_t buf;
     this->memcpy(addr, &buf, sizeof(word_t), TRM_FROM_MACHINE);
     return buf;
   }
-  void print(std::ostream &os) const override { }
+  void print(std::ostream &os) const override {}
 };
 
-DutTrmInterface npc_interface = DutTrmInterface {
-    &npc_memcpy, &npc_regcpy, &npc_exec, &npc_init, &npc_cpu};
-};
+DutTrmInterface npc_interface =
+    DutTrmInterface{&npc_memcpy, &npc_regcpy, &npc_exec, &npc_init, &npc_cpu};
+}; // namespace NPC
 
 extern "C" {
 word_t reg_str2val(const char *name, bool *success) {
@@ -114,8 +120,8 @@ int main(int argc, char **argv, char **env) {
   /* -- Difftest -- */
   std::filesystem::path ref{config.lib_ref};
   RefTrmInterface ref_interface{ref};
-  DifftestTrmInterface diff_interface{NPC::npc_interface,
-                                                ref_interface, pmem_get(), 128};
+  DifftestTrmInterface diff_interface{NPC::npc_interface, ref_interface,
+                                      pmem_get(), 128};
   SDB::SDB sdb_diff{diff_interface};
 
   int t = 8;

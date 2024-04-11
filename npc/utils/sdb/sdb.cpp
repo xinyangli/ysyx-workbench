@@ -1,8 +1,9 @@
-#include <disasm.hpp>
 #include <components.hpp>
 #include <console.hpp>
-#include <trm_interface.hpp>
+#include <disasm.hpp>
 #include <sdb.hpp>
+#include <stdexcept>
+#include <trm_interface.hpp>
 #include <types.h>
 extern "C" {
 #include <addrexp.h>
@@ -11,9 +12,8 @@ extern "C" {
 
 namespace cr = CppReadline;
 using ret = cr::Console::ReturnCode;
-Disassembler d{"riscv32-pc-linux-gnu"};
 
-std::ostream& operator<<(std::ostream &os, const TrmInterface &d) {
+std::ostream &operator<<(std::ostream &os, const TrmInterface &d) {
   d.print(os);
   return os;
 };
@@ -32,8 +32,13 @@ int SDBHandlers::cmd_step(const std::vector<std::string> &input) {
     return SDB_WRONG_ARGUMENT;
   }
   uint64_t step_count = input.size() == 2 ? std::stoull(input[1]) : 1;
-  this->funcs.exec(step_count);
-  std::cout << funcs << std::endl;
+  try {
+    this->funcs.exec(step_count);
+  } catch (std::runtime_error) {
+    std::cout << "Difftest Failed" << std::endl << funcs << std::endl;
+    return SDB_DIFFTEST_FAILED;
+  }
+  // std::cout << funcs << std::endl;
   return SDB_SUCCESS;
 }
 
@@ -62,16 +67,18 @@ int SDBHandlers::cmd_print(const std::vector<std::string> &input) {
   word_t addr = parse_expr(input[1].c_str());
   this->funcs.memcpy(addr, &buf, sizeof(word_t), TRM_FROM_MACHINE);
   // TODO: Difftest only
-  std::cout << std::hex << buf[0] << ' ' << buf[1] << std::dec << std::endl;
+  std::cout << std::hex << "dut: 0x" << buf[0] << ' ' << "ref: 0x" << buf[1]
+            << std::dec << std::endl;
   return SDB_SUCCESS;
 }
 
 void SDBHandlers::registerHandlers(cr::Console *c) {
   for (auto &h : this->all_handlers) {
     for (auto &name : h.names) {
-      std::function<int(std::vector<std::string>)> f {std::bind(h.f, this, std::placeholders::_1)};
+      std::function<int(std::vector<std::string>)> f{
+          std::bind(h.f, this, std::placeholders::_1)};
       c->registerCommand(name, f);
     }
   }
 }
-}
+} // namespace SDB

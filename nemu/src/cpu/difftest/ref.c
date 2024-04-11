@@ -14,6 +14,7 @@
 ***************************************************************************************/
 
 #include "types.h"
+#include "utils.h"
 #include <cpu/cpu.h>
 #include <cpu/decode.h>
 #include <difftest-def.h>
@@ -37,7 +38,7 @@ __EXPORT void difftest_regcpy(void *dut, bool direction) {
     memcpy(&cpu, dut, sizeof(CPU_state));
 }
 
-__EXPORT void difftest_exec(uint64_t n) { cpu_exec(n); }
+__EXPORT int difftest_exec(uint64_t n) { return cpu_exec_only(n); }
 
 __EXPORT void difftest_raise_intr(word_t NO) {
   // assert(0);

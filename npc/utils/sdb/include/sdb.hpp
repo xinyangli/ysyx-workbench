@@ -3,9 +3,9 @@
 
 #include <components.hpp>
 #include <console.hpp>
-#include <trm_interface.hpp>
 #include <memory>
 #include <stdexcept>
+#include <trm_interface.hpp>
 #include <types.h>
 
 namespace cr = CppReadline;
@@ -13,17 +13,14 @@ using ret = cr::Console::ReturnCode;
 
 namespace SDB {
 
-enum SDBStatus {
-  SDB_SUCCESS,
-  SDB_WRONG_ARGUMENT,
-};
+enum SDBStatus { SDB_SUCCESS, SDB_WRONG_ARGUMENT, SDB_DIFFTEST_FAILED };
 
 class SDBHandlers;
 
 struct Handler {
   const std::vector<const char *> names;
   // cr::Console::CommandFunction f;
-  std::function<int(SDBHandlers*, const cr::Console::Arguments &)> f;
+  std::function<int(SDBHandlers *, const cr::Console::Arguments &)> f;
 };
 
 class SDBHandlers {
@@ -41,8 +38,7 @@ private:
   int cmd_print(const std::vector<std::string> &input);
 
 public:
-  SDBHandlers(const TrmInterface &funcs)
-      : funcs(funcs){};
+  SDBHandlers(const TrmInterface &funcs) : funcs(funcs){};
   void registerHandlers(cr::Console *c);
 };
 
@@ -51,11 +47,13 @@ private:
   std::unique_ptr<CppReadline::Console> c;
   const TrmInterface &funcs;
   SDBHandlers handlers;
+
 public:
-  SDB(const TrmInterface &funcs, std::string const &greeting = "\033[1;34m(npc)\033[0m ") :
-  handlers(SDBHandlers{funcs}), funcs(funcs) {
+  SDB(const TrmInterface &funcs,
+      std::string const &greeting = "\033[1;34m(npc)\033[0m ")
+      : handlers(SDBHandlers{funcs}), funcs(funcs) {
     c = std::make_unique<CppReadline::Console>(greeting);
-    
+
     handlers.registerHandlers(c.get());
   };
 

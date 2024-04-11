@@ -13,6 +13,7 @@
 * See the Mulan PSL v2 for more details.
 ***************************************************************************************/
 
+#include <debug.h>
 #include <utils.h>
 #include <cpu/cpu.h>
 #include <cpu/decode.h>
@@ -103,6 +104,30 @@ static void statistic() {
 void assert_fail_msg() {
   isa_reg_display();
   statistic();
+}
+
+int cpu_exec_only(uint64_t n) {
+  g_print_step = (n < MAX_INST_TO_PRINT);
+  switch (nemu_state.state) {
+    case NEMU_END: case NEMU_ABORT: {
+      Error("Called after nemu stopped");
+      return -1;
+    }
+    default: nemu_state.state = NEMU_RUNNING;
+  }
+
+  execute(n);
+  
+  switch (nemu_state.state) {
+    case NEMU_RUNNING: nemu_state.state = NEMU_STOP; return 0;
+
+    case NEMU_END: case NEMU_ABORT: {
+      return (nemu_state.halt_ret == 0) ? 1 : -1;
+    }
+
+    default:
+      return -nemu_state.state;
+  }
 }
 
 /* Simulate how the CPU works. */

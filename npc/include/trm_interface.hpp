@@ -133,9 +133,7 @@ struct RefTrmInterface : TrmInterface {
     return buf;
   }
 
-  void print(std::ostream &os) const override {
-    os << *(CPUState *)cpu_state;
-  }
+  void print(std::ostream &os) const override { os << *(CPUState *)cpu_state; }
 };
 
 #endif

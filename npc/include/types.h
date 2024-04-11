@@ -17,8 +17,8 @@ typedef uint32_t paddr_t;
 typedef uint16_t ioaddr_t;
 
 #ifdef __cplusplus
-#include <string>
 #include <map>
+#include <string>
 
 const std::map<std::string, int> riscv32_regs_by_name{
     {"$0", 0},  {"ra", 1},  {"sp", 2},   {"gp", 3},   {"tp", 4},  {"t0", 5},
