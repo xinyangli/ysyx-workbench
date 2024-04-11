@@ -19,6 +19,7 @@ using Registers = _RegistersVPI<uint32_t, 32>;
 
 // SDB::SDB<NPC::npc_interface> sdb_dut;
 using CPUState = CPUStateBase<uint32_t, 32>;
+bool g_skip_memcheck = false;
 CPUState npc_cpu;
 extern "C" {
 void *pmem_get() {
