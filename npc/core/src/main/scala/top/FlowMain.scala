@@ -183,17 +183,17 @@ class Control(width: Int) extends RawModule {
 
     // ---- Memory Access Instructions ----
 
-    (lb    , (r(true.B)     :: r(rMemOut)    ::
+    (lb    , (r(true.B)     :: r(rAluOut)    ::
               r(false.B)    :: r(pStaticNpc) ::
               r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmI) :: l(Bool()) ::
               r(true.B)     :: l(UInt(4.W))  :: r(false.B)   :: HNil)),
 
-    (lh    , (r(true.B)     :: r(rMemOut)    ::
+    (lh    , (r(true.B)     :: r(rAluOut)    ::
               r(false.B)    :: r(pStaticNpc) ::
               r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmI) :: l(Bool()) ::
               r(true.B)     :: l(UInt(4.W))  :: r(false.B)   :: HNil)),
 
-    (lw    , (r(true.B)     :: r(rMemOut)    ::
+    (lw    , (r(true.B)     :: r(rAluOut)    ::
               r(false.B)    :: r(pStaticNpc) ::
               r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmI) :: l(Bool()) ::
               r(true.B)     :: l(UInt(4.W))  :: r(false.B)   :: HNil)),
@@ -201,17 +201,17 @@ class Control(width: Int) extends RawModule {
     (sb    , (r(false.B)    :: l(WriteSelect)::
               r(false.B)    :: r(pStaticNpc) ::
               r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmI) :: l(Bool()) ::
-              r(true.B)     :: r(1.U(4.W))   :: r(false.B)   :: HNil)),
+              r(true.B)     :: r(1.U(4.W))   :: r(true.B)   :: HNil)),
 
     (sh    , (r(false.B)    :: l(WriteSelect)::
               r(false.B)    :: r(pStaticNpc) ::
               r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmI) :: l(Bool()) ::
-              r(true.B)     :: r(3.U(4.W))   :: r(false.B)   :: HNil)),
+              r(true.B)     :: r(3.U(4.W))   :: r(true.B)   :: HNil)),
 
     (sw    , (r(false.B)    :: l(WriteSelect)::
               r(false.B)    :: r(pStaticNpc) ::
               r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmI) :: l(Bool()) ::
-              r(true.B)     :: r(15.U(4.W))  :: r(false.B)   :: HNil)),
+              r(true.B)     :: r(15.U(4.W))  :: r(true.B)   :: HNil)),
 
     // ---- Integer Computational Instructions ---
 
@@ -373,7 +373,6 @@ class Flow extends Module {
   import control.reg.WriteSelect._
   reg.in.writeData(lit(rAluOut)) := alu.out.result
   // TODO: Read address in load command goes here
-  reg.in.writeData(lit(rMemOut)) := ram.io.readData
   reg.in.writeData(lit(rNpc)) := npc
 
   reg.in.writeAddr := inst(11, 7)
@@ -393,6 +392,7 @@ class Flow extends Module {
   import control.alu.SrcASelect._
   import control.alu.SrcBSelect._
   alu.in.a(lit(aSrcARs1)) := reg.out.src(0)
+  alu.in.a(lit(aSrcAMem)) := ram.io.readData
   alu.in.a(lit(aSrcAPc)) := pc.out
   alu.in.a(lit(aSrcAZero)) := 0.U
 
