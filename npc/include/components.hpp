@@ -35,7 +35,7 @@ template <typename T, std::size_t n> class Memory {
       return 0;
     }
     if (addr < 0x80000000 || addr > 0x87ffffff) {
-      std::cerr << "ACCESS " << addr << std::endl;
+      std::cerr << std::hex << "ACCESS " << addr << std::dec << std::endl;
       throw std::runtime_error("Invalid memory access");
     }
     // Linear mapping
