@@ -87,7 +87,7 @@
           IMAGES_PATH = "${self.packages.${system}.am-kernels}/share/binary";
         };
 
-        devShells.npc = with pkgs; mkShell {
+        devShells.npc = with pkgs; mkShell.override { stdenv = ccacheStdenv; } {
           inherit (self.checks.${system}.pre-commit-check) shellHook;
           CHISEL_FIRTOOL_PATH = "${nixpkgs-circt162.legacyPackages.${system}.circt}/bin";
           packages = [
@@ -113,7 +113,6 @@
             cli11
             flex
             bison
-            ccacheStdenv
             verilator
           ];
 
