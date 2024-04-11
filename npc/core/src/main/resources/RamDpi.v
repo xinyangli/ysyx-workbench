@@ -9,17 +9,17 @@ module RamDpi (
   input [31:0] writeAddr,
   input [31:0] writeData,
   input [3:0] writeMask,
-  input reg [31:0] readAddr,
+  input [31:0] readAddr,
   output reg [31:0] readData,
-  input reg [31:0] pc,
+  input [31:0] pc,
   output reg [31:0] inst
 );
-  always @(posedge clock) begin
-    if(reset) begin
-      readData <= 0x80000000
-      pc <= 0x80000000 
-    end
-  end
+  // always @(posedge clock) begin
+  //   if(reset) begin
+  //     readAddr <= 32'h80000000;
+  //     pc <= 32'h80000000;
+  //   end
+  // end
   always @(*) begin
     if (valid) begin // 有读写请求时
       readData = pmem_read(readAddr);
