@@ -21,6 +21,10 @@ using Registers = _RegistersVPI<uint32_t, 32>;
 using CPUState = CPUStateBase<uint32_t, 32>;
 bool g_skip_memcheck = false;
 CPUState npc_cpu;
+VlModule *top;
+Registers *regs;
+vpiHandle pc = nullptr;
+
 extern "C" {
 void *pmem_get() {
   static auto pmem = new Memory<int, 128 * 1024>(config.memory_file,
@@ -33,23 +37,23 @@ int pmem_read(int raddr) {
   auto mem = static_cast<Memory<int, 128 * 1024> *>(pmem);
   // TODO: Do memory difftest at memory read and write to diagnose at a finer
   // granularity
-  if(config.do_mtrace)
+  if(config.do_mtrace) {
+    std::cout << regs->get_pc() << std::endl;
     mem->trace(raddr, true);
+  }
   return mem->read(raddr);
 }
 
 void pmem_write(int waddr, int wdata, char wmask) {
   void *pmem = pmem_get();
   auto mem = static_cast<Memory<int, 128 * 1024> *>(pmem);
-  if(config.do_mtrace)
+  if(config.do_mtrace) {
+    std::cout << regs->get_pc() << std::endl;
     mem->trace((std::size_t)waddr, false, wdata);
+  }
   return mem->write((std::size_t)waddr, wdata, wmask);
 }
 }
-
-VlModule *top;
-Registers *regs;
-vpiHandle pc = nullptr;
 
 namespace NPC {
 void npc_memcpy(paddr_t addr, void *buf, size_t sz, bool direction) {
