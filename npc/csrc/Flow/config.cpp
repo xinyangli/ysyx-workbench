@@ -19,6 +19,8 @@ void Config::cli_parse(int argc, char **argv) {
   app.add_option("--diff-lib", lib_ref,
                  "Dynamic library file of difftest reference")
       ->check(CLI::ExistingFile);
+  app.add_flag("--mtrace", do_mtrace, "Enable memory tracing");
+  app.add_option("--mtrace-range", "Specify memory tracing range (default: 0x80000000-0x8fffffff)");
 
   try {
     app.parse(argc, argv);
