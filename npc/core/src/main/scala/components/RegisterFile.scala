@@ -9,7 +9,7 @@ import shapeless.{ HList, HNil, :: }
 
 class RegControl extends Bundle {
   object WriteSelect extends ChiselEnum {
-    val rAluOut, rNpc = Value
+    val rAluOut, rMemOut, rNpc = Value
   }
 
   val writeEnable = Input(Bool())
