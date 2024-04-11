@@ -94,6 +94,7 @@ public:
   }
   void trace(paddr_t addr, bool is_read, word_t value = 0) {
     for(auto const &r: trace_ranges) {
+      std::cout << r[0] << ' '<< r[1] << std::endl;
       if(r[0] <= addr && r[1] >= addr) {
         std::stringstream os;
         os << std::hex;
