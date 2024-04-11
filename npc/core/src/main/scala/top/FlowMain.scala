@@ -200,17 +200,17 @@ class Control(width: Int) extends RawModule {
 
     (sb    , (r(false.B)    :: l(WriteSelect)::
               r(false.B)    :: r(pStaticNpc) ::
-              r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmI) :: l(Bool()) ::
+              r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmS) :: l(Bool()) ::
               r(true.B)     :: r(1.U(4.W))   :: r(true.B)   :: HNil)),
 
     (sh    , (r(false.B)    :: l(WriteSelect)::
               r(false.B)    :: r(pStaticNpc) ::
-              r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmI) :: l(Bool()) ::
+              r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmS) :: l(Bool()) ::
               r(true.B)     :: r(3.U(4.W))   :: r(true.B)   :: HNil)),
 
     (sw    , (r(false.B)    :: l(WriteSelect)::
               r(false.B)    :: r(pStaticNpc) ::
-              r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmI) :: l(Bool()) ::
+              r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmS) :: l(Bool()) ::
               r(true.B)     :: r(15.U(4.W))  :: r(true.B)   :: HNil)),
 
     // ---- Integer Computational Instructions ---
@@ -401,7 +401,7 @@ class Flow extends Module {
   alu.in.b(lit(aSrcBImmI)) := Cat(Fill(20, inst(31)), inst(31, 20))
   alu.in.b(lit(aSrcBImmJ)) := Cat(Fill(12, inst(31)), inst(19, 12), inst(20), inst(30, 25), inst(24, 21), 0.U(1.W))
   alu.in.b(lit(aSrcBImmB)) := Cat(Fill(20, inst(31)), inst(7), inst(30, 25), inst(11, 8), inst(0))
-  alu.in.b(lit(aSrcBImmS)) := Cat(inst(31), inst(19, 12), inst(20), inst(30, 25), inst(24, 21), 0.U(1.W)).pad(aSrcBImmS.getWidth)
+  alu.in.b(lit(aSrcBImmS)) := Cat(Fill(20, inst(31)), inst(31), inst(19, 12), inst(20), inst(30, 25), inst(24, 21), 0.U(1.W))
   alu.in.b(lit(aSrcBImmU)) := Cat(inst(31, 12), 0.U(12.W))
 
   Trace.traceName(pc.out);
