@@ -37,20 +37,16 @@ int pmem_read(int raddr) {
   auto mem = static_cast<Memory<int, 128 * 1024> *>(pmem);
   // TODO: Do memory difftest at memory read and write to diagnose at a finer
   // granularity
-  if(config.do_mtrace) {
-    std::cout << regs->get_pc() << std::endl;
-    mem->trace(raddr, true);
-  }
+  if(config.do_mtrace)
+    mem->trace(raddr, true, regs->get_pc());
   return mem->read(raddr);
 }
 
 void pmem_write(int waddr, int wdata, char wmask) {
   void *pmem = pmem_get();
   auto mem = static_cast<Memory<int, 128 * 1024> *>(pmem);
-  if(config.do_mtrace) {
-    std::cout << regs->get_pc() << std::endl;
-    mem->trace((std::size_t)waddr, false, wdata);
-  }
+  if(config.do_mtrace)
+    mem->trace((std::size_t)waddr, false, wdata, regs->get_pc());
   return mem->write((std::size_t)waddr, wdata, wmask);
 }
 }

@@ -93,15 +93,19 @@ public:
   void *guest_to_host(std::size_t addr) {
     return mem.data() + addr_to_index(addr);
   }
-  void trace(paddr_t addr, bool is_read, word_t value = 0) {
-    for(auto &r: trace_ranges) {
-      if(r[0] <= addr && r[1] >= addr) {
+  void trace(paddr_t addr, bool is_read, word_t value = 0, word_t pc = 0) {
+    for (auto &r : trace_ranges) {
+      if (r[0] <= addr && r[1] >= addr) {
         std::stringstream os;
         os << std::hex;
-        if(is_read) os << "[R] ";
-        else os << "[W] " << value << " -> ";
-        os  << "0x" << addr << std::dec << std::endl;
-        std::cout  << os.rdbuf();
+        if (pc != 0)
+          os << "0x" << pc << " ";
+        if (is_read)
+          os << "[R] ";
+        else
+          os << "[W] " << value << " -> ";
+        os << "0x" << addr << std::dec << std::endl;
+        std::cout << os.rdbuf();
         break;
       }
     }
