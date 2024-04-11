@@ -66,7 +66,7 @@ public:
    * Always reads and returns 4 bytes from the address raddr & ~0x3u.
    */
   T read(int raddr) {
-    // printf("raddr: 0x%x\n", raddr);
+    printf("raddr: 0x%x\n", raddr);
     return mem[addr_to_index((uint32_t)raddr)];
   }
   /**
