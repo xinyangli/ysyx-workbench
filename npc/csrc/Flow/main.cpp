@@ -1,9 +1,9 @@
 #include "VFlow___024root.h"
-#include "config.hpp"
-#include "disasm.hpp"
-#include "vl_wrapper.hpp"
-#include "vpi_user.h"
-#include "vpi_wrapper.hpp"
+#include <config.hpp>
+#include <disasm.hpp>
+#include <vl_wrapper.hpp>
+#include <vpi_user.h>
+#include <vpi_wrapper.hpp>
 #include <VFlow.h>
 #include <cstdint>
 #include <cstdlib>
