@@ -2,6 +2,8 @@ import "DPI-C" function int pmem_read(input int addr);
 import "DPI-C" function void pmem_write(input int waddr, input int wdata, input byte wmask);
 
 module RamDpi (
+  input clock,
+  input reset,
   input writeEnable,
   input valid,
   input [31:0] writeAddr,
