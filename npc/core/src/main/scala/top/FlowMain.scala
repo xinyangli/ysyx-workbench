@@ -152,32 +152,32 @@ class Control(width: Int) extends RawModule {
               r(false.B)    :: l(UInt(4.W)):: r(false.B)   :: HNil)),
 
     (beq   , (r(false.B)    :: l(WriteSelect) ::
-              r(true.B)     :: r(pExeOut)     ::
+              r(true.B)     :: r(pStaticNpc)     ::
               r(aOpSlt)     :: r(aSrcARs1)  :: r(aSrcBRs2) :: l(Bool())    ::
               r(false.B)    :: l(UInt(4.W)):: r(false.B)   :: HNil)),
 
     (bne   , (r(false.B)    :: l(WriteSelect) ::
-              r(true.B)     :: r(pExeOut)     ::
+              r(true.B)     :: r(pStaticNpc)     ::
               r(aOpSlt)     :: r(aSrcARs1)  :: r(aSrcBRs2) :: l(Bool())    ::
               r(false.B)    :: l(UInt(4.W)):: r(false.B)   :: HNil)),
 
     (blt   , (r(false.B)    :: l(WriteSelect) ::
-              r(true.B)     :: r(pExeOut)     ::
+              r(true.B)     :: r(pStaticNpc)     ::
               r(aOpSlt)     :: r(aSrcARs1)  :: r(aSrcBRs2) :: r(true.B)  ::
               r(false.B)    :: l(UInt(4.W)):: r(false.B)   :: HNil)),
 
     (bge   , (r(false.B)    :: l(WriteSelect) ::
-              r(true.B)     :: r(pExeOut)     ::
+              r(true.B)     :: r(pStaticNpc)     ::
               r(aOpSlt)     :: r(aSrcARs1)  :: r(aSrcBRs2) :: r(true.B)  ::
               r(false.B)    :: l(UInt(4.W)):: r(false.B)   :: HNil)),
 
     (bltu  , (r(false.B)    :: l(WriteSelect)::
-              r(true.B)     :: r(pExeOut)    ::
+              r(true.B)     :: r(pStaticNpc)    ::
               r(aOpSlt)     :: r(aSrcARs1)    :: r(aSrcBRs2) :: r(false.B) ::
               r(false.B)    :: l(UInt(4.W))  :: r(false.B)   :: HNil)),
 
     (bgeu  , (r(false.B)    :: l(WriteSelect)::
-              r(true.B)     :: r(pExeOut)    ::
+              r(true.B)     :: r(pStaticNpc)    ::
               r(aOpSlt)     :: r(aSrcARs1)    :: r(aSrcBRs2) :: r(false.B) ::
               r(false.B)    :: l(UInt(4.W))  :: r(false.B)   :: HNil)),
 
@@ -368,7 +368,6 @@ class Flow extends Module {
   branchInvertResult := inst(12)
   val _branchResult = Mux(branchUseSlt, alu.out.result(0), alu.out.eq)
   val branchResult = Mux(branchInvertResult, !_branchResult, _branchResult)
-  printf(cf"pc.useImmB = ${control.pc.useImmB}\n branchResult = ${branchResult}\n")
   pc.control.useImmB := control.pc.useImmB && branchResult
 
   import control.reg.WriteSelect._
