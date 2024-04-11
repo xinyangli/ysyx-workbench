@@ -85,8 +85,7 @@ void npc_atexit(void) {
 }
 
 void npc_init(int port) {
-  //   top = std::make_unique<VlModule>(config.do_trace, config.wavefile);
-  top = new VlModule{config.do_trace, config.wavefile};
+  top = new VlModule{config.wavefile};
   regs = new Registers("TOP.Flow.reg_0.regFile_", "TOP.Flow.pc.out");
   atexit(npc_atexit);
   top->reset_eval(10);
@@ -122,15 +121,19 @@ word_t reg_str2val(const char *name, bool *success) {
 int main(int argc, char **argv, char **env) {
   config.cli_parse(argc, argv);
 
-  /* -- Difftest -- */
-  std::filesystem::path ref{config.lib_ref};
-  RefTrmInterface ref_interface{ref};
-  DifftestTrmInterface diff_interface{NPC::npc_interface, ref_interface,
-                                      pmem_get(), 1024};
-  SDB::SDB sdb_diff{diff_interface};
+  if(config.max_sim_time > 0) {
+    NPC::npc_interface.exec(config.max_sim_time / 2);
+  } else {
+    /* -- Difftest -- */
+    std::filesystem::path ref{config.lib_ref};
+    RefTrmInterface ref_interface{ref};
+    DifftestTrmInterface diff_interface{NPC::npc_interface, ref_interface,
+                                        pmem_get(), 1024};
+    SDB::SDB sdb_diff{diff_interface};
 
-  int t = 8;
-  sdb_diff.main_loop();
+    int t = 8;
+    sdb_diff.main_loop();
+  }
 
   return 0;
 }
