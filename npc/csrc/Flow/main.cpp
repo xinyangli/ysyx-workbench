@@ -24,7 +24,7 @@ CPUState npc_cpu;
 extern "C" {
 void *pmem_get() {
   static auto pmem = new Memory<int, 128 * 1024>(config.memory_file,
-                                                 config.memory_file_binary);
+                                                 config.memory_file_binary, config.mtrace_ranges);
   return pmem;
 }
 
