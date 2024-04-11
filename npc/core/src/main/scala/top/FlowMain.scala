@@ -404,4 +404,5 @@ class Flow extends Module {
 
   Trace.traceName(pc.out);
   dontTouch(control.out)
+  dontTouch(pc.control)
 }
