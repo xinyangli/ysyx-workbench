@@ -20,7 +20,7 @@ module RamDpi (
   //     pc <= 32'h80000000;
   //   end
   // end
-  always @(*) begin
+  always @(posedge clock) begin
     if (valid) begin // 有读写请求时
       readData = pmem_read(readAddr);
       if (writeEnable) begin // 有写请求时
