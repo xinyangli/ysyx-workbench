@@ -94,7 +94,7 @@ public:
     std::stringstream os;
     if(is_read) os << "[R] ";
     else os << "[W] " << value << " -> ";
-    os << addr << std::endl;
+    os << "0x" << addr << std::endl;
     std::cout << std::hex << os.rdbuf() << std::dec;
   }
 };
