@@ -401,7 +401,7 @@ class Flow extends Module {
   alu.in.b(lit(aSrcBImmI)) := Cat(Fill(20, inst(31)), inst(31, 20))
   alu.in.b(lit(aSrcBImmJ)) := Cat(Fill(12, inst(31)), inst(19, 12), inst(20), inst(30, 25), inst(24, 21), 0.U(1.W))
   alu.in.b(lit(aSrcBImmB)) := Cat(Fill(20, inst(31)), inst(7), inst(30, 25), inst(11, 8), inst(0))
-  alu.in.b(lit(aSrcBImmS)) := Cat(Fill(20, inst(31)), inst(31), inst(19, 12), inst(20), inst(30, 25), inst(24, 21), 0.U(1.W))
+  alu.in.b(lit(aSrcBImmS)) := Cat(Fill(20, inst(31)), inst(31), inst(30, 25), inst(11, 8), inst(7))
   alu.in.b(lit(aSrcBImmU)) := Cat(inst(31, 12), 0.U(12.W))
 
   Trace.traceName(pc.out);
