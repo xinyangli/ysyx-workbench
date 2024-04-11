@@ -52,7 +52,7 @@ static void out_of_bound(paddr_t addr) {
 static void mtrace_print(char type, word_t addr, int len, word_t data) {
   for (int i = 0; i < range_count; i++)
     if (addr <= mtrace_end[i] && addr >= mtrace_start[i] ) {
-      Trace("PC=" FMT_PADDR "Mem %c" FMT_PADDR "%d D " FMT_PADDR, cpu.pc, type, addr, len, data);
+      Trace("PC=" FMT_PADDR " Mem %c" FMT_PADDR "%d D " FMT_PADDR, cpu.pc, type, addr, len, data);
       break;
     }
 }
