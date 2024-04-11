@@ -74,5 +74,4 @@ if(ENABLE_YSYX_GIT_TRACKER)
     COMMAND ${CMAKE_SOURCE_DIR}/../git_commit.sh "build_${CMAKE_PROJECT_NAME}_V${TOPMODULE}"
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/..
   )
-  # add_dependencies(V${TOPMODULE} ysyx_git_tracer)
 endif()

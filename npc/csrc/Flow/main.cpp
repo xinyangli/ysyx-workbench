@@ -78,10 +78,16 @@ void npc_exec(uint64_t n) {
   }
 }
 
+void npc_atexit(void) {
+  free(top);
+  free(regs);
+}
+
 void npc_init(int port) {
   //   top = std::make_unique<VlModule>(config.do_trace, config.wavefile);
   top = new VlModule{config.do_trace, config.wavefile};
   regs = new Registers("TOP.Flow.reg_0.regFile_", "TOP.Flow.pc.out");
+  atexit(npc_atexit);
   top->reset_eval(10);
 }
 
