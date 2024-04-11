@@ -46,7 +46,7 @@ void pmem_write(int waddr, int wdata, char wmask) {
   void *pmem = pmem_get();
   auto mem = static_cast<Memory<int, 128 * 1024> *>(pmem);
   if(config.do_mtrace)
-    mem->trace((std::size_t)waddr, false, wdata, regs->get_pc());
+    mem->trace((std::size_t)waddr, false, regs->get_pc(), wdata);
   return mem->write((std::size_t)waddr, wdata, wmask);
 }
 }
