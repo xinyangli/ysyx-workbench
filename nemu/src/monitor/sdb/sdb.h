@@ -16,8 +16,7 @@
 #ifndef __SDB_H__
 #define __SDB_H__
 
-#include <types.h>
-#include <stdbool.h>
+#include <common.h>
 
 word_t parse_expr(const char *arg, bool *success);
 int wp_add(char * expr);

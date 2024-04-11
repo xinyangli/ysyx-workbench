@@ -37,13 +37,11 @@ private:
       Handler{{"si", "step-instruction"}, &SDBHandlers::cmd_step},
       Handler{{"info-r"}, &SDBHandlers::cmd_info_registers},
       Handler{{"p", "print"}, &SDBHandlers::cmd_print},
-      Handler{{"disas", "disassemble"}, &SDBHandlers::cmd_disassemble},
   };
   int cmd_continue(const cr::Console::Arguments &input);
   int cmd_step(const std::vector<std::string> &input);
   int cmd_info_registers(const std::vector<std::string> &input);
   int cmd_print(const std::vector<std::string> &input);
-  int cmd_disassemble(const std::vector<std::string> &input);
   int exec_catch(uint64_t);
 
 public:

@@ -401,6 +401,7 @@ class Flow extends Module {
   alu.in.b(lit(aSrcBImmB)) := Cat(Fill(20, inst(31)), inst(7), inst(30, 25), inst(11, 8), inst(0))
   alu.in.b(lit(aSrcBImmS)) := Cat(inst(31), inst(19, 12), inst(20), inst(30, 25), inst(24, 21), 0.U(1.W)).pad(aSrcBImmS.getWidth)
   alu.in.b(lit(aSrcBImmU)) := Cat(inst(31, 12), 0.U(12.W))
+  printf(cf"inst = $inst\n");
 
   Trace.traceName(pc.out);
   dontTouch(control.out)

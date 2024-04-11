@@ -13,7 +13,7 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 option(BUILD_USE_BLOOP "Whether to use bloop to speed up elaborate" ON)
 option(BUILD_SIM_TARGET "Whether to build verilator simulation binary" ON)
 cmake_dependent_option(BUILD_SIM_NVBOARD_TARGET "Whether to build nvboard target" OFF "BUILD_SIM_TARGET" OFF)
-option(ENABLE_YSYX_GIT_TRACKER "Ysyx tracker support" ON)
+option(ENABLE_YSYX_GIT_TRACKER "Ysyx tracker support" OFF)
 set(TOPMODULE "Flow" CACHE STRING "Topmodule name in chisel")
 set(DIFFTEST_LIB "" CACHE STRING "Dynamic library file used as difftest reference")
 
@@ -69,9 +69,15 @@ add_subdirectory(csrc)
 
 # -- Add build tracking
 if(ENABLE_YSYX_GIT_TRACKER)
-  add_custom_target(
-    ysyx_git_tracer
-    COMMAND ${CMAKE_SOURCE_DIR}/../git_commit.sh "build_${CMAKE_PROJECT_NAME}_V${TOPMODULE}"
+  add_custom_command(
+      TARGET V${TOPMODULE}_nvboard PRE_BUILD
+      COMMAND ${CMAKE_SOURCE_DIR}/../git_commit.sh "build_${CMAKE_PROJECT_NAME}_V${TOPMODULE}_nvboard"
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/..
   )
-  add_dependencies(V${TOPMODULE} ysyx_git_tracer)
+
+  add_custom_command(
+      TARGET V${TOPMODULE} PRE_BUILD
+      COMMAND ${CMAKE_SOURCE_DIR}/../git_commit.sh "build_${CMAKE_PROJECT_NAME}_V${TOPMODULE}"
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/..
+  )
 endif()

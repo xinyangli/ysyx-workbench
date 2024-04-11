@@ -15,6 +15,7 @@
 #include <ostream>
 #include <stdexcept>
 #include <trm_interface.hpp>
+Disassembler d{"riscv32-linux-pc-gnu"};
 
 using paddr_t = uint32_t;
 struct DifftestTrmInterface : public TrmInterface {

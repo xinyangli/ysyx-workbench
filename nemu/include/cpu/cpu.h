@@ -18,7 +18,6 @@
 
 #include <common.h>
 
-int cpu_exec_only(uint64_t n);
 void cpu_exec(uint64_t n);
 
 void set_nemu_state(int state, vaddr_t pc, int halt_ret);
