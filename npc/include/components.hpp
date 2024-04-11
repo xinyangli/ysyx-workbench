@@ -54,8 +54,9 @@ template <typename T, std::size_t n> class Memory {
 
 public:
   std::array<T, n> mem;
-  std::vector<std::pair<uint64_t, uint64_t>> trace_ranges;
-  Memory(std::filesystem::path filepath, bool is_binary, std::vector<std::pair<uint64_t, uint64_t>> trace_ranges) {
+  std::vector<std::array<uint64_t, 2>> trace_ranges;
+  Memory(std::filesystem::path filepath, bool is_binary,
+         std::vector<std::array<uint64_t, 2>> &&trace_ranges) : trace_ranges(std::move(trace_ranges)){
     if (!std::filesystem::exists(filepath))
       throw std::runtime_error("Memory file not found");
     if (is_binary) {
@@ -93,8 +94,8 @@ public:
     return mem.data() + addr_to_index(addr);
   }
   void trace(paddr_t addr, bool is_read, word_t value = 0) {
-    for(auto const &r: trace_ranges) {
-      if(r.first <= addr && r.second >= addr) {
+    for(auto &r: trace_ranges) {
+      if(r[0] <= addr && r[1] >= addr) {
         std::stringstream os;
         os << std::hex;
         if(is_read) os << "[R] ";

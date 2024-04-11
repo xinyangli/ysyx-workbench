@@ -12,8 +12,8 @@ struct Config {
   uint64_t max_sim_time = 0;
   bool memory_file_binary = {true};
   bool do_mtrace{false};
-  std::vector<std::pair<std::size_t, std::size_t>> mtrace_ranges {
-    std::make_pair(0x80000000, 0x8ffffffff)
+  std::vector<std::array<std::size_t, 2>> mtrace_ranges {
+    {0x80000000, 0x8ffffffff}
   };
   std::filesystem::path wavefile;
   std::filesystem::path lib_ref;
