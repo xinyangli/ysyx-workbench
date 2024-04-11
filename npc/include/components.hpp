@@ -32,7 +32,7 @@ template <typename T, std::size_t n> class Memory {
     static bool is_initial = true;
     if (is_initial) {
       is_initial = false;
-      return (addr >> 2) - 0x20000000;
+      return 0;
     }
     if (addr < 0x80000000 || addr > 0x8fffffff) {
       std::cerr << "ACCESS " << addr << std::endl;
