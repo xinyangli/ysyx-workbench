@@ -30,6 +30,7 @@ public:
 template <typename T, std::size_t n> class Memory {
   std::size_t addr_to_index(std::size_t addr) {
     if (addr < 0x80000000 || addr > 0x8fffffff) {
+      std::cerr << "ACCESS " << addr << std::endl;
       throw std::runtime_error("Invalid memory access");
     }
     // Linear mapping
