@@ -153,32 +153,32 @@ class Control(width: Int) extends RawModule {
 
     (beq   , (r(false.B)    :: l(WriteSelect) ::
               r(true.B)     :: r(pExeOut)     ::
-              r(aOpSlt)     :: r(aSrcAPc)  :: r(aSrcBImmB) :: l(Bool())    ::
+              r(aOpSlt)     :: r(aSrcARs1)  :: r(aSrcBRs2) :: l(Bool())    ::
               r(false.B)    :: l(UInt(4.W)):: r(false.B)   :: HNil)),
 
     (bne   , (r(false.B)    :: l(WriteSelect) ::
               r(true.B)     :: r(pExeOut)     ::
-              r(aOpSlt)     :: r(aSrcAPc)  :: r(aSrcBImmB) :: l(Bool())    ::
+              r(aOpSlt)     :: r(aSrcARs1)  :: r(aSrcBRs2) :: l(Bool())    ::
               r(false.B)    :: l(UInt(4.W)):: r(false.B)   :: HNil)),
 
     (blt   , (r(false.B)    :: l(WriteSelect) ::
               r(true.B)     :: r(pExeOut)     ::
-              r(aOpSlt)     :: r(aSrcAPc)  :: r(aSrcBImmB) :: r(true.B)  ::
+              r(aOpSlt)     :: r(aSrcARs1)  :: r(aSrcBRs2) :: r(true.B)  ::
               r(false.B)    :: l(UInt(4.W)):: r(false.B)   :: HNil)),
 
     (bge   , (r(false.B)    :: l(WriteSelect) ::
               r(true.B)     :: r(pExeOut)     ::
-              r(aOpSlt)     :: r(aSrcAPc)  :: r(aSrcBImmB) :: r(true.B)  ::
+              r(aOpSlt)     :: r(aSrcARs1)  :: r(aSrcBRs2) :: r(true.B)  ::
               r(false.B)    :: l(UInt(4.W)):: r(false.B)   :: HNil)),
 
     (bltu  , (r(false.B)    :: l(WriteSelect)::
               r(true.B)     :: r(pExeOut)    ::
-              r(aOpSlt)     :: r(aSrcAPc)    :: r(aSrcBImmB) :: r(false.B) ::
+              r(aOpSlt)     :: r(aSrcARs1)    :: r(aSrcBRs2) :: r(false.B) ::
               r(false.B)    :: l(UInt(4.W))  :: r(false.B)   :: HNil)),
 
     (bgeu  , (r(false.B)    :: l(WriteSelect)::
               r(true.B)     :: r(pExeOut)    ::
-              r(aOpSlt)     :: r(aSrcAPc)    :: r(aSrcBImmB) :: r(false.B) ::
+              r(aOpSlt)     :: r(aSrcARs1)    :: r(aSrcBRs2) :: r(false.B) ::
               r(false.B)    :: l(UInt(4.W))  :: r(false.B)   :: HNil)),
 
     // ---- Memory Access Instructions ----
