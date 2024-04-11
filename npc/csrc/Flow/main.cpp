@@ -33,12 +33,16 @@ int pmem_read(int raddr) {
   auto mem = static_cast<Memory<int, 128 * 1024> *>(pmem);
   // TODO: Do memory difftest at memory read and write to diagnose at a finer
   // granularity
+  if(config.do_mtrace)
+    mem->trace(raddr, true);
   return mem->read(raddr);
 }
 
 void pmem_write(int waddr, int wdata, char wmask) {
   void *pmem = pmem_get();
   auto mem = static_cast<Memory<int, 128 * 1024> *>(pmem);
+  if(config.do_mtrace)
+    mem->trace(waddr, true);
   return mem->write((std::size_t)waddr, wdata, wmask);
 }
 }
@@ -121,7 +125,7 @@ word_t reg_str2val(const char *name, bool *success) {
 int main(int argc, char **argv, char **env) {
   config.cli_parse(argc, argv);
 
-  if(config.max_sim_time > 0) {
+  if(config.max_sim_time > 1) {
     NPC::npc_interface.exec(config.max_sim_time / 2);
   } else {
     /* -- Difftest -- */
