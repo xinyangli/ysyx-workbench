@@ -34,7 +34,7 @@ template <typename T, std::size_t n> class Memory {
     if (g_skip_memcheck) {
       return 0;
     }
-    if (addr < 0x80000000 || addr > 0x8fffffff) {
+    if (addr < 0x80000000 || addr > 0x87ffffff) {
       std::cerr << "ACCESS " << addr << std::endl;
       throw std::runtime_error("Invalid memory access");
     }
