@@ -1,6 +1,7 @@
 
 #ifndef _NPC_COMPONENTS_H_
 #define _NPC_COMPONENTS_H_
+#include "types.h"
 #include <array>
 #include <cmath>
 #include <cstdlib>
@@ -9,6 +10,7 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 
@@ -87,6 +89,13 @@ public:
   }
   void *guest_to_host(std::size_t addr) {
     return mem.data() + addr_to_index(addr);
+  }
+  void trace(word_t addr, bool is_read) {
+    std::ostringstream os;
+    if(is_read) os << "[R] ";
+    else os << "[W] ";
+    os << "addr" << std::endl;
+    std::cout << os.rdbuf();
   }
 };
 #endif
