@@ -27,6 +27,9 @@ void Config::cli_parse(int argc, char **argv) {
   } catch (const CLI::ParseError &e) {
     exit((app).exit(e));
   }
+  for(auto const& range: mtrace_ranges) {
+    std::cout << range.first << ',' << range.second << std::endl;
+  }
 }
 
 Config config;
