@@ -16,14 +16,14 @@ module RamDpi (
 );
   always @(*) begin
     if (valid) begin // 有读写请求时
-      readData <= pmem_read(readAddr);
+      readData = pmem_read(readAddr);
       if (writeEnable) begin // 有写请求时
         pmem_write(writeAddr, writeData, { 4'h0, writeMask });
       end
     end
     else begin
-      readData <= 0;
+      readData = 0;
     end
-    inst <= pmem_read(pc);
+    inst = pmem_read(pc);
   end
 endmodule
