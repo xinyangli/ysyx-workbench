@@ -52,7 +52,6 @@ public:
     }
   }
   void reset_eval(int n) {
-    this->clock = 0;
     this->reset = 1;
     this->eval(n);
     this->reset = 0;
