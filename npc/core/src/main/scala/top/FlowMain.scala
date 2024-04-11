@@ -130,6 +130,16 @@ class Control(width: Int) extends RawModule {
     //     Exe  | op :: srcASelect :: srcBSelect :: signExt :: HNil
     //     Mem  | valid :: writeMask :: writeEnable :: HNil
 
+    (lui   , (r(true.B)     :: r(rAluOut)  ::
+              r(false.B)    :: r(pStaticNpc)::
+              r(aOpAdd)     :: r(aSrcAZero)  :: r(aSrcBImmU) :: r(false.B) ::
+              r(false.B)    :: l(UInt(4.W)):: r(false.B)   :: HNil)),
+
+    (auipc , (r(true.B)     :: r(rAluOut)  ::
+              r(false.B)    :: r(pStaticNpc)::
+              r(aOpAdd)     :: r(aSrcAPc)  :: r(aSrcBImmU) :: r(false.B) ::
+              r(false.B)    :: l(UInt(4.W)):: r(false.B)   :: HNil)),
+
     // ---- Control Transfer Instructions ----
     (jal   , (r(true.B)     :: r(rNpc)     ::
               r(false.B)    :: r(pExeOut)  ::
@@ -138,7 +148,7 @@ class Control(width: Int) extends RawModule {
 
     (jalr  , (r(true.B)     :: r(rNpc)     ::
               r(false.B)    :: r(pExeOut)    ::
-              r(aOpAdd)     :: r(aSrcARs1) :: r(aSrcBImmJ) :: r(false.B) ::
+              r(aOpAdd)     :: r(aSrcARs1) :: r(aSrcBImmI) :: r(false.B) ::
               r(false.B)    :: l(UInt(4.W)):: r(false.B)   :: HNil)),
 
     (beq   , (r(false.B)    :: l(WriteSelect) ::
@@ -208,7 +218,7 @@ class Control(width: Int) extends RawModule {
     (addi  , (r(true.B)     :: r(rAluOut)  ::
               r(false.B)    :: r(pStaticNpc) ::
               r(aOpAdd)     :: r(aSrcARs1) :: r(aSrcBImmI) :: l(Bool())    ::
-              r(false.B)     :: l(UInt(4.W)):: r(false.B)   :: HNil)),
+              r(false.B)    :: l(UInt(4.W)):: r(false.B)   :: HNil)),
 
     (slti  , (r(true.B)     :: r(rAluOut)  ::
               r(false.B)    :: r(pStaticNpc) ::
@@ -385,10 +395,13 @@ class Flow extends Module {
   alu.in.a(lit(aSrcAZero)) := 0.U
 
   alu.in.b(lit(aSrcBRs2)) := reg.out.src(1)
-  alu.in.b(lit(aSrcBImmI)) := inst(31, 20).pad(aSrcBImmI.getWidth)
+  // alu.in.b(lit(aSrcBImmI)) := inst(31, 20).pad(aSrcBImmI.getWidth)
+  alu.in.b(lit(aSrcBImmI)) := Cat(Fill(20, inst(31)), inst(31, 20))
   alu.in.b(lit(aSrcBImmJ)) := Cat(Fill(12, inst(31)), inst(19, 12), inst(20), inst(30, 25), inst(24, 21), 0.U(1.W))
   alu.in.b(lit(aSrcBImmB)) := Cat(Fill(20, inst(31)), inst(7), inst(30, 25), inst(11, 8), inst(0))
   alu.in.b(lit(aSrcBImmS)) := Cat(inst(31), inst(19, 12), inst(20), inst(30, 25), inst(24, 21), 0.U(1.W)).pad(aSrcBImmS.getWidth)
+  alu.in.b(lit(aSrcBImmU)) := Cat(inst(31, 12), 0.U(12.W))
+  printf(cf"inst = $inst\n");
 
   Trace.traceName(pc.out);
   dontTouch(control.out)
