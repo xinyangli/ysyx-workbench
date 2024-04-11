@@ -1,5 +1,6 @@
 #ifndef _NPC_TRACER_H_
 #define _NPC_TRACER_H_
+#include "components.hpp"
 #include <filesystem>
 #include <verilated_vcd_c.h>
 
@@ -52,9 +53,12 @@ public:
     }
   }
   void reset_eval(int n) {
+    extern bool g_skip_memcheck;
+    g_skip_memcheck = true;
     this->reset = 1;
     this->eval(n);
     this->reset = 0;
+    g_skip_memcheck = false;
   }
   bool is_posedge() {
     // Will be posedge when eval is called
