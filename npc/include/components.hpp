@@ -90,11 +90,11 @@ public:
   void *guest_to_host(std::size_t addr) {
     return mem.data() + addr_to_index(addr);
   }
-  void trace(word_t addr, bool is_read) {
+  void trace(paddr_t addr, word_t value, bool is_read) {
     std::stringstream os;
     if(is_read) os << "[R] ";
     else os << "[W] ";
-    os << addr << std::endl;
+    os << addr << " " << value << std::endl;
     std::cout << os.rdbuf();
   }
 };
