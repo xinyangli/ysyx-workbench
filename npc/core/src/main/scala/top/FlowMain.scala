@@ -368,7 +368,7 @@ class Flow extends Module {
   branchInvertResult := inst(12)
   val _branchResult = Mux(branchUseSlt, alu.out.result(0), alu.out.eq)
   val branchResult = Mux(branchInvertResult, !_branchResult, _branchResult)
-  pc.control.useImmB := control.pc.useImmB && _branchResult
+  pc.control.useImmB := control.pc.useImmB && branchResult
 
   import control.reg.WriteSelect._
   reg.in.writeData(lit(rAluOut)) := alu.out.result
