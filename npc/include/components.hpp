@@ -95,7 +95,7 @@ public:
     if(is_read) os << "[R] ";
     else os << "[W] " << value << " -> ";
     os << addr << std::endl;
-    std::cout << os.rdbuf();
+    std::cout << std::hex << os.rdbuf() << std::dec;
   }
 };
 #endif
