@@ -20,11 +20,28 @@ std::ostream &operator<<(std::ostream &os, const TrmInterface &d) {
 
 namespace SDB {
 
+int SDBHandlers::exec_catch(uint64_t n) {
+  try {
+    this->funcs.exec(n);
+  } catch (TrmRuntimeException &e) {
+    switch (e.error_code()) {
+    case TrmRuntimeException::EBREAK:
+      return SDB_EBREAK;
+    case TrmRuntimeException::DIFFTEST_FAILED:
+      std::cout << "Difftest Failed" << std::endl << funcs << std::endl;
+      return SDB_DIFFTEST_FAILED;
+    default:
+      std::cerr << "Unknown error code" << std::endl;
+      exit(1);
+    }
+  }
+  return SDB_SUCCESS;
+}
+
 int SDBHandlers::cmd_continue(const cr::Console::Arguments &input) {
   if (input.size() > 1)
     return SDB_WRONG_ARGUMENT;
-  this->funcs.exec(-1);
-  return SDB_SUCCESS;
+  return exec_catch(-1);
 }
 
 int SDBHandlers::cmd_step(const std::vector<std::string> &input) {
@@ -32,14 +49,8 @@ int SDBHandlers::cmd_step(const std::vector<std::string> &input) {
     return SDB_WRONG_ARGUMENT;
   }
   uint64_t step_count = input.size() == 2 ? std::stoull(input[1]) : 1;
-  try {
-    this->funcs.exec(step_count);
-  } catch (std::runtime_error) {
-    std::cout << "Difftest Failed" << std::endl << funcs << std::endl;
-    return SDB_DIFFTEST_FAILED;
-  }
+  return exec_catch(step_count);
   // std::cout << funcs << std::endl;
-  return SDB_SUCCESS;
 }
 
 int SDBHandlers::cmd_info_registers(const std::vector<std::string> &input) {
@@ -72,7 +83,7 @@ int SDBHandlers::cmd_print(const std::vector<std::string> &input) {
   return SDB_SUCCESS;
 }
 
-void SDBHandlers::registerHandlers(cr::Console *c) {
+void SDBHandlers::register_handlers(cr::Console *c) {
   for (auto &h : this->all_handlers) {
     for (auto &name : h.names) {
       std::function<int(std::vector<std::string>)> f{
@@ -81,4 +92,5 @@ void SDBHandlers::registerHandlers(cr::Console *c) {
     }
   }
 }
+
 } // namespace SDB

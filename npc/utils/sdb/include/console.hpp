@@ -65,6 +65,13 @@ public:
   void registerCommand(const std::string &s, CommandFunction f);
 
   /**
+    * @brief This function removes a list of registered commands.
+    *
+    * @param sv The vector of command names to be removed.
+    */
+  void removeCommands(const std::vector<std::string> sv);
+
+  /**
     * @brief This function returns a list with the currently available commands.
     *
     * @return A vector containing all registered commands names.

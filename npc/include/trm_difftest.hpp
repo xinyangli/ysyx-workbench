@@ -34,19 +34,29 @@ struct DifftestTrmInterface : public TrmInterface {
       fetch_state();
     };
     exec = [this](uint64_t n) {
-      while (n--) {
+      bool enable_disasm = true;
+      if (n > 30) {
+        enable_disasm = false;
+      }
 
+      while (n--) {
         word_t pc = this->ref.at("pc");
         word_t inst = this->ref.at(pc);
-        std::cout << d.disassemble(pc, (uint8_t *)&inst, WORD_BYTES)
-                  << std::endl;
+        if (enable_disasm)
+          std::cout << d.disassemble(pc, (uint8_t *)&inst, WORD_BYTES)
+                    << std::endl;
+        if (inst == 1048691) {
+          // ebreak
+          throw TrmRuntimeException(TrmRuntimeException::EBREAK, "ebreak");
+        }
         this->ref.exec(1);
         this->dut.exec(1);
         this->ref.fetch_state();
         this->dut.fetch_state();
         if (*(CPUState *)this->ref.cpu_state !=
             *(CPUState *)this->dut.cpu_state) {
-          throw std::runtime_error("Difftest failed");
+          throw TrmRuntimeException(TrmRuntimeException::DIFFTEST_FAILED,
+                                    "Difftest failed");
         }
       }
     };

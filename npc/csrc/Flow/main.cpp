@@ -49,8 +49,10 @@ vpiHandle pc = nullptr;
 namespace NPC {
 void npc_memcpy(paddr_t addr, void *buf, size_t sz, bool direction) {
   if (direction == TRM_FROM_MACHINE) {
-    memcpy(buf, static_cast<Memory<int, 128 * 1024> *>(pmem_get())->mem.data(),
-           sz);
+    memcpy(
+        buf,
+        static_cast<Memory<int, 128 * 1024> *>(pmem_get())->guest_to_host(addr),
+        sz);
   }
 };
 
