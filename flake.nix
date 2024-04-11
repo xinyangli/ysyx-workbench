@@ -113,6 +113,7 @@
             cli11
             flex
             bison
+            ccacheStdenv
             verilator
           ];
 

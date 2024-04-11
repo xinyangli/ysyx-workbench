@@ -368,6 +368,7 @@ class Flow extends Module {
   branchInvertResult := inst(12)
   val _branchResult = Mux(branchUseSlt, alu.out.result(0), alu.out.eq)
   val branchResult = Mux(branchInvertResult, !_branchResult, _branchResult)
+  printf(cf"pc.useImmB = ${control.pc.useImmB}\n branchResult = ${branchResult}\n")
   pc.control.useImmB := control.pc.useImmB && branchResult
 
   import control.reg.WriteSelect._
@@ -404,5 +405,4 @@ class Flow extends Module {
 
   Trace.traceName(pc.out);
   dontTouch(control.out)
-  dontTouch(pc.control)
 }
