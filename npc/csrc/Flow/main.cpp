@@ -79,8 +79,8 @@ void npc_exec(uint64_t n) {
 }
 
 void npc_atexit(void) {
-  free(top);
-  free(regs);
+  delete top;
+  delete regs;
 }
 
 void npc_init(int port) {
