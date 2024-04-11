@@ -2,6 +2,7 @@
 #ifndef _NPC_COMPONENTS_H_
 #define _NPC_COMPONENTS_H_
 #include <array>
+#include <cmath>
 #include <cstdlib>
 #include <exception>
 #include <filesystem>
@@ -29,9 +30,9 @@ public:
 
 template <typename T, std::size_t n> class Memory {
   std::size_t addr_to_index(std::size_t addr) {
-    static bool is_initial = true;
-    if (is_initial) {
-      is_initial = false;
+    static int skip_initial = 3;
+    if (skip_initial) {
+      skip_initial--;
       return 0;
     }
     if (addr < 0x80000000 || addr > 0x8fffffff) {
