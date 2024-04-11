@@ -10,7 +10,6 @@
 #include <filesystem>
 #include <fstream>
 #include <sdb.hpp>
-#include <stdexcept>
 #include <trm_difftest.hpp>
 #include <trm_interface.hpp>
 #include <types.h>
@@ -65,7 +64,7 @@ void npc_regcpy(void *p, bool direction) {
   }
 }
 
-int npc_exec(uint64_t n) {
+void npc_exec(uint64_t n) {
   while (n--) {
     for (int i = 0; i < 2; i++) {
       if (top->is_posedge()) {
@@ -75,7 +74,6 @@ int npc_exec(uint64_t n) {
       top->eval();
       word_t inst = pmem_read(regs->get_pc());
       if(inst == 0x1048691)  // ebreak
-        throw std::
     }
   }
 }
