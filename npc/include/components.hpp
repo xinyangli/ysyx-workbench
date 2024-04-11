@@ -93,6 +93,8 @@ public:
     return mem.data() + addr_to_index(addr);
   }
   void trace(paddr_t addr, bool is_read, word_t value = 0) {
+    std::cout << trace_ranges.size() << std::endl;
+    std::cout << trace_ranges[0][0] << std::endl;
     for(auto &r: trace_ranges) {
       if(r[0] <= addr && r[1] >= addr) {
         std::stringstream os;
