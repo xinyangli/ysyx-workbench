@@ -91,7 +91,7 @@ public:
     return mem.data() + addr_to_index(addr);
   }
   void trace(word_t addr, bool is_read) {
-    std::ostringstream os;
+    std::stringstream os;
     if(is_read) os << "[R] ";
     else os << "[W] ";
     os << addr << std::endl;
