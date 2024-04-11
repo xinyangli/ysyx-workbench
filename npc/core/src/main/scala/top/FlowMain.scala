@@ -387,7 +387,7 @@ class Flow extends Module {
   ram.io.writeData := reg.out.src(1)
   ram.io.writeMask := control.ram.writeMask
   ram.io.writeEnable := control.ram.writeEnable
-  ram.io.valid := true.B
+  ram.io.valid := control.ram.valid
   ram.io.readAddr := alu.out.result
 
   import control.alu.SrcASelect._
