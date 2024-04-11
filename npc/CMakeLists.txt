@@ -69,16 +69,9 @@ add_subdirectory(csrc)
 
 # -- Add build tracking
 if(ENABLE_YSYX_GIT_TRACKER)
-  # add_custom_command(
-  #     TARGET V${TOPMODULE}_nvboard PRE_BUILD
-  #     COMMAND ${CMAKE_SOURCE_DIR}/../git_commit.sh "build_${CMAKE_PROJECT_NAME}_V${TOPMODULE}_nvboard"
-  #     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/..
-  # )
-
   add_custom_target(
     ysyx_git_tracer
     COMMAND ${CMAKE_SOURCE_DIR}/../git_commit.sh "build_${CMAKE_PROJECT_NAME}_V${TOPMODULE}"
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/..
   )
   add_dependencies(V${TOPMODULE} ysyx_git_tracer)
 endif()
