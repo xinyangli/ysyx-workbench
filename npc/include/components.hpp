@@ -94,7 +94,7 @@ public:
     std::ostringstream os;
     if(is_read) os << "[R] ";
     else os << "[W] ";
-    os << "addr" << std::endl;
+    os << addr << std::endl;
     std::cout << os.rdbuf();
   }
 };
