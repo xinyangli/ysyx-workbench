@@ -31,10 +31,10 @@ public:
 template <typename T, std::size_t n> class Memory {
   std::size_t addr_to_index(std::size_t addr) {
     extern bool g_skip_memcheck;
-    if (g_skip_memcheck) {
-      return 0;
-    }
     if (addr < 0x80000000 || addr > 0x87ffffff) {
+      if (g_skip_memcheck) {
+        return 0;
+      }
       std::cerr << "ACCESS " << addr << std::endl;
       throw std::runtime_error("Invalid memory access");
     }
