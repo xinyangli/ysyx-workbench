@@ -75,8 +75,7 @@ if(ENABLE_YSYX_GIT_TRACKER)
   #     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/..
   # )
 
-  add_custom_command(
-      TARGET V${TOPMODULE} PRE_BUILD
+  add_custom_target(
       COMMAND ${CMAKE_SOURCE_DIR}/../git_commit.sh "build_${CMAKE_PROJECT_NAME}_V${TOPMODULE}"
       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/..
   )
