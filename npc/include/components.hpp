@@ -92,9 +92,10 @@ public:
   }
   void trace(paddr_t addr, bool is_read, word_t value = 0) {
     std::stringstream os;
+    os << std::hex;
     if(is_read) os << "[R] ";
     else os << "[W] " << value << " -> ";
-    os << std::hex << "0x" << addr << std::dec << std::endl;
+    os  << "0x" << addr << std::dec << std::endl;
     std::cout  << os.rdbuf();
   }
 };
