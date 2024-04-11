@@ -119,7 +119,7 @@ int main(int argc, char **argv, char **env) {
   std::filesystem::path ref{config.lib_ref};
   RefTrmInterface ref_interface{ref};
   DifftestTrmInterface diff_interface{NPC::npc_interface, ref_interface,
-                                      pmem_get(), 128};
+                                      pmem_get(), 1024};
   SDB::SDB sdb_diff{diff_interface};
 
   int t = 8;

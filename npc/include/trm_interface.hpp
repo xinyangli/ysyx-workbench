@@ -6,6 +6,9 @@
 #include <stdexcept>
 #include <string>
 #include <types.h>
+#include <disasm.hpp>
+
+extern Disassembler d;
 
 template <typename R, size_t nr_reg> struct CPUStateBase {
   R reg[nr_reg] = {0};
