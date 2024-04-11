@@ -30,6 +30,7 @@ void *pmem_get() {
 
 int pmem_read(int raddr) {
   void *pmem = pmem_get();
+  std::cout << raddr << std::endl;
   auto mem = static_cast<Memory<int, 128 * 1024> *>(pmem);
   // TODO: Do memory difftest at memory read and write to diagnose at a finer
   // granularity
