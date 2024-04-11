@@ -30,12 +30,12 @@ public:
 
 template <typename T, std::size_t n> class Memory {
   std::size_t addr_to_index(std::size_t addr) {
-    static int skip_initial = 3;
-    if (skip_initial) {
-      skip_initial--;
-      return 0;
-    }
+    static int skip_initial = 10;
     if (addr < 0x80000000 || addr > 0x8fffffff) {
+      if (skip_initial) {
+        skip_initial--;
+        return 0;
+      }
       std::cerr << "ACCESS " << addr << std::endl;
       throw std::runtime_error("Invalid memory access");
     }
