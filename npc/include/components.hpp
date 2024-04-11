@@ -30,7 +30,7 @@ public:
 
 template <typename T, std::size_t n> class Memory {
   std::size_t addr_to_index(std::size_t addr) {
-    static int skip_initial = 10;
+    static int skip_initial = 4;
     if (addr < 0x80000000 || addr > 0x8fffffff) {
       if (skip_initial) {
         skip_initial--;
