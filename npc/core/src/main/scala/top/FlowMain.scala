@@ -383,10 +383,14 @@ class Flow extends Module {
 
   import control.reg.WriteSelect._
   reg.in.writeData(lit(rAluOut)) := alu.out.result
-  // 1 -> ext 8, 3 -> ext 16, 16 -> nothing
+  val maskedData = ram.io.readData & Cat(
+    Fill(8, ram.io.writeMask(3)),
+    Fill(8, ram.io.writeMask(2)),
+    Fill(8, ram.io.writeMask(1)),
+    Fill(8, ram.io.writeMask(0)))
+
   val signExt32 = control.ram.writeMask(3)
   val signExt16 = control.ram.writeMask(1)
-  val signExt8 = control.ram.writeMask(0)
   when(signExt32) {
     reg.in.writeData(lit(rMemOut)) := ram.io.readData
   }.elsewhen(signExt16) {
