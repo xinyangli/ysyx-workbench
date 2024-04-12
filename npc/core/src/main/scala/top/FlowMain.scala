@@ -401,7 +401,7 @@ class Flow extends Module {
     reg.in.writeData(lit(rMemOut)) := Cat(Fill(24, maskedData(7)), maskedData(7, 0))
     printf(cf"otherwise\n")
   }
-  printf(cf"maskedData = ${maskedData}\n")
+  printf(cf"maskedData = ${maskedData}, writeData = ${reg.in.writeData(lit(rMemOut))}\n")
   reg.in.writeData(lit(rNpc)) := npc
 
   reg.in.writeAddr := inst(11, 7)
