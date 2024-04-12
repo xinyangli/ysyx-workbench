@@ -22,6 +22,7 @@
 %parse-param { uint32_t *result }
 %left '-' '+'
 %left '*' '/'
+%expect 68
 
 %%
 input
