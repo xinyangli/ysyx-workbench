@@ -191,7 +191,7 @@ class Control(width: Int) extends RawModule {
     (lbu    , (r(true.B)    :: r(rMemOut)    ::
               r(false.B)    :: r(pStaticNpc) ::
               r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmI) :: l(Bool()) ::
-              r(true.B)     :: r(15.U(4.W))  :: r(false.B)   :: HNil)),
+              r(true.B)     :: r(0.U(4.W))  :: r(false.B)   :: HNil)),
 
     (lh     , (r(true.B)    :: r(rMemOut)    ::
               r(false.B)    :: r(pStaticNpc) ::
@@ -201,12 +201,12 @@ class Control(width: Int) extends RawModule {
     (lhu    , (r(true.B)    :: r(rMemOut)    ::
               r(false.B)    :: r(pStaticNpc) ::
               r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmI) :: l(Bool()) ::
-              r(true.B)     :: r(15.U(4.W))  :: r(false.B)   :: HNil)),
+              r(true.B)     :: r(2.U(4.W))  :: r(false.B)   :: HNil)),
 
     (lw    , (r(true.B)     :: r(rMemOut)    ::
               r(false.B)    :: r(pStaticNpc) ::
               r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmI) :: l(Bool()) ::
-              r(true.B)     :: r(15.U(4.W))  :: r(false.B)   :: HNil)),
+              r(true.B)     :: r(14.U(4.W))  :: r(false.B)   :: HNil)),
 
     (sb    , (r(false.B)    :: l(WriteSelect)::
               r(false.B)    :: r(pStaticNpc) ::
@@ -387,11 +387,11 @@ class Flow extends Module {
     Fill(8, ram.io.writeMask(3)),
     Fill(8, ram.io.writeMask(2)),
     Fill(8, ram.io.writeMask(1)),
-    Fill(8, ram.io.writeMask(0)))
+    Fill(8, 1.U(1.W)))
 
-  val signExt32 = control.ram.writeMask(3)
+  val doSignExt = ram.io.writeMask(0)
   val signExt16 = control.ram.writeMask(1)
-  when(signExt32) {
+  when(!doSignExt) {
     reg.in.writeData(lit(rMemOut)) := ram.io.readData
   }.elsewhen(signExt16) {
     reg.in.writeData(lit(rMemOut)) := Cat(Fill(16, ram.io.readData(15)), ram.io.readData(15, 0))
