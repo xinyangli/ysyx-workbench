@@ -3,7 +3,7 @@
 # NOTE: Must reconfigure if we add new files in SCALA_CORE directory
 file(GLOB_RECURSE SCALA_CORE_SOURCES "${SCALA_CORE}/src/main/scala/*.scala")
 file(GLOB_RECURSE SCALA_CORE_RESOURCES "${SCALA_CORE}/src/main/resources/*")
-message(STATUS "Found scala source file: ${SCALA_CORE_SOURCE}")
+message(STATUS "Found scala source file: ${SCALA_CORE_SOURCES}")
 set(CHISEL_DEPENDENCY ${SCALA_CORE_SOURCES} ${SCALA_CORE_RESOURCES} ${SCALA_CORE}/build.sbt)
 
 if(BUILD_USE_BLOOP)
