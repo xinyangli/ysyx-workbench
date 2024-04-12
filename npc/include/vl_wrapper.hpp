@@ -33,7 +33,6 @@ template <typename T> class VlModuleInterfaceCommon : public T {
 
 public:
   VlModuleInterfaceCommon<T>(std::filesystem::path wavefile) {
-    std::cout << wavefile << std::endl;
     if (!wavefile.empty())
       tracer = std::make_unique<Tracer<T>>(this, wavefile);
   }
