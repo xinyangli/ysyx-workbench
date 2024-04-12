@@ -328,8 +328,6 @@ class Control(width: Int) extends RawModule {
     .foreach({ case (src, dst) =>
       dst.toOption.get := src.asTypeOf(dst.toOption.get)
     })
-
-  pc.useImmB := DontCare
 }
 
 import flow.components.{RegisterFile, ProgramCounter, ALU, RamDpi}
