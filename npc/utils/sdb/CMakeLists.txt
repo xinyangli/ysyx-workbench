@@ -10,7 +10,7 @@ bison_target(PARSER addrexp.y "${PARSER_OUT}" DEFINES_FILE "${PARSER_DIR}/addrex
 add_flex_bison_dependency(LEXER PARSER)
 
 add_library(sdb OBJECT sdb.cpp console.cpp disasm.cpp "${LEXER_OUT}" "${PARSER_OUT}")
-llvm_map_components_to_libnames(LLVM_LIBS core)
+llvm_map_components_to_libnames(LLVM_LIBS core riscvinfo aarch64info x86info loongarchinfo)
 target_link_libraries(sdb PUBLIC ${LLVM_LIBS})
 target_link_libraries(sdb PRIVATE ${Readline_LIBRARY})
 target_include_directories(sdb PRIVATE ${PARSER_DIR})
