@@ -282,7 +282,7 @@ class Control(width: Int) extends RawModule {
 
     (sltu  , (r(true.B)     :: r(rAluOut)  ::
               r(false.B)    :: r(pStaticNpc) ::
-              r(aOpSlt)     :: r(aSrcARs1) :: r(aSrcBRs2)  :: r(false.B) ::
+              r(aOpSltu)     :: r(aSrcARs1) :: r(aSrcBRs2)  :: r(false.B) ::
               r(false.B)     :: l(UInt(4.W)):: r(false.B)   :: HNil)),
 
     (xor   , (r(true.B)     :: r(rAluOut)  ::
