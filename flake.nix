@@ -67,7 +67,6 @@
           cmakeFlags = [
             (pkgs.lib.cmakeFeature "ISA" "riscv")
             (pkgs.lib.cmakeFeature "PLATFORM" "nemu")
-            (pkgs.lib.cmakeFeature "CMAKE_INSTALL_DATADIR" "share")
           ];
 
           buildInputs = [

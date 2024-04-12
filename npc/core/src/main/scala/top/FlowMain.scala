@@ -409,7 +409,6 @@ class Flow extends Module {
   reg.in.rs(1) := inst(24, 20) // rs2
 
   // TODO: Bulk connection here
-  // FIXME: The following 2 lines won't compile with bloop
   ram.io.clock := clock
   ram.io.reset := reset
   ram.io.writeAddr := alu.out.result
