@@ -16,13 +16,12 @@ module RamDpi (
 );
   always @(*) begin
     if (valid) begin // 有读写请求时
-      readData = pmem_read(readAddr);
       assign readDataFull = pmem_read(readAddr);
       readData = {
-        readDataFull[15:12] & {3{writeMask[3]}, writeMask[3] },
-        readDataFull[11:8] & {3{writeMask[2]}, writeMask[2] },
-        readDataFull[7:4] & {3{writeMask[1]}, writeMask[1] },
-        readDataFull[3:0] & {3{writeMask[0]}, writeMask[0] }, 
+        readDataFull[15:12] & {{3{writeMask[3]}}, writeMask[3] },
+        readDataFull[11:8] & {{3{writeMask[2]}}, writeMask[2] },
+        readDataFull[7:4] & {{3{writeMask[1]}}, writeMask[1] },
+        readDataFull[3:0] & {{3{writeMask[0]}}, writeMask[0] }, 
       };
       if (writeEnable) begin // 有写请求时
         pmem_write(writeAddr, writeData, { 4'h0, writeMask });
