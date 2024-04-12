@@ -388,7 +388,7 @@ class Flow extends Module {
     Fill(8, ram.io.writeMask(2)),
     Fill(8, ram.io.writeMask(1)),
     "b11111111".U)
-  // printf(cf"maskedData = ${maskedData}\n")
+  printf(cf"maskedData = ${maskedData}\n")
 
   val doSignExt = control.ram.writeMask(0)
   val signExt16 = control.ram.writeMask(1)
