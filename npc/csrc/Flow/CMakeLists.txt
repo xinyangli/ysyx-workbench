@@ -1,5 +1,5 @@
 include(ChiselBuild)
-add_executable(V${TOPMODULE} config.cpp main.cpp)
+add_executable(V${TOPMODULE} config.cpp main.cpp ${CHISEL_OUTPUT_TOPMODULE})
 target_link_libraries(V${TOPMODULE} PRIVATE sdb)
 
 verilate(V${TOPMODULE} TRACE COVERAGE THREADS
