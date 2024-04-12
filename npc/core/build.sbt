@@ -26,5 +26,4 @@ lazy val root = (project in file("."))
       "-Ymacro-annotations",
     ),
     addCompilerPlugin("org.chipsalliance" % "chisel-plugin" % chiselVersion cross CrossVersion.full),
-    addSbtPlugin("ch.epfl.scala" % "sbt-bloop" % "1.5.17")
   )
