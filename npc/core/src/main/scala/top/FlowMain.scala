@@ -361,6 +361,7 @@ class Flow extends Module {
   reg.control <> control.reg
   // FIXME: Probably optimizable with bulk connection
   pc.control <> control.pc
+  pc.control.useImmB := control.pc.useImmB
   alu.control <> control.alu
   val branchUseSlt = Wire(Bool())
   val branchInvertResult = Wire(Bool())
