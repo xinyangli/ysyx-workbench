@@ -186,17 +186,17 @@ class Control(width: Int) extends RawModule {
     (lb    , (r(true.B)     :: r(rMemOut)    ::
               r(false.B)    :: r(pStaticNpc) ::
               r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmI) :: l(Bool()) ::
-              r(true.B)     :: l(UInt(4.W))  :: r(false.B)   :: HNil)),
+              r(true.B)     :: r(1.U(4.W))  :: r(false.B)   :: HNil)),
 
     (lh    , (r(true.B)     :: r(rMemOut)    ::
               r(false.B)    :: r(pStaticNpc) ::
               r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmI) :: l(Bool()) ::
-              r(true.B)     :: l(UInt(4.W))  :: r(false.B)   :: HNil)),
+              r(true.B)     :: r(3.U(4.W))  :: r(false.B)   :: HNil)),
 
     (lw    , (r(true.B)     :: r(rMemOut)    ::
               r(false.B)    :: r(pStaticNpc) ::
               r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmI) :: l(Bool()) ::
-              r(true.B)     :: l(UInt(4.W))  :: r(false.B)   :: HNil)),
+              r(true.B)     :: r(15.U(4.W))  :: r(false.B)   :: HNil)),
 
     (sb    , (r(false.B)    :: l(WriteSelect)::
               r(false.B)    :: r(pStaticNpc) ::
