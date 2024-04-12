@@ -23,6 +23,8 @@ class RamControlInterface(addrWidth: Int) extends Bundle {
  *        We need a way to merge two bundles together
  */
 class RamInterface[T <: Data](tpe: T, addrWidth: Int) extends RamControlInterface(addrWidth) {
+  val clock = Input(Clock())
+  val reset = Input(Reset())
   val writeAddr = Input(UInt(addrWidth.W))
   val writeData = Input(tpe)
   val readAddr = Input(UInt(addrWidth.W))

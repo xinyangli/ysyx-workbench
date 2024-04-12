@@ -152,33 +152,33 @@ class Control(width: Int) extends RawModule {
               r(false.B)    :: l(UInt(4.W)):: r(false.B)   :: HNil)),
 
     (beq   , (r(false.B)    :: l(WriteSelect) ::
-              r(true.B)     :: r(pExeOut)     ::
-              r(aOpSlt)     :: r(aSrcAPc)  :: r(aSrcBImmB) :: l(Bool())    ::
+              r(true.B)     :: r(pStaticNpc)     ::
+              r(aOpSlt)     :: r(aSrcARs1)  :: r(aSrcBRs2) :: l(Bool())    ::
               r(false.B)    :: l(UInt(4.W)):: r(false.B)   :: HNil)),
 
     (bne   , (r(false.B)    :: l(WriteSelect) ::
-              r(true.B)     :: r(pExeOut)     ::
-              r(aOpSlt)     :: r(aSrcAPc)  :: r(aSrcBImmB) :: l(Bool())    ::
+              r(true.B)     :: r(pStaticNpc)     ::
+              r(aOpSlt)     :: r(aSrcARs1)  :: r(aSrcBRs2) :: l(Bool())    ::
               r(false.B)    :: l(UInt(4.W)):: r(false.B)   :: HNil)),
 
     (blt   , (r(false.B)    :: l(WriteSelect) ::
-              r(true.B)     :: r(pExeOut)     ::
-              r(aOpSlt)     :: r(aSrcAPc)  :: r(aSrcBImmB) :: r(true.B)  ::
+              r(true.B)     :: r(pStaticNpc)     ::
+              r(aOpSlt)     :: r(aSrcARs1)  :: r(aSrcBRs2) :: r(true.B)  ::
               r(false.B)    :: l(UInt(4.W)):: r(false.B)   :: HNil)),
 
     (bge   , (r(false.B)    :: l(WriteSelect) ::
-              r(true.B)     :: r(pExeOut)     ::
-              r(aOpSlt)     :: r(aSrcAPc)  :: r(aSrcBImmB) :: r(true.B)  ::
+              r(true.B)     :: r(pStaticNpc)     ::
+              r(aOpSlt)     :: r(aSrcARs1)  :: r(aSrcBRs2) :: r(true.B)  ::
               r(false.B)    :: l(UInt(4.W)):: r(false.B)   :: HNil)),
 
     (bltu  , (r(false.B)    :: l(WriteSelect)::
-              r(true.B)     :: r(pExeOut)    ::
-              r(aOpSlt)     :: r(aSrcAPc)    :: r(aSrcBImmB) :: r(false.B) ::
+              r(true.B)     :: r(pStaticNpc)    ::
+              r(aOpSltu)     :: r(aSrcARs1)    :: r(aSrcBRs2) :: r(false.B) ::
               r(false.B)    :: l(UInt(4.W))  :: r(false.B)   :: HNil)),
 
     (bgeu  , (r(false.B)    :: l(WriteSelect)::
-              r(true.B)     :: r(pExeOut)    ::
-              r(aOpSlt)     :: r(aSrcAPc)    :: r(aSrcBImmB) :: r(false.B) ::
+              r(true.B)     :: r(pStaticNpc)    ::
+              r(aOpSltu)     :: r(aSrcARs1)    :: r(aSrcBRs2) :: r(false.B) ::
               r(false.B)    :: l(UInt(4.W))  :: r(false.B)   :: HNil)),
 
     // ---- Memory Access Instructions ----
@@ -186,32 +186,42 @@ class Control(width: Int) extends RawModule {
     (lb    , (r(true.B)     :: r(rMemOut)    ::
               r(false.B)    :: r(pStaticNpc) ::
               r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmI) :: l(Bool()) ::
-              r(true.B)     :: l(UInt(4.W))  :: r(false.B)   :: HNil)),
+              r(true.B)     :: r(1.U(4.W))  :: r(false.B)   :: HNil)),
 
-    (lh    , (r(true.B)     :: r(rMemOut)    ::
+    (lbu    , (r(true.B)    :: r(rMemOut)    ::
               r(false.B)    :: r(pStaticNpc) ::
               r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmI) :: l(Bool()) ::
-              r(true.B)     :: l(UInt(4.W))  :: r(false.B)   :: HNil)),
+              r(true.B)     :: r(0.U(4.W))  :: r(false.B)   :: HNil)),
+
+    (lh     , (r(true.B)    :: r(rMemOut)    ::
+              r(false.B)    :: r(pStaticNpc) ::
+              r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmI) :: l(Bool()) ::
+              r(true.B)     :: r(3.U(4.W))  :: r(false.B)   :: HNil)),
+
+    (lhu    , (r(true.B)    :: r(rMemOut)    ::
+              r(false.B)    :: r(pStaticNpc) ::
+              r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmI) :: l(Bool()) ::
+              r(true.B)     :: r(2.U(4.W))  :: r(false.B)   :: HNil)),
 
     (lw    , (r(true.B)     :: r(rMemOut)    ::
               r(false.B)    :: r(pStaticNpc) ::
               r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmI) :: l(Bool()) ::
-              r(true.B)     :: l(UInt(4.W))  :: r(false.B)   :: HNil)),
+              r(true.B)     :: r(14.U(4.W))  :: r(false.B)   :: HNil)),
 
     (sb    , (r(false.B)    :: l(WriteSelect)::
               r(false.B)    :: r(pStaticNpc) ::
-              r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmI) :: l(Bool()) ::
-              r(true.B)     :: r(1.U(4.W))   :: r(false.B)   :: HNil)),
+              r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmS) :: l(Bool()) ::
+              r(true.B)     :: r(1.U(4.W))   :: r(true.B)   :: HNil)),
 
     (sh    , (r(false.B)    :: l(WriteSelect)::
               r(false.B)    :: r(pStaticNpc) ::
-              r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmI) :: l(Bool()) ::
-              r(true.B)     :: r(3.U(4.W))   :: r(false.B)   :: HNil)),
+              r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmS) :: l(Bool()) ::
+              r(true.B)     :: r(3.U(4.W))   :: r(true.B)   :: HNil)),
 
     (sw    , (r(false.B)    :: l(WriteSelect)::
               r(false.B)    :: r(pStaticNpc) ::
-              r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmI) :: l(Bool()) ::
-              r(true.B)     :: r(15.U(4.W))  :: r(false.B)   :: HNil)),
+              r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmS) :: l(Bool()) ::
+              r(true.B)     :: r(15.U(4.W))  :: r(true.B)   :: HNil)),
 
     // ---- Integer Computational Instructions ---
 
@@ -227,7 +237,7 @@ class Control(width: Int) extends RawModule {
 
     (sltiu , (r(true.B)     :: r(rAluOut)  ::
               r(false.B)    :: r(pStaticNpc) ::
-              r(aOpSlt)     :: r(aSrcARs1) :: r(aSrcBImmI) :: r(false.B) ::
+              r(aOpSltu)     :: r(aSrcARs1) :: r(aSrcBImmI) :: r(false.B) ::
               r(false.B)     :: l(UInt(4.W)):: r(false.B)   :: HNil)),
 
     (xori  , (r(true.B)     :: r(rAluOut)  ::
@@ -282,7 +292,7 @@ class Control(width: Int) extends RawModule {
 
     (sltu  , (r(true.B)     :: r(rAluOut)  ::
               r(false.B)    :: r(pStaticNpc) ::
-              r(aOpSlt)     :: r(aSrcARs1) :: r(aSrcBRs2)  :: r(false.B) ::
+              r(aOpSltu)     :: r(aSrcARs1) :: r(aSrcBRs2)  :: r(false.B) ::
               r(false.B)     :: l(UInt(4.W)):: r(false.B)   :: HNil)),
 
     (xor   , (r(true.B)     :: r(rAluOut)  ::
@@ -328,8 +338,6 @@ class Control(width: Int) extends RawModule {
     .foreach({ case (src, dst) =>
       dst.toOption.get := src.asTypeOf(dst.toOption.get)
     })
-
-  pc.useImmB := DontCare
 }
 
 import flow.components.{RegisterFile, ProgramCounter, ALU, RamDpi}
@@ -355,37 +363,60 @@ class Flow extends Module {
   val npc = Wire(dataType)
   npc := pc.out + 4.U
   pc.in.exeOut := alu.out.result
-  pc.in.immB := Cat(Fill(20, inst(31)), inst(7), inst(30, 25), inst(11, 8), inst(0))
+  pc.in.immB := Cat(Fill(20, inst(31)), inst(7), inst(30, 25), inst(11, 8), 0.U(1.W))
 
   control.inst := inst
   reg.control <> control.reg
   // FIXME: Probably optimizable with bulk connection
   pc.control <> control.pc
+  pc.control.useImmB := control.pc.useImmB
   alu.control <> control.alu
   val branchUseSlt = Wire(Bool())
   val branchInvertResult = Wire(Bool())
   branchUseSlt := inst(14)
   branchInvertResult := inst(12)
   val _branchResult = Mux(branchUseSlt, alu.out.result(0), alu.out.eq)
-  val branchResult = Mux(branchInvertResult, _branchResult, !_branchResult)
-  pc.control.useImmB := control.pc.useImmB && _branchResult
+  val branchResult = Mux(branchInvertResult, !_branchResult, _branchResult)
+  pc.control.useImmB := control.pc.useImmB && branchResult
+  // printf(cf"_branchResult = ${_branchResult}, branchResult = ${branchResult}\n")
+  // printf(cf"pcin.useImmB = ${pc.control.useImmB}, control.out.useImmB = ${control.pc.useImmB} \n")
 
   import control.reg.WriteSelect._
   reg.in.writeData(lit(rAluOut)) := alu.out.result
-  // TODO: Read address in load command goes here
-  reg.in.writeData(lit(rMemOut)) := ram.io.readData
+  val maskedData = ram.io.readData & Cat(
+    Fill(8, ram.io.writeMask(3)),
+    Fill(8, ram.io.writeMask(2)),
+    Fill(8, ram.io.writeMask(1)),
+    "b11111111".U)
+
+  val doSignExt = control.ram.writeMask(0)
+  val signExt16 = control.ram.writeMask(1)
+  when(!doSignExt) {
+    reg.in.writeData(lit(rMemOut)) := maskedData
+    // printf(cf"!doSignExt\n")
+  }.elsewhen(signExt16) {
+    reg.in.writeData(lit(rMemOut)) := Cat(Fill(16, maskedData(15)), maskedData(15, 0))
+    // printf(cf"elsewhen\n")
+  }.otherwise {
+    reg.in.writeData(lit(rMemOut)) := Cat(Fill(24, maskedData(7)), maskedData(7, 0))
+    // printf(cf"otherwise\n")
+  }
+  // printf(cf"maskedData = ${maskedData}, writeData = ${reg.in.writeData(lit(rMemOut))}\n")
   reg.in.writeData(lit(rNpc)) := npc
 
   reg.in.writeAddr := inst(11, 7)
   reg.in.rs(0) := inst(19, 15) // rs1
   reg.in.rs(1) := inst(24, 20) // rs2
 
-  // TODO: Memory write goes here
+  // TODO: Bulk connection here
+  // FIXME: The following 2 lines won't compile with bloop
+  ram.io.clock := clock
+  ram.io.reset := reset
   ram.io.writeAddr := alu.out.result
   ram.io.writeData := reg.out.src(1)
   ram.io.writeMask := control.ram.writeMask
   ram.io.writeEnable := control.ram.writeEnable
-  ram.io.valid := true.B
+  ram.io.valid := control.ram.valid
   ram.io.readAddr := alu.out.result
 
   import control.alu.SrcASelect._
@@ -398,11 +429,9 @@ class Flow extends Module {
   // alu.in.b(lit(aSrcBImmI)) := inst(31, 20).pad(aSrcBImmI.getWidth)
   alu.in.b(lit(aSrcBImmI)) := Cat(Fill(20, inst(31)), inst(31, 20))
   alu.in.b(lit(aSrcBImmJ)) := Cat(Fill(12, inst(31)), inst(19, 12), inst(20), inst(30, 25), inst(24, 21), 0.U(1.W))
-  alu.in.b(lit(aSrcBImmB)) := Cat(Fill(20, inst(31)), inst(7), inst(30, 25), inst(11, 8), inst(0))
-  alu.in.b(lit(aSrcBImmS)) := Cat(inst(31), inst(19, 12), inst(20), inst(30, 25), inst(24, 21), 0.U(1.W)).pad(aSrcBImmS.getWidth)
+  alu.in.b(lit(aSrcBImmS)) := Cat(Fill(20, inst(31)), inst(31), inst(30, 25), inst(11, 8), inst(7))
   alu.in.b(lit(aSrcBImmU)) := Cat(inst(31, 12), 0.U(12.W))
-  printf(cf"inst = $inst\n");
 
-  Trace.traceName(pc.out);
+  Trace.traceName(pc.out)
   dontTouch(control.out)
 }

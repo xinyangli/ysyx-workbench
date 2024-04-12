@@ -180,7 +180,7 @@ config ITRACE_BUFFER
   default 10
 
 config MTRACE
-  depends on TRACE && TARGET_NATIVE_ELF && ENGINE_INTERPRETER
+  depends on TRACE
   bool "Enable memory tracing"
   default n
 

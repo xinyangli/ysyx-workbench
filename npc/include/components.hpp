@@ -4,6 +4,7 @@
 #include "types.h"
 #include <array>
 #include <cmath>
+#include <cstdint>
 #include <cstdlib>
 #include <exception>
 #include <filesystem>
@@ -32,18 +33,6 @@ public:
 };
 
 template <typename T, std::size_t n> class Memory {
-  std::size_t addr_to_index(std::size_t addr) {
-    extern bool g_skip_memcheck;
-    if (g_skip_memcheck) {
-      return 0;
-    }
-    if (addr < 0x80000000 || addr > 0x87ffffff) {
-      std::cerr << std::hex << "ACCESS " << addr << std::dec << std::endl;
-      throw std::runtime_error("Invalid memory access");
-    }
-    // Linear mapping
-    return (addr >> 2) - 0x20000000;
-  }
   uint32_t expand_bits(uint8_t bits) {
     uint32_t x = bits;
     x = (x | (x << 7) | (x << 14) | (x << 21)) & 0x01010101;
@@ -77,9 +66,9 @@ public:
   /**
    * Always reads and returns 4 bytes from the address raddr & ~0x3u.
    */
-  T read(int raddr) {
+  T read(paddr_t raddr) {
     // printf("raddr: 0x%x\n", raddr);
-    return mem[addr_to_index((uint32_t)raddr)];
+    return *(word_t *)guest_to_host(raddr);
   }
   /**
    * Always writes to the 4 bytes at the address `waddr` & ~0x3u.
@@ -87,12 +76,27 @@ public:
    * For example, wmask = 0x3 means only the lowest 2 bytes are written,
    * and the other bytes in memory remain unchanged.
    */
-  void write(int waddr, T wdata, char wmask) {
+  void write(paddr_t waddr, T wdata, char wmask) {
     // printf("waddr: 0x%x\n", waddr);
-    mem[addr_to_index((uint32_t)waddr)] = expand_bits(wmask) & wdata;
+    uint8_t *p_data = (uint8_t *)&wdata;
+    while (wmask & 0x1) {
+      memcpy(guest_to_host(waddr), p_data, 1);
+      waddr++;
+      p_data++;
+      wmask >>= 1;
+    }
   }
   void *guest_to_host(std::size_t addr) {
-    return mem.data() + addr_to_index(addr);
+    extern bool g_skip_memcheck;
+    if (g_skip_memcheck) {
+      return mem.data();
+    }
+    if (addr < 0x80000000 || addr > 0x87ffffff) {
+      std::cerr << std::hex << "ACCESS " << addr << std::dec << std::endl;
+      throw std::runtime_error("Invalid memory access");
+    }
+    // Linear mapping
+    return (uint8_t *)(mem.data() + (addr >> 2) - 0x20000000) + (addr & 0x3);
   }
   void trace(paddr_t addr, bool is_read, word_t pc = 0, word_t value = 0) {
     for (auto &r : trace_ranges) {

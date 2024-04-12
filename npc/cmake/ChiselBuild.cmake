@@ -3,6 +3,7 @@
 # NOTE: Must reconfigure if we add new files in SCALA_CORE directory
 file(GLOB_RECURSE SCALA_CORE_SOURCES "${SCALA_CORE}/src/main/scala/*.scala")
 file(GLOB_RECURSE SCALA_CORE_RESOURCES "${SCALA_CORE}/src/main/resources/*")
+message(STATUS "Found scala source file: ${SCALA_CORE_SOURCES}")
 set(CHISEL_DEPENDENCY ${SCALA_CORE_SOURCES} ${SCALA_CORE_RESOURCES} ${SCALA_CORE}/build.sbt)
 
 if(BUILD_USE_BLOOP)
@@ -39,7 +40,7 @@ else()
     COMMAND sbt "run ${CHISEL_EMIT_ARGS}"
     COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different ${CHISEL_OUTPUT_TMP_DIR} ${CHISEL_OUTPUT_DIR}
     WORKING_DIRECTORY ${SCALA_CORE}
-    # DEPENDS ${CHISEL_DEPENDENCY} test.scala
+    DEPENDS ${CHISEL_DEPENDENCY}
     VERBATIM
     COMMENT "Run sbt from CMake"
   )

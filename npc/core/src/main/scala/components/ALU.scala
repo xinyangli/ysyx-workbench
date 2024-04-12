@@ -6,13 +6,13 @@ import shapeless.{HNil, ::}
 
 class ALUControlInterface extends Bundle {
   object OpSelect extends ChiselEnum {
-    val aOpAdd, aOpSub, aOpNot, aOpAnd, aOpOr, aOpXor, aOpSlt, aOpSll, aOpSrl, aOpSra = Value
+    val aOpAdd, aOpSub, aOpNot, aOpAnd, aOpOr, aOpXor, aOpSlt, aOpSltu, aOpSll, aOpSrl, aOpSra = Value
   }
   object SrcASelect extends ChiselEnum {
     val aSrcARs1, aSrcAPc, aSrcAZero = Value
   }
   object SrcBSelect extends ChiselEnum {
-    val aSrcBRs2, aSrcBImmI, aSrcBImmJ, aSrcBImmB, aSrcBImmS, aSrcBImmU = Value
+    val aSrcBRs2, aSrcBImmI, aSrcBImmJ, aSrcBImmS, aSrcBImmU = Value
   }
   val op = Input(OpSelect())
   val srcASelect = Input(SrcASelect())
@@ -45,7 +45,8 @@ class ALU[T <: UInt](tpe: T) extends Module {
   val not = ~a
   val or = a | b
   val xor = a ^ b
-  val slt = a < b
+  val slt = a.asSInt < b.asSInt
+  val sltu = a < b
   val sll = a << b(log2Ceil(tpe.getWidth), 0)
   val srl = a >> b(log2Ceil(tpe.getWidth), 0)
   val sra = a.asSInt >> b(log2Ceil(tpe.getWidth), 0)
@@ -61,6 +62,7 @@ class ALU[T <: UInt](tpe: T) extends Module {
     aOpOr  -> or,
     aOpXor -> xor,
     aOpSlt -> slt,
+    aOpSltu -> sltu,
     aOpSll -> sll,
     aOpSrl -> srl,
     aOpSra -> sra.asUInt
