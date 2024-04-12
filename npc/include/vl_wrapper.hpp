@@ -1,5 +1,6 @@
 #ifndef _NPC_TRACER_H_
 #define _NPC_TRACER_H_
+#include "components.hpp"
 #include <filesystem>
 #include <verilated_vcd_c.h>
 
@@ -19,7 +20,8 @@ public:
   ~Tracer() { m_trace->close(); }
 
   /**
-   * @brief: Dump signals to waveform file. Must be called once after every top->eval() call.
+   * Dump signals to waveform file. Must be called once after every top->eval()
+   * call.
    */
   void update() { m_trace->dump(cycle++); }
 };
@@ -30,9 +32,8 @@ template <typename T> class VlModuleInterfaceCommon : public T {
   std::unique_ptr<Tracer<T>> tracer;
 
 public:
-  VlModuleInterfaceCommon<T>(bool do_trace,
-                             std::filesystem::path wavefile = "waveform.vcd") {
-    if (do_trace)
+  VlModuleInterfaceCommon<T>(std::filesystem::path wavefile) {
+    if (!wavefile.empty())
       tracer = std::make_unique<Tracer<T>>(this, wavefile);
   }
   void eval() {
@@ -51,9 +52,12 @@ public:
     }
   }
   void reset_eval(int n) {
+    extern bool g_skip_memcheck;
+    g_skip_memcheck = true;
     this->reset = 1;
     this->eval(n);
     this->reset = 0;
+    g_skip_memcheck = false;
   }
   bool is_posedge() {
     // Will be posedge when eval is called

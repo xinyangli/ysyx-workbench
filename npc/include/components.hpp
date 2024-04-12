@@ -1,15 +1,19 @@
 
 #ifndef _NPC_COMPONENTS_H_
 #define _NPC_COMPONENTS_H_
+#include "types.h"
 #include <array>
+#include <cmath>
 #include <cstdlib>
 #include <exception>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <sstream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 template <typename T, std::size_t nr> class _RegistersBase {
   std::array<T, nr> regs;
@@ -29,8 +33,13 @@ public:
 
 template <typename T, std::size_t n> class Memory {
   std::size_t addr_to_index(std::size_t addr) {
-    if (addr < 0x80000000) {
+    extern bool g_skip_memcheck;
+    if (g_skip_memcheck) {
       return 0;
+    }
+    if (addr < 0x80000000 || addr > 0x87ffffff) {
+      std::cerr << std::hex << "ACCESS " << addr << std::dec << std::endl;
+      throw std::runtime_error("Invalid memory access");
     }
     // Linear mapping
     return (addr >> 2) - 0x20000000;
@@ -45,7 +54,10 @@ template <typename T, std::size_t n> class Memory {
 
 public:
   std::array<T, n> mem;
-  Memory(std::filesystem::path filepath, bool is_binary = true) {
+  std::vector<std::array<uint64_t, 2>> trace_ranges;
+  Memory(std::filesystem::path filepath, bool is_binary,
+         std::vector<std::array<uint64_t, 2>> &&trace_ranges)
+      : trace_ranges(std::move(trace_ranges)) {
     if (!std::filesystem::exists(filepath))
       throw std::runtime_error("Memory file not found");
     if (is_binary) {
@@ -81,6 +93,23 @@ public:
   }
   void *guest_to_host(std::size_t addr) {
     return mem.data() + addr_to_index(addr);
+  }
+  void trace(paddr_t addr, bool is_read, word_t pc = 0, word_t value = 0) {
+    for (auto &r : trace_ranges) {
+      if (r[0] <= addr && r[1] >= addr) {
+        std::stringstream os;
+        os << std::hex;
+        if (pc != 0)
+          os << "0x" << pc << " ";
+        if (is_read)
+          os << "[R] ";
+        else
+          os << "[W] " << value << " -> ";
+        os << "0x" << addr << std::dec << std::endl;
+        std::cout << os.rdbuf();
+        break;
+      }
+    }
   }
 };
 #endif

@@ -1,5 +1,6 @@
 #include <components.hpp>
 #include <console.hpp>
+#include <cstdint>
 #include <disasm.hpp>
 #include <sdb.hpp>
 #include <stdexcept>
@@ -17,6 +18,8 @@ std::ostream &operator<<(std::ostream &os, const TrmInterface &d) {
   d.print(os);
   return os;
 };
+
+Disassembler d{"riscv32-linux-pc-gnu"};
 
 namespace SDB {
 
@@ -80,6 +83,21 @@ int SDBHandlers::cmd_print(const std::vector<std::string> &input) {
   // TODO: Difftest only
   std::cout << std::hex << "dut: 0x" << buf[0] << ' ' << "ref: 0x" << buf[1]
             << std::dec << std::endl;
+  return SDB_SUCCESS;
+}
+
+int SDBHandlers::cmd_disassemble(const std::vector<std::string> &input) {
+  word_t buf[2];
+  word_t addr = parse_expr(input[1].c_str());
+  this->funcs.memcpy(addr, &buf, sizeof(word_t), TRM_FROM_MACHINE);
+  // TODO: Difftest only
+  std::cout << "dut: \n"
+            << d.disassemble(addr, (uint8_t *)&buf[0], sizeof(word_t))
+            << std::endl
+            << "ref: \n"
+            << d.disassemble(addr, (uint8_t *)&buf[0], sizeof(word_t))
+            << std::endl;
+  ;
   return SDB_SUCCESS;
 }
 

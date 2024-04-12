@@ -1,29 +1,35 @@
 #include "VFlow___024root.h"
-#include "config.hpp"
-#include "disasm.hpp"
-#include "vl_wrapper.hpp"
-#include "vpi_user.h"
-#include "vpi_wrapper.hpp"
 #include <VFlow.h>
+#include <config.hpp>
 #include <cstdint>
 #include <cstdlib>
+#include <disasm.hpp>
 #include <filesystem>
 #include <fstream>
 #include <sdb.hpp>
 #include <trm_difftest.hpp>
 #include <trm_interface.hpp>
 #include <types.h>
+#include <vl_wrapper.hpp>
+#include <vpi_user.h>
+#include <vpi_wrapper.hpp>
 
 using VlModule = VlModuleInterfaceCommon<VFlow>;
 using Registers = _RegistersVPI<uint32_t, 32>;
 
 // SDB::SDB<NPC::npc_interface> sdb_dut;
 using CPUState = CPUStateBase<uint32_t, 32>;
+bool g_skip_memcheck = false;
 CPUState npc_cpu;
+VlModule *top;
+Registers *regs;
+vpiHandle pc = nullptr;
+
 extern "C" {
 void *pmem_get() {
-  static auto pmem = new Memory<int, 128 * 1024>(config.memory_file,
-                                                 config.memory_file_binary);
+  static auto pmem =
+      new Memory<int, 128 * 1024>(config.memory_file, config.memory_file_binary,
+                                  std::move(config.mtrace_ranges));
   return pmem;
 }
 
@@ -32,19 +38,19 @@ int pmem_read(int raddr) {
   auto mem = static_cast<Memory<int, 128 * 1024> *>(pmem);
   // TODO: Do memory difftest at memory read and write to diagnose at a finer
   // granularity
+  if (config.do_mtrace)
+    mem->trace(raddr, true, regs->get_pc());
   return mem->read(raddr);
 }
 
 void pmem_write(int waddr, int wdata, char wmask) {
   void *pmem = pmem_get();
   auto mem = static_cast<Memory<int, 128 * 1024> *>(pmem);
+  if (config.do_mtrace)
+    mem->trace((std::size_t)waddr, false, regs->get_pc(), wdata);
   return mem->write((std::size_t)waddr, wdata, wmask);
 }
 }
-
-VlModule *top;
-Registers *regs;
-vpiHandle pc = nullptr;
 
 namespace NPC {
 void npc_memcpy(paddr_t addr, void *buf, size_t sz, bool direction) {
@@ -78,10 +84,15 @@ void npc_exec(uint64_t n) {
   }
 }
 
+void npc_atexit(void) {
+  delete top;
+  delete regs;
+}
+
 void npc_init(int port) {
-  //   top = std::make_unique<VlModule>(config.do_trace, config.wavefile);
-  top = new VlModule{config.do_trace, config.wavefile};
+  top = new VlModule{config.wavefile};
   regs = new Registers("TOP.Flow.reg_0.regFile_", "TOP.Flow.pc.out");
+  atexit(npc_atexit);
   top->reset_eval(10);
 }
 
@@ -115,15 +126,19 @@ word_t reg_str2val(const char *name, bool *success) {
 int main(int argc, char **argv, char **env) {
   config.cli_parse(argc, argv);
 
-  /* -- Difftest -- */
-  std::filesystem::path ref{config.lib_ref};
-  RefTrmInterface ref_interface{ref};
-  DifftestTrmInterface diff_interface{NPC::npc_interface, ref_interface,
-                                      pmem_get(), 128};
-  SDB::SDB sdb_diff{diff_interface};
+  if (config.max_sim_time > 1) {
+    NPC::npc_interface.exec(config.max_sim_time / 2);
+  } else {
+    /* -- Difftest -- */
+    std::filesystem::path ref{config.lib_ref};
+    RefTrmInterface ref_interface{ref};
+    DifftestTrmInterface diff_interface{NPC::npc_interface, ref_interface,
+                                        pmem_get(), 1024};
+    SDB::SDB sdb_diff{diff_interface};
 
-  int t = 8;
-  sdb_diff.main_loop();
+    int t = 8;
+    sdb_diff.main_loop();
+  }
 
   return 0;
 }
