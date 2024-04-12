@@ -25,11 +25,14 @@
 #endif
 
 Disassembler::Disassembler(std::string triple) : triple(triple) {
-  llvm::InitializeAllTargetInfos();
-  llvm::InitializeAllTargetMCs();
-  llvm::InitializeAllAsmParsers();
-  llvm::InitializeAllDisassemblers();
-
+  // llvm::InitializeAllTargetInfos();
+  // llvm::InitializeAllTargetMCs();
+  // llvm::InitializeAllAsmParsers();
+  // llvm::InitializeAllDisassemblers();
+  LLVMInitializeRISCVTargetInfo();
+  LLVMInitializeRISCVTargetMC();
+  LLVMInitializeRISCVAsmParser();
+  LLVMInitializeRISCVDisassembler();
   std::string errstr;
 
   llvm::MCInstrInfo *gMII = nullptr;
