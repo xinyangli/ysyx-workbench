@@ -387,7 +387,7 @@ class Flow extends Module {
     Fill(8, ram.io.writeMask(3)),
     Fill(8, ram.io.writeMask(2)),
     Fill(8, ram.io.writeMask(1)),
-    Fill(8, 1.U(1.W)))
+    "b11111111".U)
 
   val doSignExt = control.ram.writeMask(0)
   val signExt16 = control.ram.writeMask(1)
