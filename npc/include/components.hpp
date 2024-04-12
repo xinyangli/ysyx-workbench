@@ -79,7 +79,7 @@ public:
   void write(paddr_t waddr, T wdata, char wmask) {
     // printf("waddr: 0x%x\n", waddr);
     uint8_t *p_data = (uint8_t *)&wdata;
-    while(wmask & 0x1) {
+    while (wmask & 0x1) {
       memcpy(guest_to_host(waddr), p_data, 1);
       waddr++;
       p_data++;
@@ -96,7 +96,7 @@ public:
       throw std::runtime_error("Invalid memory access");
     }
     // Linear mapping
-    return (uint8_t*)(mem.data() + (addr >> 2) - 0x20000000) + (addr & 0x3);
+    return (uint8_t *)(mem.data() + (addr >> 2) - 0x20000000) + (addr & 0x3);
   }
   void trace(paddr_t addr, bool is_read, word_t pc = 0, word_t value = 0) {
     for (auto &r : trace_ranges) {
