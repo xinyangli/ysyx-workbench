@@ -370,7 +370,7 @@ class Flow extends Module {
   val branchResult = Mux(branchInvertResult, !_branchResult, _branchResult)
   pc.control.useImmB := control.pc.useImmB && branchResult
   pc.control.useImmB := control.pc.useImmB && branchResult
-  printf(cf"_branchResult = ${_branchResult}, branchResult = ${branchResult}")
+  printf(cf"_branchResult = ${_branchResult}")
   printf(cf"control.useImmB = ${pc.control.useImmB}, branchResult = ${branchResult}")
 
   import control.reg.WriteSelect._
