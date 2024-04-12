@@ -55,7 +55,4 @@ if(NOT EXISTS ${CHISEL_OUTPUT_DIR})
     COMMAND sbt "run ${CHISEL_EMIT_ARGS}"
     WORKING_DIRECTORY ${SCALA_CORE}
   )
-  execute_process(
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CHISEL_OUTPUT_TMP_DIR} ${CHISEL_OUTPUT_DIR}
-  )
 endif()
