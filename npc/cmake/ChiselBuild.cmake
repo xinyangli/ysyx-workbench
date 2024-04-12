@@ -19,9 +19,8 @@ if(BUILD_USE_BLOOP)
   string(REPLACE " " ";" CHISEL_EMIT_ARGS_LIST ${CHISEL_EMIT_ARGS})
   list(TRANSFORM CHISEL_EMIT_ARGS_LIST PREPEND "--args;")
   add_custom_command(
-    OUTPUT ${CHISEL_OUTPUT_TOPMODULE}
-    COMMAND bloop run root ${CHISEL_EMIT_ARGS_LIST}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different ${CHISEL_OUTPUT_TMP_DIR} ${CHISEL_OUTPUT_DIR}
+    OUTPUT ${CHISEL_OUTPUT_TOPMODULE} ${CHISEL_OUTPUT_VERILATOR_CONF}
+    COMMAND bloop run --no-color root ${CHISEL_EMIT_ARGS_LIST}
     WORKING_DIRECTORY ${SCALA_CORE}
     DEPENDS ${CHISEL_DEPENDENCY}
     COMMAND_EXPAND_LISTS
@@ -36,9 +35,8 @@ else()
   set(CHISEL_TARGET sbt_${TOPMODULE})
   set(CHISEL_TEST_TARGET sbt_${TOPMODULE}_test)
   add_custom_command(
-    OUTPUT ${CHISEL_OUTPUT_TOPMODULE}
+    OUTPUT ${CHISEL_OUTPUT_TOPMODULE} ${CHISEL_OUTPUT_VERILATOR_CONF}
     COMMAND sbt "run ${CHISEL_EMIT_ARGS}"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different ${CHISEL_OUTPUT_TMP_DIR} ${CHISEL_OUTPUT_DIR}
     WORKING_DIRECTORY ${SCALA_CORE}
     DEPENDS ${CHISEL_DEPENDENCY}
     VERBATIM
@@ -51,13 +49,10 @@ else()
   )
 endif()
 
-if(NOT EXISTS ${CHISEL_OUTPUT_DIR})
+if(NOT EXISTS ${CHISEL_OUTPUT_TOPMODULE})
   # Probably cold build, generate verilog at configure time to produce top module file
   execute_process(
     COMMAND sbt "run ${CHISEL_EMIT_ARGS}"
     WORKING_DIRECTORY ${SCALA_CORE}
-  )
-  execute_process(
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CHISEL_OUTPUT_TMP_DIR} ${CHISEL_OUTPUT_DIR}
   )
 endif()

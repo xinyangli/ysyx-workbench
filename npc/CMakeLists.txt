@@ -10,7 +10,7 @@ enable_testing()
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 # -- Build options
-option(BUILD_USE_BLOOP "Whether to use bloop to speed up elaborate" ON)
+option(BUILD_USE_BLOOP "Whether to use bloop to speed up elaborate" OFF)
 option(BUILD_SIM_TARGET "Whether to build verilator simulation binary" ON)
 cmake_dependent_option(BUILD_SIM_NVBOARD_TARGET "Whether to build nvboard target" OFF "BUILD_SIM_TARGET" OFF)
 option(ENABLE_YSYX_GIT_TRACKER "Ysyx tracker support" ON)
@@ -34,8 +34,6 @@ if(BUILD_SIM_NVBOARD_TARGET)
   find_package(SDL2_image REQUIRED)
 endif()
 find_package(CLI11 CONFIG REQUIRED)
-# TODO: Not required
-find_package(LLVM CONFIG REQUIRED)
 
 option(ENABLE_SDB "Enable simple debugger" ON)
 
@@ -47,14 +45,11 @@ find_path(NVBOARD_INCLUDE_DIR NAMES nvboard.h)
 set(SCALA_CORE "${CMAKE_CURRENT_SOURCE_DIR}/core")
 set(CHISEL_MODULE_CLASS "${CMAKE_PROJECT_NAME}.${TOPMODULE}")
 
-# Verilog files are generted in CHISEL_OUTPUT_TMP_DIR and copy to
-# CHISEL_OUTPUT_DIR if content changes
 set(CHISEL_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/vsrc)
-set(CHISEL_OUTPUT_TMP_DIR ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/vsrc_tmp)
 
 set(CHISEL_OUTPUT_VERILATOR_CONF ${CHISEL_OUTPUT_DIR}/conf.vlt)
 set(CHISEL_OUTPUT_TOPMODULE ${CHISEL_OUTPUT_DIR}/${TOPMODULE}.sv)
-set(CHISEL_EMIT_ARGS "--target-dir ${CHISEL_OUTPUT_TMP_DIR}")
+set(CHISEL_EMIT_ARGS "--target-dir ${CHISEL_OUTPUT_DIR}")
 
 # -- Build NVBoard executable
 if(BUILD_SIM_NVBOARD_TARGET)

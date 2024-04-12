@@ -1,6 +1,7 @@
 find_package(Readline REQUIRED)
 find_package(FLEX REQUIRED)
 find_package(BISON REQUIRED)
+find_package(LLVM CONFIG REQUIRED)
 set(PARSER_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 set(LEXER_OUT "${PARSER_DIR}/lexer.c")
 set(PARSER_OUT "${PARSER_DIR}/parser.c")
@@ -8,8 +9,8 @@ flex_target(LEXER addrexp.l "${LEXER_OUT}" DEFINES_FILE "${PARSER_DIR}/addrexp_l
 bison_target(PARSER addrexp.y "${PARSER_OUT}" DEFINES_FILE "${PARSER_DIR}/addrexp.h")
 add_flex_bison_dependency(LEXER PARSER)
 
-add_library(sdb sdb.cpp console.cpp disasm.cpp "${LEXER_OUT}" "${PARSER_OUT}")
-llvm_map_components_to_libnames(LLVM_LIBS ${LLVM_TARGETS_TO_BUILD})
+add_library(sdb OBJECT sdb.cpp console.cpp disasm.cpp "${LEXER_OUT}" "${PARSER_OUT}")
+llvm_map_components_to_libnames(LLVM_LIBS core target asmparser riscvasmparser riscvdesc riscvdisassembler riscvinfo riscvtargetmca)
 target_link_libraries(sdb PUBLIC ${LLVM_LIBS})
 target_link_libraries(sdb PRIVATE ${Readline_LIBRARY})
 target_include_directories(sdb PRIVATE ${PARSER_DIR})
