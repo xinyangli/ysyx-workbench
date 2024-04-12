@@ -188,10 +188,20 @@ class Control(width: Int) extends RawModule {
               r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmI) :: l(Bool()) ::
               r(true.B)     :: r(1.U(4.W))  :: r(false.B)   :: HNil)),
 
-    (lh    , (r(true.B)     :: r(rMemOut)    ::
+    (lbu    , (r(true.B)    :: r(rMemOut)    ::
+              r(false.B)    :: r(pStaticNpc) ::
+              r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmI) :: l(Bool()) ::
+              r(true.B)     :: r(15.U(4.W))  :: r(false.B)   :: HNil)),
+
+    (lh     , (r(true.B)    :: r(rMemOut)    ::
               r(false.B)    :: r(pStaticNpc) ::
               r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmI) :: l(Bool()) ::
               r(true.B)     :: r(3.U(4.W))  :: r(false.B)   :: HNil)),
+
+    (lhu    , (r(true.B)    :: r(rMemOut)    ::
+              r(false.B)    :: r(pStaticNpc) ::
+              r(aOpAdd)     :: r(aSrcARs1)   :: r(aSrcBImmI) :: l(Bool()) ::
+              r(true.B)     :: r(15.U(4.W))  :: r(false.B)   :: HNil)),
 
     (lw    , (r(true.B)     :: r(rMemOut)    ::
               r(false.B)    :: r(pStaticNpc) ::
@@ -373,8 +383,17 @@ class Flow extends Module {
 
   import control.reg.WriteSelect._
   reg.in.writeData(lit(rAluOut)) := alu.out.result
-  // TODO: Read address in load command goes here
-  reg.in.writeData(lit(rMemOut)) := ram.io.readData
+  // 1 -> ext 8, 3 -> ext 16, 16 -> nothing
+  val signExt32 = control.ram.writeMask(3)
+  val signExt16 = control.ram.writeMask(1)
+  val signExt8 = control.ram.writeMask(0)
+  when(signExt32) {
+    reg.in.writeData(lit(rMemOut)) := ram.io.readData
+  }.elsewhen(signExt16) {
+    reg.in.writeData(lit(rMemOut)) := Cat(Fill(16, ram.io.readData(15)), ram.io.readData(15, 0))
+  }.elsewhen(signExt8) {
+    reg.in.writeData(lit(rMemOut)) := Cat(Fill(24, ram.io.readData(7)), ram.io.readData(7, 0))
+  }
   reg.in.writeData(lit(rNpc)) := npc
 
   reg.in.writeAddr := inst(11, 7)
