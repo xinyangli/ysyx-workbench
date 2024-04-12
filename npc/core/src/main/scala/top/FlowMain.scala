@@ -389,7 +389,7 @@ class Flow extends Module {
     Fill(8, ram.io.writeMask(1)),
     Fill(8, 1.U(1.W)))
 
-  val doSignExt = ram.io.writeMask(0)
+  val doSignExt = control.ram.writeMask(0)
   val signExt16 = control.ram.writeMask(1)
   when(!doSignExt) {
     reg.in.writeData(lit(rMemOut)) := ram.io.readData
