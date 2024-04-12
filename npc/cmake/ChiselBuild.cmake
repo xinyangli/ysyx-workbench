@@ -40,7 +40,7 @@ else()
     COMMAND sbt "run ${CHISEL_EMIT_ARGS}"
     COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different ${CHISEL_OUTPUT_TMP_DIR} ${CHISEL_OUTPUT_DIR}
     WORKING_DIRECTORY ${SCALA_CORE}
-    # DEPENDS ${CHISEL_DEPENDENCY} test.scala
+    DEPENDS ${CHISEL_DEPENDENCY}
     VERBATIM
     COMMENT "Run sbt from CMake"
   )
