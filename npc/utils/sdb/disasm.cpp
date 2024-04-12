@@ -4,6 +4,7 @@
 #include <llvm/MC/MCDisassembler/MCDisassembler.h>
 #include <llvm/MC/MCInstPrinter.h>
 #include <llvm/Support/raw_ostream.h>
+#include <llvm/TargetParser/Triple.h>
 #if LLVM_VERSION_MAJOR >= 14
 #include <llvm/MC/TargetRegistry.h>
 #if LLVM_VERSION_MAJOR >= 15
@@ -25,10 +26,6 @@
 #endif
 
 Disassembler::Disassembler(std::string triple) : triple(triple) {
-  llvm::InitializeRISCVTargetInfos();
-  llvm::InitializeRISCVTargetMCs();
-  llvm::InitializeRISCVAsmParsers();
-  llvm::InitializeRISCVDisassemblers();
 
   std::string errstr;
 
