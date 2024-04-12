@@ -49,7 +49,7 @@ else()
   )
 endif()
 
-if(NOT EXISTS ${CHISEL_OUTPUT_DIR})
+if(NOT EXISTS ${CHISEL_OUTPUT_TOPMODULE})
   # Probably cold build, generate verilog at configure time to produce top module file
   execute_process(
     COMMAND sbt "run ${CHISEL_EMIT_ARGS}"
