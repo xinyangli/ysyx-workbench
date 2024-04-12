@@ -2,7 +2,7 @@ include(ChiselBuild)
 add_executable(V${TOPMODULE} config.cpp main.cpp)
 target_link_libraries(V${TOPMODULE} PRIVATE sdb)
 
-verilate(V${TOPMODULE} TRACE COVERAGE THREADS
+verilate(V${TOPMODULE} TRACE THREADS
   TOP_MODULE ${TOPMODULE}
   PREFIX V${TOPMODULE}
   SOURCES ${CHISEL_OUTPUT_TOPMODULE} ${CHISEL_OUTPUT_VERILATOR_CONF}
