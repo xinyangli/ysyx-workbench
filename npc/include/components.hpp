@@ -80,8 +80,9 @@ public:
     // printf("waddr: 0x%x\n", waddr);
     uint8_t *p_data = (uint8_t *)&wdata;
     while(wmask & 0x1) {
-      memcpy(guest_to_host(waddr), p_data + 1, 1);
+      memcpy(guest_to_host(waddr), p_data, 1);
       waddr++;
+      p_data++;
       wmask >>= 1;
     }
   }
