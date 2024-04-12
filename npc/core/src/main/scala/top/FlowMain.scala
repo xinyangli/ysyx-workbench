@@ -173,12 +173,12 @@ class Control(width: Int) extends RawModule {
 
     (bltu  , (r(false.B)    :: l(WriteSelect)::
               r(true.B)     :: r(pStaticNpc)    ::
-              r(aOpSlt)     :: r(aSrcARs1)    :: r(aSrcBRs2) :: r(false.B) ::
+              r(aOpSltu)     :: r(aSrcARs1)    :: r(aSrcBRs2) :: r(false.B) ::
               r(false.B)    :: l(UInt(4.W))  :: r(false.B)   :: HNil)),
 
     (bgeu  , (r(false.B)    :: l(WriteSelect)::
               r(true.B)     :: r(pStaticNpc)    ::
-              r(aOpSlt)     :: r(aSrcARs1)    :: r(aSrcBRs2) :: r(false.B) ::
+              r(aOpSltu)     :: r(aSrcARs1)    :: r(aSrcBRs2) :: r(false.B) ::
               r(false.B)    :: l(UInt(4.W))  :: r(false.B)   :: HNil)),
 
     // ---- Memory Access Instructions ----
@@ -227,7 +227,7 @@ class Control(width: Int) extends RawModule {
 
     (sltiu , (r(true.B)     :: r(rAluOut)  ::
               r(false.B)    :: r(pStaticNpc) ::
-              r(aOpSlt)     :: r(aSrcARs1) :: r(aSrcBImmI) :: r(false.B) ::
+              r(aOpSltu)     :: r(aSrcARs1) :: r(aSrcBImmI) :: r(false.B) ::
               r(false.B)     :: l(UInt(4.W)):: r(false.B)   :: HNil)),
 
     (xori  , (r(true.B)     :: r(rAluOut)  ::
