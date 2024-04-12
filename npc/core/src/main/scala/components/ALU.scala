@@ -45,7 +45,7 @@ class ALU[T <: UInt](tpe: T) extends Module {
   val not = ~a
   val or = a | b
   val xor = a ^ b
-  val slt = a < b
+  val slt = a.asSInt < b.asSInt
   val sll = a << b(log2Ceil(tpe.getWidth), 0)
   val srl = a >> b(log2Ceil(tpe.getWidth), 0)
   val sra = a.asSInt >> b(log2Ceil(tpe.getWidth), 0)
