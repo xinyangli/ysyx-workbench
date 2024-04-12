@@ -4,6 +4,7 @@
 #include "types.h"
 #include <array>
 #include <cmath>
+#include <cstdint>
 #include <cstdlib>
 #include <exception>
 #include <filesystem>
@@ -77,7 +78,7 @@ public:
    */
   void write(int waddr, T wdata, char wmask) {
     // printf("waddr: 0x%x\n", waddr);
-    uint8_t *p_data = &wdata;
+    uint8_t *p_data = (uint8_t *)&wdata;
     while(wmask & 0x1) {
       memcpy(guest_to_host(waddr), p_data + 1, 1);
       waddr++;
