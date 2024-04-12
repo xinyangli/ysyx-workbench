@@ -381,8 +381,8 @@ class Flow extends Module {
   reg.in.rs(1) := inst(24, 20) // rs2
 
   // TODO: Bulk connection here 
-  ram.io.clock := clock
-  ram.io.reset := reset
+  // ram.io.clock := clock
+  // ram.io.reset := reset
   ram.io.writeAddr := alu.out.result
   ram.io.writeData := reg.out.src(1)
   ram.io.writeMask := control.ram.writeMask

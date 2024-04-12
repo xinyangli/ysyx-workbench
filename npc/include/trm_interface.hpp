@@ -1,12 +1,12 @@
 #ifndef _NPC_TRM_INTERFACE_HEADER_FILE_
 #define _NPC_TRM_INTERFACE_HEADER_FILE_
+#include <disasm.hpp>
 #include <dlfcn.h>
 #include <filesystem>
 #include <functional>
 #include <stdexcept>
 #include <string>
 #include <types.h>
-#include <disasm.hpp>
 
 extern Disassembler d;
 

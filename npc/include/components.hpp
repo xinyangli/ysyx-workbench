@@ -56,7 +56,8 @@ public:
   std::array<T, n> mem;
   std::vector<std::array<uint64_t, 2>> trace_ranges;
   Memory(std::filesystem::path filepath, bool is_binary,
-         std::vector<std::array<uint64_t, 2>> &&trace_ranges) : trace_ranges(std::move(trace_ranges)){
+         std::vector<std::array<uint64_t, 2>> &&trace_ranges)
+      : trace_ranges(std::move(trace_ranges)) {
     if (!std::filesystem::exists(filepath))
       throw std::runtime_error("Memory file not found");
     if (is_binary) {

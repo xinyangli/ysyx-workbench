@@ -1,18 +1,18 @@
 #include "VFlow___024root.h"
-#include <config.hpp>
-#include <disasm.hpp>
-#include <vl_wrapper.hpp>
-#include <vpi_user.h>
-#include <vpi_wrapper.hpp>
 #include <VFlow.h>
+#include <config.hpp>
 #include <cstdint>
 #include <cstdlib>
+#include <disasm.hpp>
 #include <filesystem>
 #include <fstream>
 #include <sdb.hpp>
 #include <trm_difftest.hpp>
 #include <trm_interface.hpp>
 #include <types.h>
+#include <vl_wrapper.hpp>
+#include <vpi_user.h>
+#include <vpi_wrapper.hpp>
 
 using VlModule = VlModuleInterfaceCommon<VFlow>;
 using Registers = _RegistersVPI<uint32_t, 32>;
@@ -27,8 +27,9 @@ vpiHandle pc = nullptr;
 
 extern "C" {
 void *pmem_get() {
-  static auto pmem = new Memory<int, 128 * 1024>(config.memory_file,
-                                                 config.memory_file_binary, std::move(config.mtrace_ranges));
+  static auto pmem =
+      new Memory<int, 128 * 1024>(config.memory_file, config.memory_file_binary,
+                                  std::move(config.mtrace_ranges));
   return pmem;
 }
 
@@ -37,7 +38,7 @@ int pmem_read(int raddr) {
   auto mem = static_cast<Memory<int, 128 * 1024> *>(pmem);
   // TODO: Do memory difftest at memory read and write to diagnose at a finer
   // granularity
-  if(config.do_mtrace)
+  if (config.do_mtrace)
     mem->trace(raddr, true, regs->get_pc());
   return mem->read(raddr);
 }
@@ -45,7 +46,7 @@ int pmem_read(int raddr) {
 void pmem_write(int waddr, int wdata, char wmask) {
   void *pmem = pmem_get();
   auto mem = static_cast<Memory<int, 128 * 1024> *>(pmem);
-  if(config.do_mtrace)
+  if (config.do_mtrace)
     mem->trace((std::size_t)waddr, false, regs->get_pc(), wdata);
   return mem->write((std::size_t)waddr, wdata, wmask);
 }
@@ -125,7 +126,7 @@ word_t reg_str2val(const char *name, bool *success) {
 int main(int argc, char **argv, char **env) {
   config.cli_parse(argc, argv);
 
-  if(config.max_sim_time > 1) {
+  if (config.max_sim_time > 1) {
     NPC::npc_interface.exec(config.max_sim_time / 2);
   } else {
     /* -- Difftest -- */
