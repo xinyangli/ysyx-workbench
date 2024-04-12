@@ -25,10 +25,10 @@
 #endif
 
 Disassembler::Disassembler(std::string triple) : triple(triple) {
-  llvm::InitializeRISCVTargetInfos();
-  llvm::InitializeRISCVTargetMCs();
-  llvm::InitializeRISCVAsmParsers();
-  llvm::InitializeRISCVDisassemblers();
+  llvm::InitializeAllTargetInfos();
+  llvm::InitializeAllTargetMCs();
+  llvm::InitializeAllAsmParsers();
+  llvm::InitializeAllDisassemblers();
 
   std::string errstr;
 
