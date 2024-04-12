@@ -37,7 +37,6 @@ Disassembler::Disassembler(std::string triple) : triple(triple) {
                  << "\n";
     assert(0);
   }
-
   llvm::MCTargetOptions MCOptions;
   gSTI = target->createMCSubtargetInfo(triple, "", "");
   std::string isa = target->getName();
