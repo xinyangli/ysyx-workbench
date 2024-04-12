@@ -62,6 +62,7 @@ class ALU[T <: UInt](tpe: T) extends Module {
     aOpOr  -> or,
     aOpXor -> xor,
     aOpSlt -> slt,
+    aOpSltu -> sltu,
     aOpSll -> sll,
     aOpSrl -> srl,
     aOpSra -> sra.asUInt
