@@ -392,11 +392,11 @@ class Flow extends Module {
   val doSignExt = control.ram.writeMask(0)
   val signExt16 = control.ram.writeMask(1)
   when(!doSignExt) {
-    reg.in.writeData(lit(rMemOut)) := ram.io.readData
+    reg.in.writeData(lit(rMemOut)) := maskedData
   }.elsewhen(signExt16) {
-    reg.in.writeData(lit(rMemOut)) := Cat(Fill(16, ram.io.readData(15)), ram.io.readData(15, 0))
+    reg.in.writeData(lit(rMemOut)) := Cat(Fill(16, maskedData(15)), maskedData(15, 0))
   }.otherwise {
-    reg.in.writeData(lit(rMemOut)) := Cat(Fill(24, ram.io.readData(7)), ram.io.readData(7, 0))
+    reg.in.writeData(lit(rMemOut)) := Cat(Fill(24, maskedData(7)), maskedData(7, 0))
   }
   reg.in.writeData(lit(rNpc)) := npc
 
