@@ -391,7 +391,7 @@ class Flow extends Module {
     reg.in.writeData(lit(rMemOut)) := ram.io.readData
   }.elsewhen(signExt16) {
     reg.in.writeData(lit(rMemOut)) := Cat(Fill(16, ram.io.readData(15)), ram.io.readData(15, 0))
-  }.elsewhen(signExt8) {
+  }.otherwise {
     reg.in.writeData(lit(rMemOut)) := Cat(Fill(24, ram.io.readData(7)), ram.io.readData(7, 0))
   }
   reg.in.writeData(lit(rNpc)) := npc
