@@ -32,7 +32,6 @@ object VerilogMain extends App {
     }
     case None => Config(traceConfig = TraceConfig(enable = true))
   }
-
   val annos = (new ChiselStage).execute(
     Array("--target-dir", opt.targetDir.toString, "--target", "systemverilog", "--split-verilog", "--full-stacktrace"),
     Seq(
