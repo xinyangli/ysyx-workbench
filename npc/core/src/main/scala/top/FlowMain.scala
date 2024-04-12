@@ -404,6 +404,7 @@ class Flow extends Module {
   alu.in.b(lit(aSrcBImmS)) := Cat(Fill(20, inst(31)), inst(31), inst(30, 25), inst(11, 8), inst(7))
   alu.in.b(lit(aSrcBImmU)) := Cat(inst(31, 12), 0.U(12.W))
 
-  Trace.traceName(pc.out);
+  Trace.traceName(pc.out)
   dontTouch(control.out)
+  dontTouch(pc.control.useImmB)
 }
