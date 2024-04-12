@@ -78,10 +78,10 @@ public:
   void write(int waddr, T wdata, char wmask) {
     // printf("waddr: 0x%x\n", waddr);
     // Assume little endian
-    waddr = waddr + 3;
+    uint8_t p_data = &wdata;
     while(wmask & 0x1) {
-      memcpy(guest_to_host(waddr), wdata, 1);
-      waddr--;
+      memcpy(guest_to_host(waddr), p_data + 1, 1);
+      waddr++;
       wmask >>= 1;
     }
   }
