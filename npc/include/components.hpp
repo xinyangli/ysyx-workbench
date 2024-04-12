@@ -66,7 +66,7 @@ public:
   /**
    * Always reads and returns 4 bytes from the address raddr & ~0x3u.
    */
-  T read(int raddr) {
+  T read(paddr_t raddr) {
     // printf("raddr: 0x%x\n", raddr);
     return *(word_t *)guest_to_host(raddr);
   }
@@ -76,7 +76,7 @@ public:
    * For example, wmask = 0x3 means only the lowest 2 bytes are written,
    * and the other bytes in memory remain unchanged.
    */
-  void write(int waddr, T wdata, char wmask) {
+  void write(paddr_t waddr, T wdata, char wmask) {
     // printf("waddr: 0x%x\n", waddr);
     uint8_t *p_data = (uint8_t *)&wdata;
     while(wmask & 0x1) {
