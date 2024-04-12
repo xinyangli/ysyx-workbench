@@ -1,6 +1,7 @@
 find_package(Readline REQUIRED)
 find_package(FLEX REQUIRED)
 find_package(BISON REQUIRED)
+find_package(LLVM CONFIG REQUIRED)
 set(PARSER_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 set(LEXER_OUT "${PARSER_DIR}/lexer.c")
 set(PARSER_OUT "${PARSER_DIR}/parser.c")

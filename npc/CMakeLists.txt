@@ -34,8 +34,6 @@ if(BUILD_SIM_NVBOARD_TARGET)
   find_package(SDL2_image REQUIRED)
 endif()
 find_package(CLI11 CONFIG REQUIRED)
-# TODO: Not required
-find_package(LLVM CONFIG REQUIRED)
 
 option(ENABLE_SDB "Enable simple debugger" ON)
 
