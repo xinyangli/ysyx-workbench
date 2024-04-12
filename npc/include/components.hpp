@@ -88,7 +88,7 @@ public:
   void *guest_to_host(std::size_t addr) {
     extern bool g_skip_memcheck;
     if (g_skip_memcheck) {
-      return 0;
+      return mem.data();
     }
     if (addr < 0x80000000 || addr > 0x87ffffff) {
       std::cerr << std::hex << "ACCESS " << addr << std::dec << std::endl;
