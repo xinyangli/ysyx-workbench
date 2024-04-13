@@ -1,8 +1,0 @@
-digraph "mingcc" {
-node [
-  fontsize = "12"
-];
-    "node3" [ label = "mingcc", shape = octagon ];
-    "node0" [ label = "am-riscv-npc", shape = octagon ];
-    "node0" -> "node3" [ style = dotted ] // am-riscv-npc -> mingcc
-}

@@ -1,8 +1,0 @@
-digraph "m" {
-node [
-  fontsize = "12"
-];
-    "node2" [ label = "m", shape = septagon ];
-    "node0" [ label = "am-riscv-npc", shape = octagon ];
-    "node0" -> "node2" [ style = dashed ] // am-riscv-npc -> m
-}
