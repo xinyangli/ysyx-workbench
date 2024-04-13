@@ -18,7 +18,7 @@ foreach(DIFFTEST_BINARY_FILE IN LISTS DIFFTEST_BINARY_FILES)
   add_test(
     NAME V${TOPMODULE}_${FILENAME}
     COMMAND V${TOPMODULE}
-      --no-bin -m ${DIFFTEST_BINARY_FILE}
+      -m ${DIFFTEST_BINARY_FILE}
       --diff-lib ${DIFFTEST_LIB})
   unset(FILENAME)
 endforeach()
