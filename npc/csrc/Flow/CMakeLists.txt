@@ -20,5 +20,8 @@ foreach(DIFFTEST_BINARY_FILE IN LISTS DIFFTEST_BINARY_FILES)
     COMMAND V${TOPMODULE}
       -m ${DIFFTEST_BINARY_FILE}
       --diff-lib ${DIFFTEST_LIB})
+  set_tests_properties(
+    V${TOPMODULE}_${FILENAME}
+    PROPERTIES LABELS cpu-tests)
   unset(FILENAME)
 endforeach()
