@@ -1,10 +1,26 @@
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-
-add_library(am_interface INTERFACE)
-target_include_directories(am_interface INTERFACE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include/abstract-machine>)
-
 add_subdirectory(src)
 
-install(DIRECTORY include/ DESTINATION include/abstract-machine)
+install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/abstract-machine)
+
+foreach(PLATFORM IN LISTS PLATFORMS)
+    if(ISA MATCHES "native")
+        set(ARCH "native")
+    else()
+        set(ARCH ${ISA}-${PLATFORM})
+    endif()
+    install(TARGETS am-${ARCH}
+            EXPORT amTargets-${ARCH}
+            LIBRARY DESTINATION lib)
+
+    install(EXPORT amTargets-${ARCH}
+            FILE amTargets.cmake
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/am-${ARCH})
+
+    configure_package_config_file(
+            ${CMAKE_SOURCE_DIR}/cmake/am-config.cmake.in
+            ${CMAKE_CURRENT_BINARY_DIR}/am-${ARCH}-config.cmake
+            INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/am-${ARCH})
+
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/am-${ARCH}-config.cmake
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/am-${ARCH})
+endforeach()

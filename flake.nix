@@ -42,6 +42,8 @@
             src = ./.;
             hooks = {
               trim-trailing-whitespace.enable = true;
+              end-of-file-fixer.enable = true;
+              cmake-format.enable = true;
               clang-format = {
                 enable = true;
                 types_or = pkgs.lib.mkForce [ "c" "c++" ];
@@ -52,7 +54,8 @@
 
         packages.nemu = pkgs.callPackage ./nemu { am-kernels = self.packages.${system}.am-kernels; };
         packages.nemu-lib = pkgs.callPackage ./nemu { am-kernels = self.packages.${system}.am-kernels; defconfig = "riscv32-lib_defconfig"; };
-        packages.abstract-machine = crossPkgs.callPackage ./abstract-machine { isa = "riscv"; platform = "nemu"; };
+        packages.abstract-machine = crossPkgs.callPackage ./abstract-machine { isa = "riscv"; platform = [ "nemu" "npc" ]; };
+        packages.abstract-machine-native = pkgs.callPackage ./abstract-machine { isa = "native"; };
 
         packages.am-kernels = crossPkgs.stdenv.mkDerivation rec {
           pname = "am-kernels-cmake";
@@ -67,7 +70,6 @@
           cmakeFlags = [
             (pkgs.lib.cmakeFeature "ISA" "riscv")
             (pkgs.lib.cmakeFeature "PLATFORM" "nemu")
-            (pkgs.lib.cmakeFeature "CMAKE_INSTALL_DATADIR" "share")
           ];
 
           buildInputs = [
@@ -87,13 +89,12 @@
           IMAGES_PATH = "${self.packages.${system}.am-kernels}/share/binary";
         };
 
-        devShells.npc = with pkgs; mkShell {
+        devShells.npc = with pkgs; mkShell.override { stdenv = ccacheStdenv; } {
           inherit (self.checks.${system}.pre-commit-check) shellHook;
           CHISEL_FIRTOOL_PATH = "${nixpkgs-circt162.legacyPackages.${system}.circt}/bin";
           packages = [
             clang-tools
             cmake
-            ninja
             coursier
             espresso
             bloop

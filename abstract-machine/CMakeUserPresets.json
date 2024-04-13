@@ -1,0 +1,15 @@
+{
+    "version": 6,
+    "configurePresets": [
+        {
+            "name": "Native install",
+            "inherits": "native",
+            "installDir": "/home/xin/repo/ysyx-workbench/abstract-machine/out/install"
+        },
+        {
+            "name": "RISCV install",
+            "inherits": "riscv",
+            "installDir": "/home/xin/repo/ysyx-workbench/abstract-machine/out/install"
+        }
+    ]
+}

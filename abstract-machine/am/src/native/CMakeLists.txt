@@ -1,6 +1,3 @@
-include(CheckPIESupported)
-check_pie_supported()
-
 set(SOURCES
     trap.S
     cte.c
@@ -23,4 +20,4 @@ set_target_properties(am-native PROPERTIES
     INTERFACE_POSITION_INDEPENDENT_CODE TRUE)
 
 find_package(SDL2 REQUIRED)
-target_link_libraries(am-${ARCH} PUBLIC SDL2::SDL2)
+target_link_libraries(am-native PUBLIC SDL2::SDL2 PRIVATE klib_interface am_interface)
