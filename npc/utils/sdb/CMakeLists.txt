@@ -15,7 +15,7 @@ target_link_libraries(sdb PUBLIC ${LLVM_LIBS})
 target_link_libraries(sdb PRIVATE ${Readline_LIBRARY})
 
 target_include_directories(sdb
-  PRIVATE ${PARSER_DIR}) ${Readline_INCLUDE_DIR}
+  PRIVATE ${PARSER_DIR} ${Readline_INCLUDE_DIR}
   PUBLIC ${CMAKE_SOURCE_DIR}/include)
 
 target_include_directories(sdb PUBLIC include)
