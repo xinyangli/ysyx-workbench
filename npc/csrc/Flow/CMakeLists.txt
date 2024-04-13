@@ -1,6 +1,7 @@
 include(ChiselBuild)
 add_executable(V${TOPMODULE} config.cpp main.cpp)
 target_link_libraries(V${TOPMODULE} PRIVATE sdb)
+target_include_directories(V${TOPMODULE} PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
 verilate(V${TOPMODULE} TRACE THREADS
   TOP_MODULE ${TOPMODULE}
