@@ -1,0 +1,8 @@
+digraph "klib_interface" {
+node [
+  fontsize = "12"
+];
+    "node1" [ label = "klib_interface", shape = pentagon ];
+    "node0" [ label = "am-riscv-npc", shape = octagon ];
+    "node0" -> "node1" [ style = dotted ] // am-riscv-npc -> klib_interface
+}

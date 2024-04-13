@@ -1,0 +1,34 @@
+digraph "abstract-machine" {
+node [
+  fontsize = "12"
+];
+subgraph clusterLegend {
+  label = "Legend";
+  color = black;
+  edge [ style = invis ];
+  legendNode0 [ label = "Executable", shape = egg ];
+  legendNode1 [ label = "Static Library", shape = octagon ];
+  legendNode2 [ label = "Shared Library", shape = doubleoctagon ];
+  legendNode3 [ label = "Module Library", shape = tripleoctagon ];
+  legendNode4 [ label = "Interface Library", shape = pentagon ];
+  legendNode5 [ label = "Object Library", shape = hexagon ];
+  legendNode6 [ label = "Unknown Library", shape = septagon ];
+  legendNode7 [ label = "Custom Target", shape = box ];
+  legendNode0 -> legendNode1 [ style = solid ];
+  legendNode0 -> legendNode2 [ style = solid ];
+  legendNode0 -> legendNode3;
+  legendNode1 -> legendNode4 [ label = "Interface", style = dashed ];
+  legendNode2 -> legendNode5 [ label = "Private", style = dotted ];
+  legendNode3 -> legendNode6 [ style = solid ];
+  legendNode0 -> legendNode7;
+}
+    "node0" [ label = "am-riscv-npc", shape = octagon ];
+    "node1" [ label = "klib_interface", shape = pentagon ];
+    "node0" -> "node1" [ style = dotted ] // am-riscv-npc -> klib_interface
+    "node2" [ label = "m", shape = septagon ];
+    "node0" -> "node2" [ style = dashed ] // am-riscv-npc -> m
+    "node3" [ label = "mingcc", shape = octagon ];
+    "node0" -> "node3" [ style = dotted ] // am-riscv-npc -> mingcc
+    "node4" [ label = "am_interface", shape = pentagon ];
+    "node5" [ label = "klib", shape = octagon ];
+}

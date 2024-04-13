@@ -19,7 +19,7 @@ set(CMAKE_IMPORT_FILE_VERSION 1)
 set(_cmake_targets_defined "")
 set(_cmake_targets_not_defined "")
 set(_cmake_expected_targets "")
-foreach(_cmake_expected_target IN ITEMS klib)
+foreach(_cmake_expected_target IN ITEMS mingcc am-riscv-npc klib_interface am_interface)
   list(APPEND _cmake_expected_targets "${_cmake_expected_target}")
   if(TARGET "${_cmake_expected_target}")
     list(APPEND _cmake_targets_defined "${_cmake_expected_target}")
@@ -55,16 +55,44 @@ if(_IMPORT_PREFIX STREQUAL "/")
   set(_IMPORT_PREFIX "")
 endif()
 
-# Create imported target klib
-add_library(klib STATIC IMPORTED)
+# Create imported target mingcc
+add_library(mingcc STATIC IMPORTED)
 
-set_target_properties(klib PROPERTIES
-  INTERFACE_COMPILE_DEFINITIONS "\$<TARGET_PROPERTY:am-riscv-npc,INTERFACE_COMPILE_DEFINITIONS>"
-  INTERFACE_INCLUDE_DIRECTORIES "\$<TARGET_PROPERTY:am_interface,INTERFACE_INCLUDE_DIRECTORIES>"
+set_target_properties(mingcc PROPERTIES
+  INTERFACE_LINK_LIBRARIES "\$<LINK_ONLY:klib_interface>;\$<LINK_ONLY:am_interface>"
+  INTERFACE_LINK_OPTIONS "-nolibc;-nostdlib"
 )
 
+# Create imported target am-riscv-npc
+add_library(am-riscv-npc STATIC IMPORTED)
+
+set_target_properties(am-riscv-npc PROPERTIES
+  INTERFACE_COMPILE_DEFINITIONS "\$<MAKE_C_IDENTIFIER:__ARCH_RISCV-NPC__>;__ISA_RISCV__;__PLATFORM_NPC__;\$<\$<BOOL:ON>:__NATIVE_USE_KLIB__>;ARCH_H=<arch/riscv.h>"
+  INTERFACE_COMPILE_OPTIONS "-fno-asynchronous-unwind-tables;-fno-builtin;-fno-stack-protector;-U_FORTIFY_SOURCE;\$<\$<COMPILE_LANGUAGE:CXX>:-fno-exceptions>;\$<\$<COMPILE_LANGUAGE:CXX>:-ffreestanding>;\$<\$<COMPILE_LANGUAGE:CXX>:-fno-rtti>"
+  INTERFACE_LINK_LIBRARIES "\$<LINK_ONLY:mingcc>;\$<LINK_ONLY:am_interface>;\$<LINK_ONLY:klib_interface>"
+  INTERFACE_LINK_OPTIONS "LINKER:--defsym=_pmem_start=0x80000000;LINKER:--defsym=_entry_offset=0x0;LINKER:--gc-sections;LINKER:-e;_start;-nostartfiles;-T/home/xin/repo/ysyx-workbench/abstract-machine/out/install/share/linker.ld;-znoexecstack"
+)
+
+# Create imported target klib_interface
+add_library(klib_interface INTERFACE IMPORTED)
+
+set_target_properties(klib_interface PROPERTIES
+  INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include/abstract-machine"
+)
+
+# Create imported target am_interface
+add_library(am_interface INTERFACE IMPORTED)
+
+set_target_properties(am_interface PROPERTIES
+  INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include/abstract-machine"
+)
+
+if(CMAKE_VERSION VERSION_LESS 3.0.0)
+  message(FATAL_ERROR "This file relies on consumers using CMake 3.0.0 or greater.")
+endif()
+
 # Load information for each installed configuration.
-file(GLOB _cmake_config_files "${CMAKE_CURRENT_LIST_DIR}/klibTargets-*.cmake")
+file(GLOB _cmake_config_files "${CMAKE_CURRENT_LIST_DIR}/amTargets-*.cmake")
 foreach(_cmake_config_file IN LISTS _cmake_config_files)
   include("${_cmake_config_file}")
 endforeach()
@@ -95,24 +123,8 @@ endforeach()
 unset(_cmake_target)
 unset(_cmake_import_check_targets)
 
-# Make sure the targets which have been exported in some other
-# export set exist.
-unset(${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE_targets)
-foreach(_target "am_interface" "am-riscv-npc" )
-  if(NOT TARGET "${_target}" )
-    set(${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE_targets "${${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE_targets} ${_target}")
-  endif()
-endforeach()
-
-if(DEFINED ${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE_targets)
-  if(CMAKE_FIND_PACKAGE_NAME)
-    set( ${CMAKE_FIND_PACKAGE_NAME}_FOUND FALSE)
-    set( ${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE "The following imported targets are referenced, but are missing: ${${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE_targets}")
-  else()
-    message(FATAL_ERROR "The following imported targets are referenced, but are missing: ${${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE_targets}")
-  endif()
-endif()
-unset(${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE_targets)
+# This file does not depend on other imported targets which have
+# been exported from the same project but in a separate export set.
 
 # Commands beyond this point should not need to know the version.
 set(CMAKE_IMPORT_FILE_VERSION)
