@@ -57,7 +57,6 @@ if(BUILD_SIM_NVBOARD_TARGET)
 endif()
 
 # -- Build Verilator executable and add to test
-include_directories(include)
 add_subdirectory(utils)
 
 add_subdirectory(csrc)
