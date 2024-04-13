@@ -1,4 +1,4 @@
-add_library(mingcc
+add_library(npcgcc
     ashldi3.c
     div.S
     muldi3.S
@@ -6,10 +6,9 @@ add_library(mingcc
     unused.c
 )
 
-target_link_libraries(mingcc PRIVATE klib_interface am_interface)
-target_compile_definitions(mingcc PRIVATE ARCH_H=<arch/riscv.h>)
-target_link_options(mingcc INTERFACE -nolibc -nostdlib)
+target_link_libraries(npcgcc PRIVATE klib_interface am_interface)
+target_link_options(npcgcc INTERFACE -nolibc -nostdlib)
 
-install(TARGETS mingcc
+install(TARGETS npcgcc
         EXPORT amTargets
         LIBRARY DESTINATION lib)

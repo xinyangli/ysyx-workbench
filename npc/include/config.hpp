@@ -9,7 +9,7 @@
 
 struct Config {
   std::filesystem::path memory_file;
-  uint64_t max_sim_time = 0;
+  bool interactive{false};
   bool memory_file_binary = {true};
   bool do_mtrace{false};
   std::vector<std::array<std::size_t, 2>> mtrace_ranges{

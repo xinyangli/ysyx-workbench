@@ -126,7 +126,7 @@ word_t reg_str2val(const char *name, bool *success) {
 int main(int argc, char **argv, char **env) {
   config.cli_parse(argc, argv);
 
-  if (config.max_sim_time > 1) {
+  if (config.interactive) {
     NPC::npc_interface.exec(config.max_sim_time / 2);
   } else {
     /* -- Difftest -- */
@@ -134,10 +134,26 @@ int main(int argc, char **argv, char **env) {
     RefTrmInterface ref_interface{ref};
     DifftestTrmInterface diff_interface{NPC::npc_interface, ref_interface,
                                         pmem_get(), 128 * 1024};
-    SDB::SDB sdb_diff{diff_interface};
-
-    int t = 8;
-    sdb_diff.main_loop();
+    if(config.interactive) {
+      SDB::SDB sdb_diff{diff_interface};
+      sdb_diff.main_loop();
+    } else {
+      try {
+        diff_interface.exec(-1);
+      } catch (TrmRuntimeException &e) {
+        switch (e.error_code()) {
+        case TrmRuntimeException::EBREAK:
+          return 0;
+        case TrmRuntimeException::DIFFTEST_FAILED:
+          std::cout << "Difftest Failed" << std::endl;
+          diff_interface.print(std::cout);
+          return 1;
+        default:
+          std::cerr << "Unknown error happened" << std::endl;
+          return 1;
+        }
+      }
+    }
   }
 
   return 0;

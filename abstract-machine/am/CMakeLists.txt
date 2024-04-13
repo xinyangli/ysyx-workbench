@@ -4,6 +4,7 @@ target_include_directories(am_interface INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
     $<INSTALL_INTERFACE:include/abstract-machine>)
+target_compile_definitions(am_interface INTERFACE ARCH_H=<arch/${ISA}.h>)
 
 set(AM_COMMON_COMPILE_DEF
     # -- Arch related

@@ -13,8 +13,8 @@ set(SOURCES
 )
 
 add_library(klib ${SOURCES})
-target_include_directories(klib PUBLIC $<TARGET_PROPERTY:am_interface,INTERFACE_INCLUDE_DIRECTORIES>)
-target_compile_definitions(klib PUBLIC $<TARGET_PROPERTY:am-${ARCH},INTERFACE_COMPILE_DEFINITIONS>)
+# target_include_directories(klib PUBLIC $<TARGET_PROPERTY:am_interface,INTERFACE_INCLUDE_DIRECTORIES>)
+target_link_libraries(klib PRIVATE am_interface)
 
 install(TARGETS klib
         EXPORT klibTargets

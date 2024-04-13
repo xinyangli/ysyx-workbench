@@ -59,9 +59,12 @@ endif()
 add_library(klib STATIC IMPORTED)
 
 set_target_properties(klib PROPERTIES
-  INTERFACE_COMPILE_DEFINITIONS "\$<TARGET_PROPERTY:am-riscv-npc,INTERFACE_COMPILE_DEFINITIONS>"
-  INTERFACE_INCLUDE_DIRECTORIES "\$<TARGET_PROPERTY:am_interface,INTERFACE_INCLUDE_DIRECTORIES>"
+  INTERFACE_LINK_LIBRARIES "\$<LINK_ONLY:am_interface>"
 )
+
+if(CMAKE_VERSION VERSION_LESS 2.8.12)
+  message(FATAL_ERROR "This file relies on consumers using CMake 2.8.12 or greater.")
+endif()
 
 # Load information for each installed configuration.
 file(GLOB _cmake_config_files "${CMAKE_CURRENT_LIST_DIR}/klibTargets-*.cmake")
@@ -98,7 +101,7 @@ unset(_cmake_import_check_targets)
 # Make sure the targets which have been exported in some other
 # export set exist.
 unset(${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE_targets)
-foreach(_target "am_interface" "am-riscv-npc" )
+foreach(_target "am_interface" )
   if(NOT TARGET "${_target}" )
     set(${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE_targets "${${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE_targets} ${_target}")
   endif()

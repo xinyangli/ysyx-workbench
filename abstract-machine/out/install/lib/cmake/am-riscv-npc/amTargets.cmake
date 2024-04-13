@@ -69,7 +69,7 @@ add_library(am-riscv-npc STATIC IMPORTED)
 set_target_properties(am-riscv-npc PROPERTIES
   INTERFACE_COMPILE_DEFINITIONS "\$<MAKE_C_IDENTIFIER:__ARCH_RISCV-NPC__>;__ISA_RISCV__;__PLATFORM_NPC__;\$<\$<BOOL:ON>:__NATIVE_USE_KLIB__>;ARCH_H=<arch/riscv.h>"
   INTERFACE_COMPILE_OPTIONS "-fno-asynchronous-unwind-tables;-fno-builtin;-fno-stack-protector;-U_FORTIFY_SOURCE;\$<\$<COMPILE_LANGUAGE:CXX>:-fno-exceptions>;\$<\$<COMPILE_LANGUAGE:CXX>:-ffreestanding>;\$<\$<COMPILE_LANGUAGE:CXX>:-fno-rtti>"
-  INTERFACE_LINK_LIBRARIES "\$<LINK_ONLY:mingcc>;\$<LINK_ONLY:am_interface>;\$<LINK_ONLY:klib_interface>"
+  INTERFACE_LINK_LIBRARIES "\$<LINK_ONLY:mingcc>;am_interface;klib_interface"
   INTERFACE_LINK_OPTIONS "LINKER:--defsym=_pmem_start=0x80000000;LINKER:--defsym=_entry_offset=0x0;LINKER:--gc-sections;LINKER:-e;_start;-nostartfiles;-T/home/xin/repo/ysyx-workbench/abstract-machine/out/install/share/linker.ld;-znoexecstack"
 )
 
@@ -84,6 +84,7 @@ set_target_properties(klib_interface PROPERTIES
 add_library(am_interface INTERFACE IMPORTED)
 
 set_target_properties(am_interface PROPERTIES
+  INTERFACE_COMPILE_DEFINITIONS "ARCH_H=<arch/riscv.h>"
   INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include/abstract-machine"
 )
 

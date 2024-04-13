@@ -27,6 +27,10 @@ install(TARGETS am-${ARCH} klib_interface am_interface
         EXPORT amTargets
         LIBRARY DESTINATION lib)
 
+# TODO: check
+install(FILES ${CMAKE_SOURCE_DIR}/scripts/${LINKER_SCRIPT}
+        DESTINATION ${CMAKE_INSTALL_DATADIR})
+
 install(EXPORT amTargets 
         FILE amTargets.cmake
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/am-${ARCH})
@@ -37,7 +41,3 @@ configure_package_config_file(${CMAKE_SOURCE_DIR}/cmake/am-config.cmake.in
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/am-${ARCH}-config.cmake
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/am-${ARCH})
-
-# TODO: check
-install(FILES ${CMAKE_SOURCE_DIR}/scripts/${LINKER_SCRIPT}
-        DESTINATION ${CMAKE_INSTALL_DATADIR})

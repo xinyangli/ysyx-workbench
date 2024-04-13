@@ -28,15 +28,14 @@ target_include_directories(am-riscv-nemu
     PUBLIC
       $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/am/include>
       $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/abstract-machine>)
-target_link_libraries(am-${ARCH}
-    PRIVATE klib_interface
+
+target_link_libraries(am-riscv-nemu
+    PUBLIC am_interface klib_interface
     INTERFACE m)
 
-target_compile_definitions(am-riscv-nemu PUBLIC
-    ARCH_H="arch/riscv.h")
 target_compile_definitions(am-riscv-nemu PRIVATE
-    ISA_H="riscv/riscv.h")
+    ISA_H=<riscv/riscv.h>)
 
-set_target_properties(am-${ISA}-nemu PROPERTIES
+set_target_properties(am-riscv-nemu PROPERTIES
     POSITION_INDEPENDENT_CODE OFF
     INTERFACE_POSITION_INDEPENDENT_CODE OFF)

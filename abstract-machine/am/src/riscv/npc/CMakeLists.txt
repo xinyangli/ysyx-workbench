@@ -14,7 +14,7 @@ add_library(am-riscv-npc
     vme.c
 )
 
-target_link_libraries(am-riscv-npc PRIVATE mingcc am_interface klib_interface)
+target_link_libraries(am-riscv-npc PRIVATE npcgcc PUBLIC am_interface klib_interface)
 
 target_link_options(am-riscv-npc INTERFACE
     LINKER:--defsym=_pmem_start=0x80000000
