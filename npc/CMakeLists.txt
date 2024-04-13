@@ -16,7 +16,7 @@ cmake_dependent_option(BUILD_SIM_NVBOARD_TARGET "Whether to build nvboard target
 option(ENABLE_YSYX_GIT_TRACKER "Ysyx tracker support" ON)
 set(TOPMODULE "Flow" CACHE STRING "Topmodule name in chisel")
 set(DIFFTEST_LIB "" CACHE FILEPATH "Dynamic library file used as difftest reference")
-set(DIFFTEST_MEMORY_FILE "" CACHE PATH "Dynamic library file used as difftest reference")
+set(DIFFTEST_RESOURCE_DIR "" CACHE PATH "Dynamic library file used as difftest reference")
 
 # -- Ysyx tracker, configure
 if(ENABLE_YSYX_GIT_TRACKER)
@@ -51,6 +51,9 @@ set(CHISEL_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/${TOPMODULE}/vsrc)
 set(CHISEL_OUTPUT_VERILATOR_CONF ${CHISEL_OUTPUT_DIR}/conf.vlt)
 set(CHISEL_OUTPUT_TOPMODULE ${CHISEL_OUTPUT_DIR}/${TOPMODULE}.sv)
 set(CHISEL_EMIT_ARGS "--target-dir ${CHISEL_OUTPUT_DIR}")
+
+# -- Find difftest binaries
+file(GLOB_RECURSE DIFFTEST_BINARY_FILES "${DIFFTEST_RESOURCE_DIR}/*.bin")
 
 # -- Build NVBoard executable
 if(BUILD_SIM_NVBOARD_TARGET)

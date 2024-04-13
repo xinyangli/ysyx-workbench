@@ -13,8 +13,10 @@ verilate(V${TOPMODULE} TRACE THREADS
     "-Wno-UNOPTFLAT"
 )
 
-add_test(
-  NAME V${TOPMODULE}
-  COMMAND V${TOPMODULE}
-    --no-bin -m ${PROJECT_SOURCE_DIR}/resource/addi.txt
-    --diff-lib ${DIFFTEST_LIB})
+foreach(DIFFTEST_BINARY_FILE IN LISTS ${DIFFTEST_BINARY_FILES})
+  add_test(
+    NAME V${TOPMODULE}
+    COMMAND V${TOPMODULE}
+      --no-bin -m ${DIFFTEST_BINARY_FILE}
+      --diff-lib ${DIFFTEST_LIB})
+endforeach()
