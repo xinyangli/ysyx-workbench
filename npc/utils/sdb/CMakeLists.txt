@@ -13,6 +13,10 @@ add_library(sdb OBJECT sdb.cpp console.cpp disasm.cpp "${LEXER_OUT}" "${PARSER_O
 llvm_map_components_to_libnames(LLVM_LIBS core target asmparser riscvasmparser riscvdesc riscvdisassembler riscvinfo riscvtargetmca)
 target_link_libraries(sdb PUBLIC ${LLVM_LIBS})
 target_link_libraries(sdb PRIVATE ${Readline_LIBRARY})
-target_include_directories(sdb PRIVATE ${PARSER_DIR})
-target_include_directories(sdb PRIVATE ${Readline_INCLUDE_DIR})
+
+target_include_directories(sdb
+  PRIVATE
+    ${PARSER_DIR}) ${Readline_INCLUDE_DIR})
+    ${CMAKE_SOURCE_DIR}/include)
+
 target_include_directories(sdb PUBLIC include)
