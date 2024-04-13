@@ -8,7 +8,7 @@ void Config::cli_parse(int argc, char **argv) {
   app.add_flag("!--no-bin", memory_file_binary,
                "Memory file is in text format");
   app.add_option("--wav", wavefile, "output .vcd file path");
-  app.add_option("-t", max_sim_time, "Max simulation timestep");
+  app.add_flag("-i", interactive, "Launch sdb for interactive session");
   app.add_option("--diff-lib", lib_ref,
                  "Dynamic library file of difftest reference")
       ->check(CLI::ExistingFile);
