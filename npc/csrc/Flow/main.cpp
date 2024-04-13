@@ -135,6 +135,7 @@ int main(int argc, char **argv, char **env) {
     SDB::SDB sdb_diff{diff_interface};
     sdb_diff.main_loop();
   } else {
+    diff_interface.init(0);
     try {
       diff_interface.exec(-1);
     } catch (TrmRuntimeException &e) {
