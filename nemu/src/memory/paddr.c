@@ -89,7 +89,7 @@ void init_mem() {
 word_t paddr_read(paddr_t addr, int len) {
   word_t result = 0;
   if (likely(in_pmem(addr))) { result = pmem_read(addr, len); goto mtrace;}
-  IFDEF(CONFIG_DEVICE, result = mmio_read(addr, len); goto mtrace)
+  IFDEF(CONFIG_DEVICE, result = mmio_read(addr, len); goto mtrace;)
   out_of_bound(addr);
 
 mtrace:

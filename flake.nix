@@ -81,6 +81,7 @@
           packages = with pkgs; [
             clang-tools
             gdb
+            SDL2
           ];
           inputsFrom = [
             self.packages.${system}.nemu
