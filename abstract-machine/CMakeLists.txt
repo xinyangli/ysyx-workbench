@@ -19,6 +19,9 @@ cmake_dependent_option(
     __PLATFORM_NEMU__ "Run on NEMU"
     ON "ISA MATCHES \"(riscv | x86)\"" OFF)
 cmake_dependent_option(
+    __PLATFORM_NPC__ "Run on NPC"
+    ON "ISA MATCHES riscv" OFF)
+cmake_dependent_option(
     __PLATFORM_NATIVE__ "Run on native"
     ON "ISA MATCHES native" OFF)
 
@@ -33,27 +36,27 @@ foreach(VAR IN LISTS CACHE_VARS)
         get_property(VAR_VALUE CACHE ${VAR} PROPERTY VALUE)
         set(PLATFORM_UPPER ${CMAKE_MATCH_1})
         string(TOLOWER ${PLATFORM_UPPER} PLATFORM)
+        list(APPEND PLATFORMS ${PLATFORM})
         message(STATUS "Variable: ${VAR}=${VAR_VALUE}, Platform: ${PLATFORM}")
-        break()
     endif()
 endforeach()
 
-if(NOT PLATFORM)
+if((NOT PLATFORM) AND (NOT ISA MATCHES native))
     message(FATAL_ERROR "Platform not given!")
 endif()
 
-if(${PLATFORM} MATCHES "native")
-set(ARCH "native")
-else()
-set(ARCH ${ISA}-${PLATFORM})
-endif()
-string(TOUPPER ${ARCH} ARCH_UPPER)
-
 set(SUPPORTED_ARCH "riscv-nemu" "riscv-npc" "native")
-set(ARCH ${ISA}-${PLATFORM})
-if(NOT ARCH IN_LIST SUPPORTED_ARCH)
-    message(FATAL_ERROR "Given ISA-PLATFORM (${ISA}-${PLATFORM}) does not match one of the following: ${SUPPORTED_ARCH}")
-endif()
+foreach(PLATFORM IN LISTS PLATFORMS)
+    if(${ISA} MATCHES "native")
+        set(ARCH "native")
+    else()
+        set(ARCH ${ISA}-${PLATFORM})
+    endif()
+
+    if(NOT ARCH IN_LIST SUPPORTED_ARCH)
+        message(FATAL_ERROR "Given ISA-PLATFORM (${ISA}-${PLATFORM}) does not match one of the following: ${SUPPORTED_ARCH}")
+    endif()
+endforeach()
 
 # -- Target specific options
 cmake_dependent_option(
@@ -62,10 +65,33 @@ cmake_dependent_option(
 
 # -- Add compile definitions based on options
 
-# -- Include linker script here. Use this linker script at link time if INCLUDE_LINKER_SCRIPT is set to true
-set(LINKER_SCRIPT linker.ld)
-
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+
+# NOTE: klib and am include header files in each other,
+#       so we need to create interface libraries for correct dependency
+add_library(am_interface INTERFACE)
+target_include_directories(am_interface INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/am/include>
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/am/src>
+    $<INSTALL_INTERFACE:include/abstract-machine>)
+target_compile_definitions(am_interface INTERFACE ARCH_H=<arch/${ISA}.h>)
+
+add_library(klib_interface INTERFACE)
+target_include_directories(klib_interface
+    INTERFACE
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/klib/include>
+      $<INSTALL_INTERFACE:include/abstract-machine>)
+
+install(TARGETS am_interface klib_interface
+    EXPORT interfaceTargets
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/abstract-machine)
+
+install(EXPORT interfaceTargets
+        FILE interfaceTargets.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake)
 
 add_subdirectory(klib)
 add_subdirectory(am)
+
+# -- Test depends on klib and am should be added last.
+add_subdirectory(klib/tests)

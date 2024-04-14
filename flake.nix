@@ -42,6 +42,8 @@
             src = ./.;
             hooks = {
               trim-trailing-whitespace.enable = true;
+              end-of-file-fixer.enable = true;
+              cmake-format.enable = true;
               clang-format = {
                 enable = true;
                 types_or = pkgs.lib.mkForce [ "c" "c++" ];
@@ -52,7 +54,8 @@
 
         packages.nemu = pkgs.callPackage ./nemu { am-kernels = self.packages.${system}.am-kernels; };
         packages.nemu-lib = pkgs.callPackage ./nemu { am-kernels = self.packages.${system}.am-kernels; defconfig = "riscv32-lib_defconfig"; };
-        packages.abstract-machine = crossPkgs.callPackage ./abstract-machine { isa = "riscv"; platform = "nemu"; };
+        packages.abstract-machine = crossPkgs.callPackage ./abstract-machine { isa = "riscv"; platform = [ "nemu" "npc" ]; };
+        packages.abstract-machine-native = pkgs.callPackage ./abstract-machine { isa = "native"; };
 
         packages.am-kernels = crossPkgs.stdenv.mkDerivation rec {
           pname = "am-kernels-cmake";

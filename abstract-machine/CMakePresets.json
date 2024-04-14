@@ -14,27 +14,15 @@
             }
         },
         {
-            "name": "riscv-nemu",
-            "displayName": "Riscv32 NEMU",
+            "name": "riscv",
+            "displayName": "RV32 all platform",
             "generator": "Unix Makefiles",
             "binaryDir": "${sourceDir}/out/build/${presetName}",
-            "installDir": "/home/xin/repo/ysyx-workbench/abstract-machine/out/install",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
                 "ISA": "riscv",
+                "__PLATFORM_NPC__": true,
                 "__PLATFORM_NEMU__": true
-            }
-        },
-        {
-            "name": "riscv-npc",
-            "displayName": "Riscv32 NPC",
-            "generator": "Unix Makefiles",
-            "binaryDir": "${sourceDir}/out/build/${presetName}",
-            "installDir": "/home/xin/repo/ysyx-workbench/abstract-machine/out/install",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "ISA": "riscv",
-                "__PLATFORM_NPC__": true
             }
         }
     ]

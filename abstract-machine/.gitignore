@@ -2,5 +2,7 @@
 **/build/
 **/.envrc
 **/.cache
+out/
 .vscode
 compile_commands.json
+cmakeUserh

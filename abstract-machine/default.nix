@@ -3,7 +3,7 @@
   cmake,
   SDL2,
   isa ? "native",
-  platform ? "NEMU"
+  platform ? [ ]
 }:
 stdenv.mkDerivation {
   pname = "abstract-machine";
@@ -13,8 +13,7 @@ stdenv.mkDerivation {
 
   cmakeFlags =  [
     (lib.cmakeFeature "ISA" isa)
-    (lib.cmakeBool "__PLATFORM_${lib.strings.toUpper platform}__" true)
-  ];
+  ] ++ map (p: (lib.cmakeBool "__PLATFORM_${lib.strings.toUpper p}__" true)) platform;
 
   nativeBuildInputs = [
     cmake
@@ -22,5 +21,7 @@ stdenv.mkDerivation {
 
   buildInputs = [
 
-  ] ++ (if platform=="native" then [ SDL2 ] else [ ]);
+  ] ++ (if isa=="native" then [ SDL2 ] else [ ]);
+
+  doCheck = true;
 }
