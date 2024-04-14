@@ -73,18 +73,24 @@ add_library(am_interface INTERFACE)
 target_include_directories(am_interface INTERFACE
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/am/include>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/am/src>
-    $<INSTALL_INTERFACE:include/abstract-machine>)
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 target_compile_definitions(am_interface INTERFACE ARCH_H=<arch/${ISA}.h>)
+file(GLOB_RECURSE AM_HEADERS "${CMAKE_SOURCE_DIR}/am/include/*.h")
+target_sources(am_interface PUBLIC FILE_SET am_headers TYPE HEADERS BASE_DIRS ${CMAKE_SOURCE_DIR}/am/include FILES ${AM_HEADERS})
 
 add_library(klib_interface INTERFACE)
 target_include_directories(klib_interface
     INTERFACE
       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/klib/include>
-      $<INSTALL_INTERFACE:include/abstract-machine>)
+      $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+file(GLOB_RECURSE KLIB_HEADERS "${CMAKE_SOURCE_DIR}/klib/include/*.h")
+target_sources(klib_interface PUBLIC FILE_SET klib_headers TYPE HEADERS BASE_DIRS ${CMAKE_SOURCE_DIR}/klib/include FILES ${KLIB_HEADERS})
 
 install(TARGETS am_interface klib_interface
     EXPORT interfaceTargets
-    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/abstract-machine)
+    FILE_SET klib_headers
+    FILE_SET am_headers
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 install(EXPORT interfaceTargets
         FILE interfaceTargets.cmake

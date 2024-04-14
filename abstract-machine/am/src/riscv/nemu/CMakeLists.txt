@@ -31,11 +31,6 @@ target_link_options(am-riscv-nemu INTERFACE
     $<BUILD_INTERFACE:-T${CMAKE_SOURCE_DIR}/scripts/linker.ld>
     $<INSTALL_INTERFACE:-T${CMAKE_INSTALL_FULL_DATADIR}/linker.ld>)
 
-target_include_directories(am-riscv-nemu
-    PUBLIC
-      $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/am/include>
-      $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/abstract-machine>)
-
 target_link_libraries(am-riscv-nemu
     PUBLIC am_interface klib_interface
     INTERFACE m)

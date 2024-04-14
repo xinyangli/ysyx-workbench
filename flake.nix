@@ -68,8 +68,7 @@
           ];
 
           cmakeFlags = [
-            (pkgs.lib.cmakeFeature "ISA" "riscv")
-            (pkgs.lib.cmakeFeature "PLATFORM" "nemu")
+            (pkgs.lib.cmakeFeature "ARCH" "riscv-nemu")
           ];
 
           buildInputs = [
