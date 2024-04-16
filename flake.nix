@@ -86,7 +86,7 @@
           inputsFrom = [
             self.packages.${system}.nemu
           ];
-          IMAGES_PATH = "${self.packages.${system}.am-kernels}/share/binary";
+          IMAGES_PATH = "${self.packages.${system}.am-kernels}/share/am-kernels";
         };
 
         devShells.npc = with pkgs; mkShell.override { stdenv = ccacheStdenv; } {
