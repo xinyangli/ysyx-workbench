@@ -13,7 +13,9 @@ set(SOURCES
 )
 
 add_library(klib ${SOURCES})
-target_link_libraries(klib PRIVATE am_interface klib_interface)
+target_link_libraries(klib PUBLIC am_interface klib_interface)
+target_compile_options(klib PUBLIC -fno-builtin)
+target_link_options(klib PUBLIC -nostartfiles -nolibc)
 
 install(TARGETS klib
         EXPORT klibTargets
