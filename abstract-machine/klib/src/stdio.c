@@ -48,13 +48,11 @@ int vprintf(const char *format, va_list args) {
       char pad = ' ';
       int width = 0;
 
-      // Handle zero padding
       if (*p == '0') {
         pad = '0';
         p++;
       }
 
-      // Handle width
       while (*p >= '0' && *p <= '9') {
         width = width * 10 + (*p - '0');
         p++;
@@ -81,7 +79,7 @@ int vprintf(const char *format, va_list args) {
         break;
       }
       default:
-        panic_on(true, "Wrong formatter provided to printf");
+        panic("Wrong formatter provided to printf");
       }
     } else {
       putch(*p);
