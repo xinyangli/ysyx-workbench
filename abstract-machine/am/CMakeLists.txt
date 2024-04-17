@@ -1,7 +1,5 @@
 add_subdirectory(src)
 
-# install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/abstract-machine)
-
 foreach(PLATFORM IN LISTS PLATFORMS)
     if(ISA MATCHES "native")
         set(ARCH "native")

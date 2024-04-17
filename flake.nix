@@ -65,6 +65,7 @@
 
           nativeBuildInputs = [
             pkgs.cmake
+            pkgs.gcc # Generate expr tests
           ];
 
           cmakeFlags = [
@@ -82,11 +83,19 @@
             clang-tools
             gdb
             SDL2
+            gnumake
+            pkg-config
+            flex
+            bison
+            dtc
+
+            readline
+            libllvm
           ];
           inputsFrom = [
-            self.packages.${system}.nemu
+            # self.packages.${system}.nemu
           ];
-          IMAGES_PATH = "${self.packages.${system}.am-kernels}/share/am-kernels";
+          NEMU_HOME = "/home/xin/repo/ysyx-workbench/nemu";
         };
 
         devShells.npc = with pkgs; mkShell.override { stdenv = ccacheStdenv; } {
