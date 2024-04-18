@@ -12,17 +12,16 @@ class Device {
 };
 
 class Serial : public Device {
-  std::array<uint8_t, 8> buf;
+  std::array<uint8_t, 1> buf;
   
   
   public:
     Serial() {
-      buf.fill(0);
+      buf[0] = 0;
     };
     void io_handler(uint32_t offset, int len, bool is_write) override {
-      assert(len == 1);
       if(!is_write) {
-        // std::cout << ;
+        std::cout << (char)buf[0];
       }
     }
 } ;

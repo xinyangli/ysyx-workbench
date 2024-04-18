@@ -13,6 +13,7 @@
 #include <vl_wrapper.hpp>
 #include <vpi_user.h>
 #include <vpi_wrapper.hpp>
+#include <devices>
 
 using VlModule = VlModuleInterfaceCommon<VFlow>;
 using Registers = _RegistersVPI<uint32_t, 32>;
@@ -24,6 +25,7 @@ CPUState npc_cpu;
 VlModule *top;
 Registers *regs;
 vpiHandle pc = nullptr;
+std::unique_ptr<Devices[]> 
 
 extern "C" {
 void *pmem_get() {
