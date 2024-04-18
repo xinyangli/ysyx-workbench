@@ -11,6 +11,7 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <memory>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -32,21 +33,20 @@ public:
   }
 };
 
-template <typename T, std::size_t n> class Memory {
-  uint32_t expand_bits(uint8_t bits) {
-    uint32_t x = bits;
+template <std::size_t n> class Memory {
+  static word_t expand_bits(uint8_t bits) {
+    word_t x = bits;
     x = (x | (x << 7) | (x << 14) | (x << 21)) & 0x01010101;
     x = x * 0xFF;
     // printf("expand: %hhx->%x\n", bits, x);
     return x;
   }
+  paddr_t pmem_start, pmem_end;
 
 public:
-  std::array<T, n> mem;
-  std::vector<std::array<uint64_t, 2>> trace_ranges;
-  Memory(std::filesystem::path filepath, bool is_binary,
-         std::vector<std::array<uint64_t, 2>> &&trace_ranges)
-      : trace_ranges(std::move(trace_ranges)) {
+  std::array<word_t, n> mem;
+  Memory(std::filesystem::path filepath, bool is_binary, paddr_t pmem_start, paddr_t pmem_end)
+      : pmem_start(pmem_start), pmem_end(pmem_end) {
     if (!std::filesystem::exists(filepath))
       throw std::runtime_error("Memory file not found");
     if (is_binary) {
@@ -62,28 +62,12 @@ public:
       }
     }
   }
-  const T &operator[](std::size_t addr) { return this->read(addr); }
-  /**
-   * Always reads and returns 4 bytes from the address raddr & ~0x3u.
-   */
-  T read(paddr_t raddr) {
-    // printf("raddr: 0x%x\n", raddr);
-    return *(word_t *)guest_to_host(raddr);
-  }
-  /**
-   * Always writes to the 4 bytes at the address `waddr` & ~0x3u.
-   * Each bit in `wmask` represents a mask for one byte in wdata.
-   * For example, wmask = 0x3 means only the lowest 2 bytes are written,
-   * and the other bytes in memory remain unchanged.
-   */
-  void write(paddr_t waddr, T wdata, char wmask) {
-    // printf("waddr: 0x%x\n", waddr);
-    uint8_t *p_data = (uint8_t *)&wdata;
-    while (wmask & 0x1) {
-      memcpy(guest_to_host(waddr), p_data, 1);
-      waddr++;
-      p_data++;
-      wmask >>= 1;
+  const word_t &operator[](std::size_t addr) { return this->read(addr); }
+  void transfer(paddr_t addr, uint8_t *data, size_t len, bool is_write) {
+    if(!is_write) {
+      std::copy(data, guest_to_host(addr), len);
+    } else {
+      std::copy(guest_to_host(addr), data, len);
     }
   }
   void *guest_to_host(std::size_t addr) {
@@ -91,29 +75,66 @@ public:
     if (g_skip_memcheck) {
       return mem.data();
     }
-    if (addr < 0x80000000 || addr > 0x87ffffff) {
+    if (!in_pmem(addr)) {
       std::cerr << std::hex << "ACCESS " << addr << std::dec << std::endl;
       throw std::runtime_error("Invalid memory access");
     }
     // Linear mapping
-    return (uint8_t *)(mem.data() + (addr >> 2) - 0x20000000) + (addr & 0x3);
+    size_t offset = (addr - pmem_start);
+    return (uint8_t *)mem.data() + offset;
   }
-  void trace(paddr_t addr, bool is_read, word_t pc = 0, word_t value = 0) {
-    for (auto &r : trace_ranges) {
-      if (r[0] <= addr && r[1] >= addr) {
-        std::stringstream os;
-        os << std::hex;
-        if (pc != 0)
-          os << "0x" << pc << " ";
-        if (is_read)
-          os << "[R] ";
-        else
-          os << "[W] " << value << " -> ";
-        os << "0x" << addr << std::dec << std::endl;
-        std::cout << os.rdbuf();
-        break;
+  bool in_pmem(paddr_t addr) const {
+    return addr >= pmem_start && addr <= pmem_end;
+  }
+};
+
+template <typename Mem, typename DevMap>
+class MemoryMap {
+  std::unique_ptr <Mem> ram;
+  std::unique_ptr <DevMap> devices;
+  const std::vector<std::array<uint64_t, 2>> &trace_ranges;
+  public:
+    MemoryMap(std::unique_ptr<Mem> &&ram, std::unique_ptr<DevMap> &&devices, const std::vector<std::array<uint64_t, 2>> &trace_ranges)
+        : ram(std::move(ram)), devices(std::move(devices)), trace_ranges(trace_ranges) {}
+    void write(paddr_t waddr, word_t wdata, char wmask) {
+      // printf("waddr: 0x%x\n", waddr);
+      size_t len = (wmask & 1) + (wmask & 2) + (wmask & 4) + (wmask & 8);
+      if (ram->in_pmem(waddr)) { ram->transfer(waddr, &wdata, len, true);}
+      else { devices.handle(waddr, &wdata, len, true); }
+    }
+    word_t read(paddr_t raddr) {
+      word_t res = 0;
+      if (ram->in_pmem(raddr)) { ram->transfer(raddr, &res, 4, true);}
+      else { devices.handle(raddr, &res, 4, true); }
+      return res;
+    }
+    void copy_to(paddr_t addr, uint8_t *buf, size_t len) const {
+      if (ram->in_pmem()) { ram->transfer(addr, buf, len, false);}
+      else { std::cerr << "Not in pmem" << std::endl; }
+    }
+    void copy_from(paddr_t addr, const uint8_t *buf, size_t len) {
+      if (ram->in_pmem()) { ram->transfer(addr, buf, len, true);}
+      else { std::cerr << "Not in pmem"; }
+    }
+    void *get_pmem() {
+      return ram.mem.data();
+    }
+    void trace(paddr_t addr, bool is_read, word_t pc = 0, word_t value = 0) {
+      for (auto &r : trace_ranges) {
+        if (r[0] <= addr && r[1] >= addr) {
+          std::stringstream os;
+          os << std::hex;
+          if (pc != 0)
+            os << "0x" << pc << " ";
+          if (is_read)
+            os << "[R] ";
+          else
+            os << "[W] " << value << " -> ";
+          os << "0x" << addr << std::dec << std::endl;
+          std::cout << os.rdbuf();
+          break;
+        }
       }
     }
-  }
 };
 #endif

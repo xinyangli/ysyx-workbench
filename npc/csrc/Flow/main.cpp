@@ -1,11 +1,14 @@
 #include "VFlow___024root.h"
+#include "components.hpp"
 #include <VFlow.h>
+#include <array>
 #include <config.hpp>
 #include <cstdint>
 #include <cstdlib>
 #include <disasm.hpp>
 #include <filesystem>
 #include <fstream>
+#include <memory>
 #include <sdb.hpp>
 #include <trm_difftest.hpp>
 #include <trm_interface.hpp>
@@ -13,7 +16,7 @@
 #include <vl_wrapper.hpp>
 #include <vpi_user.h>
 #include <vpi_wrapper.hpp>
-#include <devices.cpp>
+#include <devices.hpp>
 
 using VlModule = VlModuleInterfaceCommon<VFlow>;
 using Registers = _RegistersVPI<uint32_t, 32>;
@@ -25,19 +28,26 @@ CPUState npc_cpu;
 VlModule *top;
 Registers *regs;
 vpiHandle pc = nullptr;
-// std::unique_ptr<Devices[]> 
+
+const size_t PMEM_START = 0x80000000; 
+const size_t PMEM_END = 0x87ffffff;
 
 extern "C" {
+using MMap = MemoryMap<Memory<128 * 1024>, Devices::DeviceMap>;
 void *pmem_get() {
-  static auto pmem =
-      new Memory<int, 128 * 1024>(config.memory_file, config.memory_file_binary,
-                                  std::move(config.mtrace_ranges));
+  static Devices::DeviceMap devices {
+    new Devices::Serial(0x10000000, 0x1000)
+  };
+  static auto pmem = new MemoryMap<Memory<128 * 1024>, Devices::DeviceMap>(
+      std::make_unique<Memory<128 * 1024>>(
+          config.memory_file, config.memory_file_binary, PMEM_START, PMEM_END),
+      std::make_unique<Devices::DeviceMap>(devices), config.mtrace_ranges);
   return pmem;
 }
 
 int pmem_read(int raddr) {
   void *pmem = pmem_get();
-  auto mem = static_cast<Memory<int, 128 * 1024> *>(pmem);
+  auto mem = static_cast<MMap *>(pmem);
   // TODO: Do memory difftest at memory read and write to diagnose at a finer
   // granularity
   if (config.do_mtrace)
@@ -47,9 +57,10 @@ int pmem_read(int raddr) {
 
 void pmem_write(int waddr, int wdata, char wmask) {
   void *pmem = pmem_get();
-  auto mem = static_cast<Memory<int, 128 * 1024> *>(pmem);
+  auto mem = static_cast<MMap *>(pmem);
   if (config.do_mtrace)
     mem->trace((std::size_t)waddr, false, regs->get_pc(), wdata);
+  
   return mem->write((std::size_t)waddr, wdata, wmask);
 }
 }
@@ -57,10 +68,7 @@ void pmem_write(int waddr, int wdata, char wmask) {
 namespace NPC {
 void npc_memcpy(paddr_t addr, void *buf, size_t sz, bool direction) {
   if (direction == TRM_FROM_MACHINE) {
-    memcpy(
-        buf,
-        static_cast<Memory<int, 128 * 1024> *>(pmem_get())->guest_to_host(addr),
-        sz);
+    static_cast<MMap *>(pmem_get())->copy_to(addr, (uint8_t *)buf, sz);
   }
 };
 
