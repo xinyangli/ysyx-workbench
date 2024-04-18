@@ -139,8 +139,7 @@ int main(int argc, char **argv, char **env) {
   if(config.lib_ref.empty()) {
     NPC::npc_interface.init(0);
     while(true) {
-      word_t pc = NPC::npc_interface.at("pc");
-      word_t inst = NPC::npc_interface.at(pc);
+      word_t inst = NPC::npc_interface.at(regs->get_pc());
       std::cout << std::hex << pc << ' '<< inst << std::endl;
       if (inst == 1048691) {
         return 0;
