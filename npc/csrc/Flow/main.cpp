@@ -69,7 +69,6 @@ void pmem_write(int waddr, int wdata, char wmask) {
 namespace NPC {
 void npc_memcpy(paddr_t addr, void *buf, size_t sz, bool direction) {
   if (direction == TRM_FROM_MACHINE) {
-    std::cout << "memcpy" << std::endl;
     static_cast<MMap *>(pmem_get())->copy_to(addr, (uint8_t *)buf, sz);
   }
 };
@@ -142,7 +141,7 @@ int main(int argc, char **argv, char **env) {
   std::filesystem::path ref{config.lib_ref};
   RefTrmInterface ref_interface{ref};
   DifftestTrmInterface diff_interface{NPC::npc_interface, ref_interface,
-                                      pmem_get(), 128 * 1024};
+                                      static_cast<MMap *>(pmem_get())->get_pmem(), 128 * 1024};
   if(config.interactive) {
     SDB::SDB sdb_diff{diff_interface};
     sdb_diff.main_loop();
