@@ -1,6 +1,7 @@
 #include <cstdint>
 #include <cassert>
 #include <iostream>
+#include <array>
 #include <memory>
 
 namespace Devices {
