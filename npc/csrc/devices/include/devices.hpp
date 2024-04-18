@@ -25,6 +25,7 @@ class Serial : public Device {
   std::array<uint8_t, 1> buf;
   public:
     Serial(uint64_t addr, size_t len);
+    ~Serial();
     void io_handler(uint32_t offset, size_t len, bool is_write) override;
     void transfer(uint8_t *src, size_t len, bool is_write) override;
 };
