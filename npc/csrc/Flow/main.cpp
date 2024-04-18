@@ -52,7 +52,7 @@ int pmem_read(int raddr) {
   // granularity
   if (config.do_mtrace)
     mem->trace(raddr, true, regs->get_pc());
-  if(g_skip_memcheck) return 0;
+  if(g_skip_memcheck) return mem->read(PMEM_START);
   return mem->read(raddr);
 }
 
