@@ -34,17 +34,10 @@ public:
 };
 
 template <std::size_t n> class Memory {
-  static word_t expand_bits(uint8_t bits) {
-    word_t x = bits;
-    x = (x | (x << 7) | (x << 14) | (x << 21)) & 0x01010101;
-    x = x * 0xFF;
-    // printf("expand: %hhx->%x\n", bits, x);
-    return x;
-  }
   paddr_t pmem_start, pmem_end;
 
 public:
-  std::array<word_t, n> mem;
+  std::array<uint8_t, n> mem;
   // TODO: Read memory file before init and use memcpy to initialize memory.
   Memory(std::filesystem::path filepath, bool is_binary, paddr_t pmem_start, paddr_t pmem_end)
       : pmem_start(pmem_start), pmem_end(pmem_end) {
