@@ -121,7 +121,7 @@ class MemoryMap {
       else { std::cerr << "Not in pmem"; }
     }
     void *get_pmem() {
-      return ram.mem.data();
+      return ram->mem.data();
     }
     void trace(paddr_t addr, bool is_read, word_t pc = 0, word_t value = 0) {
       for (auto &r : trace_ranges) {
