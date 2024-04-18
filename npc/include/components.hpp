@@ -100,12 +100,12 @@ class MemoryMap {
       // printf("waddr: 0x%x\n", waddr);
       size_t len = (wmask & 1) + (wmask & 2) + (wmask & 4) + (wmask & 8);
       if (ram->in_pmem(waddr)) { ram->transfer(waddr, (uint8_t *)&wdata, len, true);}
-      else { devices.handle(waddr, (uint8_t *)&wdata, len, true); }
+      else { devices->handle(waddr, (uint8_t *)&wdata, len, true); }
     }
     word_t read(paddr_t raddr) {
       word_t res = 0;
       if (ram->in_pmem(raddr)) { ram->transfer(raddr, (uint8_t *)&res, 4, true);}
-      else { devices.handle(raddr, (uint8_t *)&res, 4, true); }
+      else { devices->handle(raddr, (uint8_t *)&res, 4, true); }
       return res;
     }
     void copy_to(paddr_t addr, uint8_t *buf, size_t len) const {
