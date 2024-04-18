@@ -160,6 +160,7 @@ int main(int argc, char **argv, char **env) {
   }
 
   try {
+    diff_interface.init(0);
     diff_interface.exec(-1);
   } catch (TrmRuntimeException &e) {
     switch (e.error_code()) {
