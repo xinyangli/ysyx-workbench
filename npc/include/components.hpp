@@ -109,11 +109,11 @@ class MemoryMap {
       return res;
     }
     void copy_to(paddr_t addr, uint8_t *buf, size_t len) const {
-      if (ram->in_pmem()) { ram->transfer(addr, buf, len, false);}
+      if (ram->in_pmem(addr)) { ram->transfer(addr, buf, len, false);}
       else { std::cerr << "Not in pmem" << std::endl; }
     }
     void copy_from(paddr_t addr, const uint8_t *buf, size_t len) {
-      if (ram->in_pmem()) { ram->transfer(addr, buf, len, true);}
+      if (ram->in_pmem(addr)) { ram->transfer(addr, buf, len, true);}
       else { std::cerr << "Not in pmem"; }
     }
     void *get_pmem() {
