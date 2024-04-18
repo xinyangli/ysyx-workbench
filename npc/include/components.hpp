@@ -63,26 +63,30 @@ public:
     }
   }
   const word_t &operator[](std::size_t addr) { return this->read(addr); }
-  void transfer(paddr_t addr, uint8_t *data, size_t len, bool is_write) {
+  void transfer(paddr_t addr, uint8_t data[], size_t len, bool is_write) {
     if(!is_write) {
-      std::copy(data, (uint8_t *)guest_to_host(addr), len);
+      // memcpy(data, guest_to_host(addr), len);
+      size_t offset = (addr - pmem_start);
+      std::copy(data, data + len, &mem[offset]);
     } else {
-      std::copy((uint8_t *)guest_to_host(addr), data, len);
+      // memcpy(guest_to_host(addr), data, len);
+      size_t offset = (addr - pmem_start);
+      std::copy(&mem[offset], &mem[offset + len], data);
     }
   }
-  void *guest_to_host(std::size_t addr) {
-    extern bool g_skip_memcheck;
-    if (g_skip_memcheck) {
-      return mem.data();
-    }
-    if (!in_pmem(addr)) {
-      std::cerr << std::hex << "ACCESS " << addr << std::dec << std::endl;
-      throw std::runtime_error("Invalid memory access");
-    }
-    // Linear mapping
-    size_t offset = (addr - pmem_start);
-    return (uint8_t *)mem.data() + offset;
-  }
+  // void *guest_to_host(std::size_t addr) {
+  //   extern bool g_skip_memcheck;
+  //   if (g_skip_memcheck) {
+  //     return mem.data();
+  //   }
+  //   if (!in_pmem(addr)) {
+  //     std::cerr << std::hex << "ACCESS " << addr << std::dec << std::endl;
+  //     throw std::runtime_error("Invalid memory access");
+  //   }
+  //   // Linear mapping
+  //   size_t offset = (addr - pmem_start);
+  //   return (uint8_t *)mem.data() + offset;
+  // }
   bool in_pmem(paddr_t addr) const {
     return addr >= pmem_start && addr <= pmem_end;
   }
