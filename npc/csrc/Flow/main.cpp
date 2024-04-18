@@ -69,6 +69,7 @@ void pmem_write(int waddr, int wdata, char wmask) {
 namespace NPC {
 void npc_memcpy(paddr_t addr, void *buf, size_t sz, bool direction) {
   if (direction == TRM_FROM_MACHINE) {
+    std::cout << "memcpy" << std::endl;
     static_cast<MMap *>(pmem_get())->copy_to(addr, (uint8_t *)buf, sz);
   }
 };
