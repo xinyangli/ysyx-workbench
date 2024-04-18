@@ -95,7 +95,7 @@ class MemoryMap {
     MemoryMap(std::unique_ptr<Mem> &&ram, std::unique_ptr<DevMap> &&devices, const std::vector<std::array<uint64_t, 2>> &trace_ranges)
         : ram(std::move(ram)), devices(std::move(devices)), trace_ranges(trace_ranges) {}
     void write(paddr_t waddr, word_t wdata, char wmask) {
-      printf("waddr: 0x%x\n", waddr);
+      // printf("waddr: 0x%x\n", waddr);
       size_t len = (wmask & 1) + ((wmask & 2) >> 1) + ((wmask & 4) >> 2) + ((wmask & 8) >> 3);
       if (ram->in_pmem(waddr)) { ram->transfer(waddr, (uint8_t *)&wdata, len, true);}
       else if(devices->handle(waddr, (uint8_t *)&wdata, len, true)) {}
