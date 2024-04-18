@@ -65,9 +65,9 @@ public:
   const word_t &operator[](std::size_t addr) { return this->read(addr); }
   void transfer(paddr_t addr, uint8_t *data, size_t len, bool is_write) {
     if(!is_write) {
-      std::copy(data, guest_to_host(addr), len);
+      std::copy(data, (uint8_t *)guest_to_host(addr), len);
     } else {
-      std::copy(guest_to_host(addr), data, len);
+      std::copy((uint8_t *)guest_to_host(addr), data, len);
     }
   }
   void *guest_to_host(std::size_t addr) {
