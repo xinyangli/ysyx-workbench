@@ -133,7 +133,7 @@ class MemoryMap {
           if (pc != 0)
             os << "0x" << pc << " ";
           if (is_read)
-            os << "[R] " << ram->read(addr) << " -> ";
+            os << "[R] " << this->read(addr) << " -> ";
           else
             os << "[W] " << value << " -> ";
           os << "0x" << addr << std::dec << std::endl;
