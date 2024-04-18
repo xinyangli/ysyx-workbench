@@ -112,6 +112,7 @@ class MemoryMap {
       // printf("raddr: 0x%x, in_pmem: %d\n", raddr, ram->in_pmem(raddr));
       if (ram->in_pmem(raddr)) { ram->transfer(raddr, (uint8_t *)&res, 4, false);}
       else if( devices->handle(raddr, (uint8_t *)&res, 4, true)) {}
+      std::cout << res << std::endl;
       return res;
     }
     void copy_to(paddr_t addr, uint8_t *buf, size_t len) const {
