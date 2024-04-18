@@ -104,8 +104,8 @@ class MemoryMap {
     }
     word_t read(paddr_t raddr) {
       word_t res = 0;
-      if (ram->in_pmem(raddr)) { ram->transfer(raddr, &res, 4, true);}
-      else { devices.handle(raddr, &res, 4, true); }
+      if (ram->in_pmem(raddr)) { ram->transfer(raddr, *(uint8_t *)&res, 4, true);}
+      else { devices.handle(raddr, *(uint8_t *)&res, 4, true); }
       return res;
     }
     void copy_to(paddr_t addr, uint8_t *buf, size_t len) const {
