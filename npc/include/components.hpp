@@ -109,7 +109,7 @@ class MemoryMap {
     }
     word_t read(paddr_t raddr) {
       word_t res = 0;
-      printf("raddr: 0x%x, in_pmem: %d\n", raddr, ram->in_pmem(raddr));
+      // printf("raddr: 0x%x, in_pmem: %d\n", raddr, ram->in_pmem(raddr));
       if (ram->in_pmem(raddr)) { ram->transfer(raddr, (uint8_t *)&res, 4, true);}
       else if( devices->handle(raddr, (uint8_t *)&res, 4, true)) {}
       return res;
