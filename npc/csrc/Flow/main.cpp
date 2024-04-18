@@ -136,6 +136,18 @@ word_t reg_str2val(const char *name, bool *success) {
 int main(int argc, char **argv, char **env) {
   config.cli_parse(argc, argv);
 
+  if(config.lib_ref.empty()) {
+    NPC::npc_interface.init(0);
+    while(true) {
+      word_t pc = NPC::npc_interface.at("pc");
+      word_t inst = NPC::npc_interface.at(pc);
+      if (inst == 1048691) {
+        return 0;
+      }
+      NPC::npc_interface.exec(1);
+    }
+  }
+
   /* -- Difftest -- */
   std::filesystem::path ref{config.lib_ref};
   RefTrmInterface ref_interface{ref};
@@ -144,22 +156,22 @@ int main(int argc, char **argv, char **env) {
   if(config.interactive) {
     SDB::SDB sdb_diff{diff_interface};
     sdb_diff.main_loop();
-  } else {
-    diff_interface.init(0);
-    try {
-      diff_interface.exec(-1);
-    } catch (TrmRuntimeException &e) {
-      switch (e.error_code()) {
-      case TrmRuntimeException::EBREAK:
-        return 0;
-      case TrmRuntimeException::DIFFTEST_FAILED:
-        std::cout << "Difftest Failed" << std::endl;
-        diff_interface.print(std::cout);
-        return 1;
-      default:
-        std::cerr << "Unknown error happened" << std::endl;
-        return 1;
-      }
+    return 0;
+  }
+
+  try {
+    diff_interface.exec(-1);
+  } catch (TrmRuntimeException &e) {
+    switch (e.error_code()) {
+    case TrmRuntimeException::EBREAK:
+      return 0;
+    case TrmRuntimeException::DIFFTEST_FAILED:
+      std::cout << "Difftest Failed" << std::endl;
+      diff_interface.print(std::cout);
+      return 1;
+    default:
+      std::cerr << "Unknown error happened" << std::endl;
+      return 1;
     }
   }
 
