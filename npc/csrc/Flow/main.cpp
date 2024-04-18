@@ -52,6 +52,7 @@ int pmem_read(int raddr) {
   // granularity
   if (config.do_mtrace)
     mem->trace(raddr, true, regs->get_pc());
+  if(g_skip_memcheck) return 0;
   return mem->read(raddr);
 }
 
@@ -60,7 +61,7 @@ void pmem_write(int waddr, int wdata, char wmask) {
   auto mem = static_cast<MMap *>(pmem);
   if (config.do_mtrace)
     mem->trace((std::size_t)waddr, false, regs->get_pc(), wdata);
-  
+  if(g_skip_memcheck) return;
   return mem->write((std::size_t)waddr, wdata, wmask);
 }
 }

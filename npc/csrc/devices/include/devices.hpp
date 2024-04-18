@@ -38,11 +38,11 @@ class DeviceMap {
         addr_to_device.insert(std::make_pair(device->addr, device));
       }
     }
-    void handle(uint64_t addr, uint8_t *data, size_t len, bool is_write) {
+    bool handle(uint64_t addr, uint8_t *data, size_t len, bool is_write) {
       auto it = addr_to_device.upper_bound(addr);
       if(it == addr_to_device.begin() || --it->second->addr + it->second->len <= addr) {
         std::cerr << "Use of a unintialized device at memory addr: 0x" << std::hex << addr << std::dec << std::endl;
-        return;
+        return false;
       }
       auto &device = it->second;
       uint32_t offset = addr - device->addr;
@@ -53,6 +53,7 @@ class DeviceMap {
         device->io_handler(offset, len, is_write);
         device->transfer(data, len, is_write);
       }
+      return true;
     }
     // ~DeviceMap() {
     //   for (auto &device : this->addr_to_device) {
