@@ -141,6 +141,7 @@ int main(int argc, char **argv, char **env) {
     while(true) {
       word_t pc = NPC::npc_interface.at("pc");
       word_t inst = NPC::npc_interface.at(pc);
+      std::cout << pc << ' '<< inst << std::endl;
       if (inst == 1048691) {
         return 0;
       }
