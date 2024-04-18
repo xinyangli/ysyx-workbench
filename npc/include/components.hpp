@@ -129,14 +129,13 @@ class MemoryMap {
       for (auto &r : trace_ranges) {
         if (r[0] <= addr && r[1] >= addr) {
           std::stringstream os;
-          os << std::hex;
           if (pc != 0)
-            os << "0x" << pc << " ";
+            os << "0x" << std::hex << pc << " ";
           if (is_read)
-            os << "[R] " << this->read(addr) << " -> ";
+            os << "[R] " << "0x" << addr << ": 0x" << this->read(addr);
           else
-            os << "[W] " << value << " -> ";
-          os << "0x" << addr << std::dec << std::endl;
+            os << "[W] " << value << " -> " << "0x" << addr;
+          os << std::dec << std::endl;
           std::cout << os.rdbuf();
           break;
         }
