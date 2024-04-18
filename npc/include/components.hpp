@@ -99,8 +99,8 @@ class MemoryMap {
     void write(paddr_t waddr, word_t wdata, char wmask) {
       // printf("waddr: 0x%x\n", waddr);
       size_t len = (wmask & 1) + (wmask & 2) + (wmask & 4) + (wmask & 8);
-      if (ram->in_pmem(waddr)) { ram->transfer(waddr, &wdata, len, true);}
-      else { devices.handle(waddr, &wdata, len, true); }
+      if (ram->in_pmem(waddr)) { ram->transfer(waddr, *(uint8_t *)&wdata, len, true);}
+      else { devices.handle(waddr, *(uint8_t *)&wdata, len, true); }
     }
     word_t read(paddr_t raddr) {
       word_t res = 0;
