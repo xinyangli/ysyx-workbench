@@ -45,6 +45,7 @@ template <std::size_t n> class Memory {
 
 public:
   std::array<word_t, n> mem;
+  // TODO: Read memory file before init and use memcpy to initialize memory.
   Memory(std::filesystem::path filepath, bool is_binary, paddr_t pmem_start, paddr_t pmem_end)
       : pmem_start(pmem_start), pmem_end(pmem_end) {
     if (!std::filesystem::exists(filepath))
@@ -118,7 +119,7 @@ class MemoryMap {
     }
     void copy_from(paddr_t addr, const uint8_t *buf, size_t len) {
       if (ram->in_pmem(addr)) { ram->transfer(addr, buf, len, true);}
-      else { std::cerr << "Not in pmem"; }
+      else { std::cerr << "Not in pmem" << std::endl; }
     }
     void *get_pmem() {
       return ram->mem.data();
