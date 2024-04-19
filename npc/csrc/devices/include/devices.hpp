@@ -46,7 +46,6 @@ class DeviceMap {
       }
       auto &device = it->second;
       uint32_t offset = addr - device->addr;
-      std::cout << std::hex << addr << " " << data << " " << len << " " << is_write << std::endl;
       if(is_write) {
         device->transfer(data, len, is_write);
         device->io_handler(offset, len, is_write);
