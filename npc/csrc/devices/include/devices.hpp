@@ -75,10 +75,5 @@ class DeviceMap {
       }
       return true;
     }
-    // ~DeviceMap() {
-    //   for (auto &device : this->addr_to_device) {
-    //     delete device.second;
-    //   }
-    // }
 };
 }
