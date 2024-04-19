@@ -24,6 +24,6 @@ module RamDpi (
     else begin
       readData = 32'h80000000;
     end
-    inst = pmem_read(pc);
   end
+  inst = pmem_read(pc);
 endmodule
