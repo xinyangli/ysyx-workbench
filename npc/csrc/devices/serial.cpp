@@ -6,7 +6,7 @@ Serial::Serial(uint64_t addr, size_t len) : Device(addr, len) {
   buf[0] = 0;
 };
 void Serial::io_handler(uint32_t offset, size_t len, bool is_write)  {
-  if(!is_write) {
+  if(is_write) {
     std::cout << (char)buf[0];
   }
 }
