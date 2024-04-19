@@ -30,6 +30,7 @@ public:
     for (int i = 0; i < regs.size(); i++) {
       regs[i] = fetch_reg(i);
     }
+    pc = get_pc();
   }
 };
 
