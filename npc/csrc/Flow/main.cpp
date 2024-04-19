@@ -140,17 +140,20 @@ int main(int argc, char **argv, char **env) {
   config.cli_parse(argc, argv);
 
   if(config.lib_ref.empty()) {
-    SDB::SDB sdb_npc{NPC::npc_interface};
-    sdb_npc.main_loop();
-    return 0;
-    // NPC::npc_interface.init(0);
-    // while(true) {
-    //   word_t inst = NPC::npc_interface.at(regs->get_pc());
-    //   if (inst == 1048691) {
-    //     return 0;
-    //   }
-    //   NPC::npc_interface.exec(1);
-    // }
+    if(config.interactive) {
+      SDB::SDB sdb_npc{NPC::npc_interface};
+      sdb_npc.main_loop();
+      return 0;
+    } else {
+      NPC::npc_interface.init(0);
+      while(true) {
+        word_t inst = NPC::npc_interface.at(regs->get_pc());
+        if (inst == 1048691) {
+          return 0;
+        }
+        NPC::npc_interface.exec(1);
+      }
+    }
   }
 
   /* -- Difftest -- */
