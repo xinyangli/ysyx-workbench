@@ -120,7 +120,9 @@ public:
     this->memcpy(addr, &buf, sizeof(word_t), TRM_FROM_MACHINE);
     return buf;
   }
-  void print(std::ostream &os) const override {}
+  void print(std::ostream &os) const override {
+    os << npc_cpu << std::endl;
+  }
 };
 
 DutTrmInterface npc_interface =
