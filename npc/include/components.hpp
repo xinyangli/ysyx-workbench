@@ -33,6 +33,12 @@ public:
   }
 };
 
+// class MemoryFile {
+//   std::filesystem::path filepath;
+//   public:
+
+// };
+
 template <std::size_t n> class Memory {
   paddr_t pmem_start, pmem_end;
 

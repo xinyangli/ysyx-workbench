@@ -23,8 +23,8 @@ uint64_t RTC::get_time() {
   return now - boot_time;
 }
 
-RTC::RTC(uint64_t addr, size_t len) : Device(addr, len) {
-  *(uint64_t *)buf.data() = 0;
+RTC::RTC(uint64_t addr, size_t len) : Device(addr, len, buf) {
+  *(uint64_t *)buf = 0;
 };
 
 void RTC::io_handler(uint32_t offset, size_t len, bool is_write) {
@@ -36,13 +36,13 @@ void RTC::io_handler(uint32_t offset, size_t len, bool is_write) {
   }
 }
 
-void RTC::transfer(uint8_t *src, size_t len, bool is_write) {
-  if (is_write) {
-    for (size_t i = 0; i < len; i++)
-      buf[i] = src[i];
-  } else {
-    for (size_t i = 0; i < len; i++)
-      src[i] = buf[i];
-  }
-}
+// void RTC::transfer(uint8_t *src, size_t len, bool is_write) {
+//   if (is_write) {
+//     for (size_t i = 0; i < len; i++)
+//       buf[i] = src[i];
+//   } else {
+//     for (size_t i = 0; i < len; i++)
+//       src[i] = buf[i];
+//   }
+// }
 }

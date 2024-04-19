@@ -8,30 +8,38 @@
 #include <map>
 #include <memory>
 #include <unordered_map>
+#include <cstring>
 #include <utility>
 
 namespace Devices {
 class Device {
   public:
+    uint8_t *p_buf;
     uint64_t addr;
     size_t len;
-    Device(uint64_t addr, size_t len) : addr(addr), len(len) {}
+    Device(uint64_t addr, size_t len, uint8_t buf[]) : addr(addr), len(len), p_buf(buf) {}
     virtual ~Device() {};
     virtual void io_handler(uint32_t offset, size_t len, bool is_write) = 0;
-    virtual void transfer(uint8_t *src, size_t len, bool is_write) = 0;
+    void transfer(uint8_t *src, size_t len, bool is_write) {
+      if (is_write) {
+        memmove(p_buf, src, len);
+      } else {
+        memmove(src, p_buf, len);
+      }
+    };
 };
 
 class Serial : public Device {
-  std::array<uint8_t, 1> buf;
+  uint8_t buf[1];
   public:
     Serial(uint64_t addr, size_t len);
     ~Serial() override { };
     void io_handler(uint32_t offset, size_t len, bool is_write) override;
-    void transfer(uint8_t *src, size_t len, bool is_write) override;
+    // void transfer(uint8_t *src, size_t len, bool is_write) override;
 };
 
 class RTC : public Device {
-  std::array<uint8_t, 8> buf;
+  uint8_t buf[8];
   uint64_t boot_time;
   uint64_t get_time_internal();
   uint64_t get_time();
@@ -39,7 +47,7 @@ class RTC : public Device {
     RTC(uint64_t addr, size_t len);
     ~RTC() override { };
     void io_handler(uint32_t offset, size_t len, bool is_write) override;
-    void transfer(uint8_t *src, size_t len, bool is_write) override;
+    // void transfer(uint8_t *src, size_t len, bool is_write) override;
 };
 
 class DeviceMap {
