@@ -22,7 +22,7 @@ module RamDpi (
       end
     end
     else begin
-      readData = 0x80000000;
+      readData = 4'h80000000;
     end
     inst = pmem_read(pc);
   end
