@@ -40,7 +40,7 @@ class DeviceMap {
     }
     bool handle(uint64_t addr, uint8_t *data, size_t len, bool is_write) {
       auto it = addr_to_device.upper_bound(addr);
-      std::cout << std::hex << addr << " " << data << " " << len << " " << is_write << std::endl;
+      // std::cout << std::hex << addr << " " << data << " " << len << " " << is_write << std::endl;
       if(it == addr_to_device.begin() || (--it)->second->addr + it->second->len <= addr) {
         std::cerr << "Use of a unintialized device at memory addr: 0x" << std::hex << addr << std::dec << std::endl;
         return false;
