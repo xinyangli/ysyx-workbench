@@ -121,7 +121,7 @@ public:
     return buf;
   }
   void print(std::ostream &os) const override {
-    os << (*(CPUState *)cpu_state) << std::endl;
+    os << (CPUState *)cpu_state << std::endl;
   }
 };
 

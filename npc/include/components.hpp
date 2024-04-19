@@ -30,7 +30,6 @@ public:
     for (int i = 0; i < regs.size(); i++) {
       regs[i] = fetch_reg(i);
     }
-    pc = get_pc();
   }
 };
 
@@ -69,19 +68,6 @@ public:
       std::copy(&mem[offset], &mem[offset + len], data);
     }
   }
-  // void *guest_to_host(std::size_t addr) {
-  //   extern bool g_skip_memcheck;
-  //   if (g_skip_memcheck) {
-  //     return mem.data();
-  //   }
-  //   if (!in_pmem(addr)) {
-  //     std::cerr << std::hex << "ACCESS " << addr << std::dec << std::endl;
-  //     throw std::runtime_error("Invalid memory access");
-  //   }
-  //   // Linear mapping
-  //   size_t offset = (addr - pmem_start);
-  //   return (uint8_t *)mem.data() + offset;
-  // }
   bool in_pmem(paddr_t addr) const {
     return addr >= pmem_start && addr <= pmem_end;
   }
@@ -97,20 +83,28 @@ class MemoryMap {
         : ram(std::move(ram)), devices(std::move(devices)), trace_ranges(trace_ranges) {}
     void write(paddr_t waddr, word_t wdata, char wmask) {
       // printf("waddr: 0x%x\n", waddr);
-      size_t len = (wmask & 1) + ((wmask & 2) >> 1) + ((wmask & 4) >> 2) + ((wmask & 8) >> 3);
-      if (ram->in_pmem(waddr)) { ram->transfer(waddr, (uint8_t *)&wdata, len, true);}
-      else if(devices->handle(waddr, (uint8_t *)&wdata, len, true)) {}
+      size_t len = (wmask & 1) + ((wmask & 2) >> 1) + ((wmask & 4) >> 2) +
+                   ((wmask & 8) >> 3);
+      if (ram->in_pmem(waddr)) {
+        ram->transfer(waddr, (uint8_t *)&wdata, len, true);
+      } else if (devices->handle(waddr, (uint8_t *)&wdata, len, true)) {
+      }
     }
-    word_t read(paddr_t raddr) {
+    word_t read(paddr_t raddr) const {
       word_t res = 0;
       // printf("raddr: 0x%x, in_pmem: %d\n", raddr, ram->in_pmem(raddr));
-      if (ram->in_pmem(raddr)) { ram->transfer(raddr, (uint8_t *)&res, 4, false);}
-      else if( devices->handle(raddr, (uint8_t *)&res, 4, false)) {}
+      if (ram->in_pmem(raddr)) {
+        ram->transfer(raddr, (uint8_t *)&res, 4, false);
+      } else if (devices->handle(raddr, (uint8_t *)&res, 4, false)) {
+      }
       return res;
     }
     void copy_to(paddr_t addr, uint8_t *buf, size_t len) const {
-      if (ram->in_pmem(addr)) { ram->transfer(addr, buf, len, false);}
-      else { std::cerr << "Not in pmem" << std::endl; }
+      if (ram->in_pmem(addr)) {
+        ram->transfer(addr, buf, len, false);
+      } else {
+        std::cerr << "Not in pmem" << std::endl;
+      }
     }
     void copy_from(paddr_t addr, const uint8_t *buf, size_t len) {
       if (ram->in_pmem(addr)) { ram->transfer(addr, buf, len, true);}
