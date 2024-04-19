@@ -3,7 +3,6 @@
 #include <cstdint>
 #include <disasm.hpp>
 #include <sdb.hpp>
-#include <stdexcept>
 #include <trm_interface.hpp>
 #include <types.h>
 extern "C" {

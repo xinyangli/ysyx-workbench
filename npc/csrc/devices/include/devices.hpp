@@ -30,6 +30,18 @@ class Serial : public Device {
     void transfer(uint8_t *src, size_t len, bool is_write) override;
 };
 
+class RTC : public Device {
+  std::array<uint8_t, 8> buf;
+  uint64_t boot_time;
+  uint64_t get_time_internal();
+  uint64_t get_time();
+  public:
+    RTC(uint64_t addr, size_t len);
+    ~RTC() override { };
+    void io_handler(uint32_t offset, size_t len, bool is_write) override;
+    void transfer(uint8_t *src, size_t len, bool is_write) override;
+};
+
 class DeviceMap {
   std::map<uint64_t, Device *> addr_to_device;
   public:
