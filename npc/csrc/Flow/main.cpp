@@ -36,7 +36,7 @@ extern "C" {
 using MMap = MemoryMap<Memory<128 * 1024>, Devices::DeviceMap>;
 void *pmem_get() {
   static Devices::DeviceMap devices {
-    new Devices::Serial(0x10000000, 0x1000)
+    new Devices::Serial(0x20000000, 0x1000)
   };
   static auto pmem = new MemoryMap<Memory<128 * 1024>, Devices::DeviceMap>(
       std::make_unique<Memory<128 * 1024>>(
