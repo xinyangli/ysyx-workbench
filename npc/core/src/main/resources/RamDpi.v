@@ -12,7 +12,7 @@ module RamDpi (
   input reg [31:0] readAddr,
   output reg [31:0] readData,
   input reg [31:0] pc,
-  output reg [31:0] inst
+  output [31:0] inst
 );
   always @(posedge clock) begin
     if (valid) begin // 有读写请求时
