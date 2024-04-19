@@ -122,7 +122,7 @@ public:
   }
   void print(std::ostream &os) const override {
     this->regcpy(cpu_state, TRM_FROM_MACHINE);
-    os << (CPUState *)cpu_state << std::endl;
+    os << *(CPUState *)cpu_state << std::endl;
   }
 };
 
