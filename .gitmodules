@@ -1,3 +1,6 @@
 [submodule "am-kernels"]
 	path = am-kernels
 	url = https://git.xinyang.life/xin/am-kernels.git
+[submodule "nemu/mini-gdbstub"]
+	path = nemu/mini-gdbstub
+	url = git@github.com:xinyangli/mini-gdbstub.git
