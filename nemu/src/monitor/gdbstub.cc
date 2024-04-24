@@ -112,9 +112,9 @@ int nemu_gdbstub_init() {
   return 0;
 }
 int nemu_gdbstub_run() {
-  // if (!gdbstub_run(&dbg.gdbstub, &dbg)) {
-  //   return EINVAL;
-  // }
+  if (!gdbstub_run(&dbg.gdbstub, &dbg)) {
+    return EINVAL;
+  }
   return 0;
 }
 }
