@@ -90,7 +90,9 @@ static bool nemu_del_bp(void *args, size_t addr, bp_type_t type) {
   return false;
 }
 
-static void nemu_on_interrupt(void *args) {}
+static void nemu_on_interrupt(void *args) {
+  fputs("Not implemented", stderr);
+}
 
 extern "C" {
 
