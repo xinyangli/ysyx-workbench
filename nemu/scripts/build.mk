@@ -73,7 +73,7 @@ app: $(BINARY)
 
 $(BINARY):: $(OBJS) $(ARCHIVES) $(NEMU_HOME)/mini-gdbstub/build/libgdbstub.a
 	@echo + LD $@
-	@$(LD) -o $@ $(NEMU_HOME)/mini-gdbstub/build/libgdbstub.a $(OBJS) $(LDFLAGS) $(ARCHIVES) $(LIBS) 
+	@$(LD) -o $@ $(OBJS) $(NEMU_HOME)/mini-gdbstub/build/libgdbstub.a  $(LDFLAGS) $(ARCHIVES) $(LIBS) 
 
 install: $(BINARY)
 ifeq ($(SHARE),1)

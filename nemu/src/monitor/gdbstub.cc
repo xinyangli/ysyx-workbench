@@ -105,10 +105,10 @@ static struct target_ops nemu_gdbstub_ops = {.cont = nemu_cont,
                                              .on_interrupt = nemu_on_interrupt};
 static DbgState dbg;
 int nemu_gdbstub_init() {
-  // if (!gdbstub_init(&dbg.gdbstub, &nemu_gdbstub_ops, (arch_info_t)isa_arch_info,
-  //                   (char *)"auto")) {
-  //   return EINVAL;
-  // }
+  if (!gdbstub_init(&dbg.gdbstub, &nemu_gdbstub_ops, (arch_info_t)isa_arch_info,
+                    (char *)"auto")) {
+    return EINVAL;
+  }
   return 0;
 }
 int nemu_gdbstub_run() {
