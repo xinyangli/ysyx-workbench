@@ -1,3 +1,4 @@
+#include "utils.h"
 #include <vector>
 
 extern "C" {
@@ -33,23 +34,10 @@ static gdb_action_t nemu_is_stopped() {
   switch (nemu_state.state) {
   case NEMU_RUNNING:
     nemu_state.state = NEMU_STOP;
-    return ACT_RESUME;
+    return (gdb_action_t) {.reason = gdb_action_t::ACT_BREAKPOINT, .data = 0};
 
-  case NEMU_END:
-  case NEMU_ABORT: {
-    // Log("nemu: %s at pc = " FMT_WORD,
-    //     (nemu_state.state == NEMU_ABORT
-    //          ? ANSI_FMT("ABORT", ANSI_FG_RED)
-    //          : (nemu_state.halt_ret == 0
-    //                 ? ANSI_FMT("HIT GOOD TRAP", ANSI_FG_GREEN)
-    //                 : ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED))),
-    //     nemu_state.halt_pc);
-    if (nemu_state.halt_ret != 0) {
-      IFDEF(CONFIG_ITRACE, log_itrace_print());
-    }
-  }
   default:
-    return ACT_SHUTDOWN;
+    return (gdb_action_t) {.reason = gdb_action_t::ACT_SHUTDOWN, .data = nemu_state.halt_ret};
   }
 }
 
@@ -110,7 +98,7 @@ static struct target_ops nemu_gdbstub_ops = {.cont = nemu_cont,
 static DbgState dbg;
 int nemu_gdbstub_init() {
   if (!gdbstub_init(&dbg.gdbstub, &nemu_gdbstub_ops, (arch_info_t)isa_arch_info,
-                    (char *)"127.0.0.1:1234")) {
+                    (char *)".nemugdb")) {
     return EINVAL;
   }
   return 0;
