@@ -22,7 +22,7 @@ CXX := g++
 endif
 LD := $(CXX)
 INCLUDES = $(addprefix -I, $(INC_PATH))
-CFLAGS  := -O2 -MMD -Wall -Werror $(INCLUDES) $(CFLAGS)
+CFLAGS  := -O2 -MMD -Wall $(INCLUDES) $(CFLAGS)
 LDFLAGS := -O2 $(LDFLAGS)
 
 OBJS = $(SRCS:%.c=$(OBJ_DIR)/%.o) $(CXXSRC:%.cc=$(OBJ_DIR)/%.o)
@@ -71,9 +71,9 @@ $(OBJ_DIR)/%.yy.o: $(OBJ_DIR)/%.yy.c
 
 app: $(BINARY)
 
-$(BINARY):: $(OBJS) $(ARCHIVES)
+$(BINARY):: $(OBJS) $(ARCHIVES) $(NEMU_HOME)/mini-gdbstub/build/libgdbstub.a
 	@echo + LD $@
-	@$(LD) -o $@ $(OBJS) $(LDFLAGS) $(ARCHIVES) $(LIBS)
+	@$(LD) -o $@ $(NEMU_HOME)/mini-gdbstub/build/libgdbstub.a $(OBJS) $(LDFLAGS) $(ARCHIVES) $(LIBS) 
 
 install: $(BINARY)
 ifeq ($(SHARE),1)

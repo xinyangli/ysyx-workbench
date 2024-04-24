@@ -14,6 +14,8 @@
 ***************************************************************************************/
 
 #include <isa.h>
+#include <errno.h>
+#include "gdbstub.h"
 #include "local-include/reg.h"
 #include "macro.h"
 
@@ -49,3 +51,34 @@ word_t isa_reg_str2val(const char *s, bool *success) {
 
   return gpr(i);
 }
+
+int isa_read_reg(void *args, int regno, size_t *reg_value) {
+    if (regno > 32) {
+        return EFAULT;
+    }
+
+    if (regno == 32) {
+        *reg_value = cpu.pc;
+    } else {
+        *reg_value = cpu.gpr[regno];
+    }
+    return 0;
+}
+
+int isa_write_reg(void *args, int regno, size_t data) {
+    if (regno > 32) {
+        return EFAULT;
+    }
+
+    if (regno == 32) {
+        cpu.pc = data;
+    } else {
+        cpu.gpr[regno] = data;
+    }
+    return 0;
+}
+
+arch_info_t isa_arch_info = {
+  .reg_num = 33,
+  .reg_byte = MUXDEF(CONFIG_RV64, 8, 4),
+};

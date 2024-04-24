@@ -34,7 +34,6 @@ IFDEF(CONFIG_ITRACE, extern char logbuf[CONFIG_ITRACE_BUFFER][128]);
 IFDEF(CONFIG_ITRACE, extern int logbuf_rear);
 
 void device_update();
-bool wp_eval_all();
 
 static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 #ifdef CONFIG_ITRACE_COND
@@ -82,10 +81,6 @@ static void execute(uint64_t n) {
     exec_once(&s, cpu.pc);
     g_nr_guest_inst ++;
     trace_and_difftest(&s, cpu.pc);
-    if (wp_eval_all()) { 
-      IFDEF(CONFIG_ITRACE, puts(logbuf[logbuf_rear]));
-      break;
-    }
     if (nemu_state.state != NEMU_RUNNING) break;
     IFDEF(CONFIG_DEVICE, device_update());
   }
@@ -139,29 +134,19 @@ void cpu_exec(uint64_t n) {
   }
 }
 
-void cpu_exec_with_bp(uint64_t n, size_t *bp, size_t len) {
+void cpu_exec_with_bp(uint64_t n, breakpoint_t *bp, size_t len) {
   static Decode s;
   do {
     exec_once(&s, cpu.pc);
     g_nr_guest_inst++;
     for(int i = 0; i < len; i++) {
-      if(cpu.pc == bp[i]) return;
+      size_t addr = bp[i].addr;
+      if(cpu.pc == addr) return;
+      if(s.inst_type == INST_MEM_READ && s.inst_value.rmem == addr) {
+        return;
+      } else if(s.inst_type == INST_MEM_WRITE && s.inst_value.wmem == addr) {
+        return;
+      }
     }
   } while(--n);
-
-  switch (nemu_state.state) {
-    case NEMU_RUNNING: nemu_state.state = NEMU_STOP; break;
-
-    case NEMU_END: case NEMU_ABORT: {
-      Log("nemu: %s at pc = " FMT_WORD,
-          (nemu_state.state == NEMU_ABORT ? ANSI_FMT("ABORT", ANSI_FG_RED) :
-           (nemu_state.halt_ret == 0 ? ANSI_FMT("HIT GOOD TRAP", ANSI_FG_GREEN) :
-            ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED))),
-          nemu_state.halt_pc);
-      if(nemu_state.halt_ret != 0) {
-        IFDEF(CONFIG_ITRACE, log_itrace_print());
-      }
-    } // fall through
-    case NEMU_QUIT: statistic();
-  }
 }

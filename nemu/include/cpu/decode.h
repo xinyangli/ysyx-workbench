@@ -16,12 +16,24 @@
 #ifndef __CPU_DECODE_H__
 #define __CPU_DECODE_H__
 
+#include "types.h"
 #include <isa.h>
+
+typedef enum {
+  INST_NORMAL, INST_MEM_WRITE, INST_MEM_READ
+} inst_type_t;
+
+typedef union {
+  paddr_t rmem;
+  paddr_t wmem;
+} inst_type_op;
 
 typedef struct Decode {
   vaddr_t pc;
   vaddr_t snpc; // static next pc
   vaddr_t dnpc; // dynamic next pc
+  inst_type_t inst_type;
+  inst_type_op inst_value;
   ISADecodeInfo isa;
 } Decode;
 

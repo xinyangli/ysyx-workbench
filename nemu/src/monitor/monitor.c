@@ -22,7 +22,6 @@ void init_log(const char *log_file);
 void init_mem();
 void init_difftest(char *ref_so_file, long img_size, int port);
 void init_device();
-void init_sdb();
 void init_disasm(const char *triple);
 
 static void welcome() {
@@ -37,8 +36,6 @@ static void welcome() {
 
 #ifndef CONFIG_TARGET_AM
 #include <getopt.h>
-
-void sdb_set_batch_mode();
 
 static char *log_file = NULL;
 static char *elf_file = NULL;
@@ -81,7 +78,6 @@ static int parse_args(int argc, char *argv[]) {
   int o;
   while ( (o = getopt_long(argc, argv, "-bhl:d:p:", table, NULL)) != -1) {
     switch (o) {
-      case 'b': sdb_set_batch_mode(); break;
       case 'p': sscanf(optarg, "%d", &difftest_port); break;
       case 'l': log_file = optarg; break;
       case 'd': diff_so_file = optarg; break;
@@ -127,9 +123,6 @@ void init_monitor(int argc, char *argv[]) {
 
   /* Initialize differential testing. */
   init_difftest(diff_so_file, img_size, difftest_port);
-
-  /* Initialize the simple debugger. */
-  init_sdb();
 
   // printf("elf_file: %s\n", elf_file);
   if(elf_file != NULL) {

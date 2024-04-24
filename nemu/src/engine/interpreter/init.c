@@ -14,6 +14,7 @@
 ***************************************************************************************/
 
 #include <cpu/cpu.h>
+#include <gdbstub.h>
 
 void sdb_mainloop();
 
@@ -22,6 +23,9 @@ void engine_start() {
   cpu_exec(-1);
 #else
   /* Receive commands from user. */
-  sdb_mainloop();
+  int nemu_gdbstub_init();
+  int nemu_gdbstub_run();
+  nemu_gdbstub_init();
+  nemu_gdbstub_run();
 #endif
 }
