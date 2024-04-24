@@ -18,12 +18,13 @@ typedef struct {
 } DbgState;
 
 static int nemu_read_mem(void *args, size_t addr, size_t len, void *val) {
-  if(addr < 0x80000000) return EINVAL;
+  if(!in_pmem(addr)) return EINVAL;
   memcpy(val, guest_to_host(addr), len);
   return 0;
 }
 
 static int nemu_write_mem(void *args, size_t addr, size_t len, void *val) {
+  if(!in_pmem(addr)) return EINVAL;
   memcpy(guest_to_host(addr), val, len);
   return 0;
 }
