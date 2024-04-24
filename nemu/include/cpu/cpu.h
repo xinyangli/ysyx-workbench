@@ -17,9 +17,10 @@
 #define __CPU_CPU_H__
 
 #include <common.h>
+#include <stddef.h>
 
-int cpu_exec_only(uint64_t n);
 void cpu_exec(uint64_t n);
+void cpu_exec_with_bp(uint64_t n, size_t *bp, size_t len);
 
 void set_nemu_state(int state, vaddr_t pc, int halt_ret);
 void invalid_inst(vaddr_t thispc);

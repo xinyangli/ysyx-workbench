@@ -105,30 +105,6 @@ void assert_fail_msg() {
   statistic();
 }
 
-// int cpu_exec_only(uint64_t n) {
-//   g_print_step = (n < MAX_INST_TO_PRINT);
-//   switch (nemu_state.state) {
-//     case NEMU_END: case NEMU_ABORT: {
-//       Error("Called after nemu stopped");
-//       return -1;
-//     }
-//     default: nemu_state.state = NEMU_RUNNING;
-//   }
-
-//   execute(n);
-  
-//   switch (nemu_state.state) {
-//     case NEMU_RUNNING: nemu_state.state = NEMU_STOP; return 0;
-
-//     case NEMU_END: case NEMU_ABORT: {
-//       return (nemu_state.halt_ret == 0) ? 1 : -1;
-//     }
-
-//     default:
-//       return -nemu_state.state;
-//   }
-// }
-
 /* Simulate how the CPU works. */
 void cpu_exec(uint64_t n) {
   g_print_step = (n < MAX_INST_TO_PRINT);
@@ -145,6 +121,33 @@ void cpu_exec(uint64_t n) {
 
   uint64_t timer_end = get_time();
   g_timer += timer_end - timer_start;
+
+  switch (nemu_state.state) {
+    case NEMU_RUNNING: nemu_state.state = NEMU_STOP; break;
+
+    case NEMU_END: case NEMU_ABORT: {
+      Log("nemu: %s at pc = " FMT_WORD,
+          (nemu_state.state == NEMU_ABORT ? ANSI_FMT("ABORT", ANSI_FG_RED) :
+           (nemu_state.halt_ret == 0 ? ANSI_FMT("HIT GOOD TRAP", ANSI_FG_GREEN) :
+            ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED))),
+          nemu_state.halt_pc);
+      if(nemu_state.halt_ret != 0) {
+        IFDEF(CONFIG_ITRACE, log_itrace_print());
+      }
+    } // fall through
+    case NEMU_QUIT: statistic();
+  }
+}
+
+void cpu_exec_with_bp(uint64_t n, size_t *bp, size_t len) {
+  static Decode s;
+  do {
+    exec_once(&s, cpu.pc);
+    g_nr_guest_inst++;
+    for(int i = 0; i < len; i++) {
+      if(cpu.pc == bp[i]) return;
+    }
+  } while(--n);
 
   switch (nemu_state.state) {
     case NEMU_RUNNING: nemu_state.state = NEMU_STOP; break;
