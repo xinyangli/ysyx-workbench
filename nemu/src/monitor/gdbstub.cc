@@ -41,16 +41,16 @@ static gdb_action_t nemu_is_stopped() {
   }
 }
 
-static gdb_action_t nemu_cont(void *args) {
+static void nemu_cont(void *args, gdb_action_t *res) {
   DbgState *dbg_state = (DbgState *)args;
   cpu_exec_with_bp(-1, dbg_state->bp->data(), dbg_state->bp->size());
-  return nemu_is_stopped();
+  *res = nemu_is_stopped();
 }
 
-static gdb_action_t nemu_stepi(void *args) {
+static void nemu_stepi(void *args, gdb_action_t *res) {
   DbgState *dbg_state = (DbgState *)args;
   cpu_exec_with_bp(1, dbg_state->bp->data(), dbg_state->bp->size());
-  return nemu_is_stopped();
+  *res = nemu_is_stopped();
 }
 
 static bool nemu_set_bp(void *args, size_t addr, bp_type_t type) {
