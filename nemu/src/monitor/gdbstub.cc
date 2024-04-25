@@ -48,7 +48,6 @@ static void nemu_is_stopped(gdb_action_t *act) {
 static void nemu_cont(void *args, gdb_action_t *res) {
   DbgState *dbg_state = (DbgState *)args;
   cpu_exec_with_bp(-1, dbg_state->bp->data(), dbg_state->bp->size());
-  puts("CONT");
   nemu_is_stopped(res);
 }
 
