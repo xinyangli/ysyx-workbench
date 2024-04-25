@@ -122,7 +122,7 @@ int nemu_gdbstub_init() {
   return 0;
 }
 int nemu_gdbstub_run() {
-  puts("Waiting for connection at " SOCKET_ADDR);
+  puts("Waiting for gdb connection at " SOCKET_ADDR);
   bool success = gdbstub_run(&gdbstub_priv, &dbg);
   gdbstub_close(&gdbstub_priv);
   return !success;
