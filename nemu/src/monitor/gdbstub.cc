@@ -30,27 +30,28 @@ static int nemu_write_mem(void *args, size_t addr, size_t len, void *val) {
   return 0;
 }
 
-static gdb_action_t nemu_is_stopped() {
+static void nemu_is_stopped(gdb_action_t *act) {
   switch (nemu_state.state) {
   case NEMU_RUNNING:
     nemu_state.state = NEMU_STOP;
-    return (gdb_action_t) {.reason = gdb_action_t::ACT_BREAKPOINT, .data = 0};
+    act->reason = gdb_action_t::ACT_BREAKPOINT;
+    break;
 
   default:
-    return (gdb_action_t) {.reason = gdb_action_t::ACT_SHUTDOWN, .data = nemu_state.halt_ret};
+    act->reason = gdb_action_t::ACT_SHUTDOWN;
   }
 }
 
 static void nemu_cont(void *args, gdb_action_t *res) {
   DbgState *dbg_state = (DbgState *)args;
   cpu_exec_with_bp(-1, dbg_state->bp->data(), dbg_state->bp->size());
-  *res = nemu_is_stopped();
+  nemu_is_stopped(res);
 }
 
 static void nemu_stepi(void *args, gdb_action_t *res) {
   DbgState *dbg_state = (DbgState *)args;
   cpu_exec_with_bp(1, dbg_state->bp->data(), dbg_state->bp->size());
-  *res = nemu_is_stopped();
+  nemu_is_stopped(res);
 }
 
 static bool nemu_set_bp(void *args, size_t addr, bp_type_t type) {
