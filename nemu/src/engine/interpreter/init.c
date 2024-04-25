@@ -26,11 +26,11 @@ void engine_start() {
   /* Receive commands from user. */
   int nemu_gdbstub_init();
   int nemu_gdbstub_run();
-  if (!nemu_gdbstub_init()) {
+  if (nemu_gdbstub_init()) {
     Error("Failed to init");
     exit(1);
   }
-  if (!nemu_gdbstub_run()) {
+  if (nemu_gdbstub_run()) {
       Error("gdbstub exited abnormally")
       exit(1);
   }
