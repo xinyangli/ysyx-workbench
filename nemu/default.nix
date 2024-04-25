@@ -3,6 +3,7 @@
   stdenv,
   am-kernels,
   dtc,
+  mini-gdbstub,
   defconfig ? "alldefconfig",
 }:
 
@@ -23,6 +24,7 @@ stdenv.mkDerivation rec {
   buildInputs = with pkgs; [
     readline
     libllvm
+    mini-gdbstub
   ];
 
   checkInputs = [

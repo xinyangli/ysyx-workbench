@@ -13,11 +13,12 @@
 * See the Mulan PSL v2 for more details.
 ***************************************************************************************/
 
-#include <utils.h>
+#include "gdbstub.h"
 #include <cpu/cpu.h>
 #include <cpu/decode.h>
 #include <cpu/difftest.h>
 #include <locale.h>
+#include <utils.h>
 
 /* The assembly code of instructions executed is only output to the screen
  * when the number of instructions executed is less than this value.
@@ -34,13 +35,16 @@ IFDEF(CONFIG_ITRACE, extern char logbuf[CONFIG_ITRACE_BUFFER][128]);
 IFDEF(CONFIG_ITRACE, extern int logbuf_rear);
 
 void device_update();
-bool wp_eval_all();
 
 static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 #ifdef CONFIG_ITRACE_COND
-  if (ITRACE_COND) { log_write("%s\n", logbuf[logbuf_rear]); }
+  if (ITRACE_COND) {
+    log_write("%s\n", logbuf[logbuf_rear]);
+  }
 #endif
-  if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(logbuf[logbuf_rear])); }
+  if (g_print_step) {
+    IFDEF(CONFIG_ITRACE, puts(logbuf[logbuf_rear]));
+  }
   IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
 }
 
@@ -56,12 +60,13 @@ static void exec_once(Decode *s, vaddr_t pc) {
   int ilen = s->snpc - s->pc;
   int i;
   uint8_t *inst = (uint8_t *)&s->isa.inst.val;
-  for (i = ilen - 1; i >= 0; i --) {
+  for (i = ilen - 1; i >= 0; i--) {
     p += snprintf(p, 4, " %02x", inst[i]);
   }
   int ilen_max = MUXDEF(CONFIG_ISA_x86, 8, 4);
   int space_len = ilen_max - ilen;
-  if (space_len < 0) space_len = 0;
+  if (space_len < 0)
+    space_len = 0;
   space_len = space_len * 3 + 1;
   memset(p, ' ', space_len);
   p += space_len;
@@ -69,7 +74,8 @@ static void exec_once(Decode *s, vaddr_t pc) {
 #ifndef CONFIG_ISA_loongarch32r
   void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
   disassemble(p, logbuf[logbuf_rear] + sizeof(logbuf[logbuf_rear]) - p,
-      MUXDEF(CONFIG_ISA_x86, s->snpc, s->pc), (uint8_t *)&s->isa.inst.val, ilen);
+              MUXDEF(CONFIG_ISA_x86, s->snpc, s->pc),
+              (uint8_t *)&s->isa.inst.val, ilen);
 #else
   p[0] = '\0'; // the upstream llvm does not support loongarch32r
 #endif
@@ -78,15 +84,12 @@ static void exec_once(Decode *s, vaddr_t pc) {
 
 static void execute(uint64_t n) {
   Decode s;
-  for (;n > 0; n --) {
+  for (; n > 0; n--) {
     exec_once(&s, cpu.pc);
-    g_nr_guest_inst ++;
+    g_nr_guest_inst++;
     trace_and_difftest(&s, cpu.pc);
-    if (wp_eval_all()) { 
-      IFDEF(CONFIG_ITRACE, puts(logbuf[logbuf_rear]));
+    if (nemu_state.state != NEMU_RUNNING)
       break;
-    }
-    if (nemu_state.state != NEMU_RUNNING) break;
     IFDEF(CONFIG_DEVICE, device_update());
   }
 }
@@ -96,8 +99,12 @@ static void statistic() {
 #define NUMBERIC_FMT MUXDEF(CONFIG_TARGET_AM, "%", "%'") PRIu64
   Log("host time spent = " NUMBERIC_FMT " us", g_timer);
   Log("total guest instructions = " NUMBERIC_FMT, g_nr_guest_inst);
-  if (g_timer > 0) Log("simulation frequency = " NUMBERIC_FMT " inst/s", g_nr_guest_inst * 1000000 / g_timer);
-  else Log("Finish running in less than 1 us and can not calculate the simulation frequency");
+  if (g_timer > 0)
+    Log("simulation frequency = " NUMBERIC_FMT " inst/s",
+        g_nr_guest_inst * 1000000 / g_timer);
+  else
+    Log("Finish running in less than 1 us and can not calculate the simulation "
+        "frequency");
 }
 
 void assert_fail_msg() {
@@ -109,10 +116,13 @@ void assert_fail_msg() {
 void cpu_exec(uint64_t n) {
   g_print_step = (n < MAX_INST_TO_PRINT);
   switch (nemu_state.state) {
-    case NEMU_END: case NEMU_ABORT:
-      printf("Program execution has ended. To restart the program, exit NEMU and run again.\n");
-      return;
-    default: nemu_state.state = NEMU_RUNNING;
+  case NEMU_END:
+  case NEMU_ABORT:
+    printf("Program execution has ended. To restart the program, exit NEMU and "
+           "run again.\n");
+    return;
+  default:
+    nemu_state.state = NEMU_RUNNING;
   }
 
   uint64_t timer_start = get_time();
@@ -123,18 +133,52 @@ void cpu_exec(uint64_t n) {
   g_timer += timer_end - timer_start;
 
   switch (nemu_state.state) {
-    case NEMU_RUNNING: nemu_state.state = NEMU_STOP; break;
+  case NEMU_RUNNING:
+    nemu_state.state = NEMU_STOP;
+    break;
 
-    case NEMU_END: case NEMU_ABORT: {
-      Log("nemu: %s at pc = " FMT_WORD,
-          (nemu_state.state == NEMU_ABORT ? ANSI_FMT("ABORT", ANSI_FG_RED) :
-           (nemu_state.halt_ret == 0 ? ANSI_FMT("HIT GOOD TRAP", ANSI_FG_GREEN) :
-            ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED))),
-          nemu_state.halt_pc);
-      if(nemu_state.halt_ret != 0) {
-        IFDEF(CONFIG_ITRACE, log_itrace_print());
-      }
-    } // fall through
-    case NEMU_QUIT: statistic();
+  case NEMU_END:
+  case NEMU_ABORT: {
+    Log("nemu: %s at pc = " FMT_WORD,
+        (nemu_state.state == NEMU_ABORT
+             ? ANSI_FMT("ABORT", ANSI_FG_RED)
+             : (nemu_state.halt_ret == 0
+                    ? ANSI_FMT("HIT GOOD TRAP", ANSI_FG_GREEN)
+                    : ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED))),
+        nemu_state.halt_pc);
+    if (nemu_state.halt_ret != 0) {
+      IFDEF(CONFIG_ITRACE, log_itrace_print());
+    }
+  } // fall through
+  case NEMU_QUIT:
+    statistic();
   }
+}
+
+breakpoint_t *cpu_exec_with_bp(uint64_t n, breakpoint_t *bp, size_t len) {
+  static Decode s;
+  nemu_state.state = NEMU_RUNNING;
+  do {
+    exec_once(&s, cpu.pc);
+    g_nr_guest_inst++;
+    for (int i = 0; i < len; i++) {
+      size_t addr = bp[i].addr;
+      bp_type_t bptype = bp[i].type;
+      if (bptype == BP_SOFTWARE && cpu.pc == addr) {
+        return bp + i;
+      }
+      bool is_write = (bptype == BP_WRITE) || (bptype == BP_ACCESS);
+      bool is_read = (bptype == BP_READ) || (bptype == BP_ACCESS);
+      if (s.inst_type == INST_MEM_READ && s.inst_value.rmem == addr &&
+          is_write) {
+        return bp + i;
+      } else if (s.inst_type == INST_MEM_WRITE && s.inst_value.wmem == addr &&
+                 is_read) {
+        return bp + i;
+      }
+    }
+    if (nemu_state.state != NEMU_RUNNING)
+      return NULL;
+  } while (--n);
+  return NULL;
 }

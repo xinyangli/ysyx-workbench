@@ -13,7 +13,9 @@
 * See the Mulan PSL v2 for more details.
 ***************************************************************************************/
 
+#include "debug.h"
 #include <cpu/cpu.h>
+#include <gdbstub.h>
 
 void sdb_mainloop();
 
@@ -22,6 +24,10 @@ void engine_start() {
   cpu_exec(-1);
 #else
   /* Receive commands from user. */
-  sdb_mainloop();
+  int nemu_gdbstub_run();
+  if (nemu_gdbstub_run()) {
+    Error("gdbstub exited abnormally");
+    exit(1);
+  }
 #endif
 }

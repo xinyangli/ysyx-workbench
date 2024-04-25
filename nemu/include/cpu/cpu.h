@@ -17,8 +17,18 @@
 #define __CPU_CPU_H__
 
 #include <common.h>
+#include <stddef.h>
+
+#include <gdbstub.h>
+#include <stddef.h>
+
+typedef struct {
+  size_t addr;
+  bp_type_t type;
+} breakpoint_t;
 
 void cpu_exec(uint64_t n);
+breakpoint_t *cpu_exec_with_bp(uint64_t n, breakpoint_t *bp, size_t len);
 
 void set_nemu_state(int state, vaddr_t pc, int halt_ret);
 void invalid_inst(vaddr_t thispc);

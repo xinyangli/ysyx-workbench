@@ -180,7 +180,7 @@ config ITRACE_BUFFER
   default 10
 
 config MTRACE
-  depends on TRACE
+  depends on TRACE && LOG_TRACE
   bool "Enable memory tracing"
   default n
 
@@ -198,7 +198,7 @@ config MTRACE_RANGE_MAX
   default 10
 
 config FTRACE
-  depends on TRACE && TARGET_NATIVE_ELF && ENGINE_INTERPRETER
+  depends on TRACE && TARGET_NATIVE_ELF && ENGINE_INTERPRETER && LOG_TRACE
   bool "Enable function tracing"
   default n
 
