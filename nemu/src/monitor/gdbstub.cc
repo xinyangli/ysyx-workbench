@@ -85,7 +85,7 @@ static bool nemu_del_bp(void *args, size_t addr, bp_type_t type) {
 }
 
 static void nemu_on_interrupt(void *args) {
-  fputs("Not implemented", stderr);
+  // fputs("Not implemented", stderr);
 }
 
 static struct target_ops nemu_gdbstub_ops = {.cont = nemu_cont,
@@ -96,7 +96,7 @@ static struct target_ops nemu_gdbstub_ops = {.cont = nemu_cont,
                                              .write_mem = nemu_write_mem,
                                              .set_bp = nemu_set_bp,
                                              .del_bp = nemu_del_bp,
-                                             .on_interrupt = nemu_on_interrupt};
+                                             .on_interrupt = NULL};
 static DbgState dbg;
 int nemu_gdbstub_init() {
   if (!gdbstub_init(&dbg.gdbstub, &nemu_gdbstub_ops, (arch_info_t)isa_arch_info,
