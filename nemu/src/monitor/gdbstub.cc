@@ -18,6 +18,8 @@ typedef struct {
   gdbstub_t gdbstub;
 } DbgState;
 
+extern "C" {
+
 static int nemu_read_mem(void *args, size_t addr, size_t len, void *val) {
   if(!in_pmem(addr)) return EINVAL;
   memcpy(val, guest_to_host(addr), len);
@@ -84,8 +86,6 @@ static bool nemu_del_bp(void *args, size_t addr, bp_type_t type) {
 static void nemu_on_interrupt(void *args) {
   fputs("Not implemented", stderr);
 }
-
-extern "C" {
 
 static struct target_ops nemu_gdbstub_ops = {.cont = nemu_cont,
                                              .stepi = nemu_stepi,
