@@ -19,8 +19,8 @@
 #include <common.h>
 #include <stddef.h>
 
-#include <stddef.h>
 #include <gdbstub.h>
+#include <stddef.h>
 
 typedef struct {
   size_t addr;

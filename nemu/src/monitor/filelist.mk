@@ -1,3 +1,3 @@
 DIRS-y += src/monitor/monitor.c
 
-CXXSRC += src/monitor/gdbstub.cc 
+CXXSRC += src/monitor/gdbstub.cc
