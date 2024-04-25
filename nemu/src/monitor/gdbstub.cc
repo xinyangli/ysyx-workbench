@@ -111,18 +111,18 @@ static struct target_ops nemu_gdbstub_ops = {.cont = nemu_cont,
 static DbgState dbg;
 extern "C" {
 static gdbstub_t gdbstub_priv;
-char *conn = "127.0.0.1:1234";
+#define SOCKET_ADDR "127.0.0.1:1234"
 int nemu_gdbstub_init() {
   dbg.bp = new std::vector<breakpoint_t>();
   assert(dbg.bp);
   if (!gdbstub_init(&gdbstub_priv, &nemu_gdbstub_ops,
-                    (arch_info_t)isa_arch_info, conn)) {
+                    (arch_info_t)isa_arch_info, SOCKET_ADDR)) {
     return EINVAL;
   }
   return 0;
 }
 int nemu_gdbstub_run() {
-  printf("Waiting for connection at %s", conn);
+  puts("Waiting for connection at " SOCKET_ADDR);
   bool success = gdbstub_run(&gdbstub_priv, &dbg);
   gdbstub_close(&gdbstub_priv);
   return !success;
