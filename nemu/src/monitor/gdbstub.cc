@@ -59,10 +59,6 @@ static void nemu_stepi(void *args, gdb_action_t *res) {
 
 static bool nemu_set_bp(void *args, size_t addr, bp_type_t type) {
   DbgState *dbg_state = (DbgState *)args;
-  if (dbg_state->bp == nullptr) {
-    dbg_state->bp = new std::vector<breakpoint_t>();
-    assert(dbg_state->bp);
-  }
   for (const auto &bp : *dbg_state->bp) {
     if (bp.addr == addr && bp.type == type) {
       return true;
@@ -99,6 +95,8 @@ static struct target_ops nemu_gdbstub_ops = {.cont = nemu_cont,
                                              .on_interrupt = NULL};
 static DbgState dbg;
 int nemu_gdbstub_init() {
+  dbg.bp = new std::vector<breakpoint_t>();
+  assert(dbg.bp);
   if (!gdbstub_init(&dbg.gdbstub, &nemu_gdbstub_ops, (arch_info_t)isa_arch_info,
                     (char *)"127.0.0.1:1234")) {
     return EINVAL;
