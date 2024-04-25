@@ -31,8 +31,8 @@ void engine_start() {
     exit(1);
   }
   if (nemu_gdbstub_run()) {
-      Error("gdbstub exited abnormally")
-      exit(1);
+    Error("gdbstub exited abnormally");
+    exit(1);
   }
 #endif
 }
