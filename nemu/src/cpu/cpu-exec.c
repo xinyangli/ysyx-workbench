@@ -136,7 +136,6 @@ void cpu_exec(uint64_t n) {
 
 void cpu_exec_with_bp(uint64_t n, breakpoint_t *bp, size_t len) {
   static Decode s;
-  puts("CONT");
   nemu_state.state = NEMU_RUNNING;
   do {
     exec_once(&s, cpu.pc);
