@@ -22,6 +22,7 @@
           overlays = [
             (self: super: {
               nvboard = nur-xin.legacyPackages.${system}.nvboard;
+              mini-gdbstub = nur-xin.legacyPackages.${system}.mini-gdbstub;
             })
           ];
         };
@@ -91,6 +92,7 @@
 
             readline
             libllvm
+            mini-gdbstub
           ];
           inputsFrom = [
             # self.packages.${system}.nemu

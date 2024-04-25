@@ -71,9 +71,9 @@ $(OBJ_DIR)/%.yy.o: $(OBJ_DIR)/%.yy.c
 
 app: $(BINARY)
 
-$(BINARY):: $(OBJS) $(ARCHIVES) $(NEMU_HOME)/mini-gdbstub/build/libgdbstub.a
+$(BINARY):: $(OBJS) $(ARCHIVES)
 	@echo + LD $@
-	@$(LD) -o $@ $(OBJS) $(NEMU_HOME)/mini-gdbstub/build/libgdbstub.a  $(LDFLAGS) $(ARCHIVES) $(LIBS) 
+	@$(LD) -o $@ $(OBJS) $(LDFLAGS) $(ARCHIVES) $(LIBS)
 
 install: $(BINARY)
 ifeq ($(SHARE),1)

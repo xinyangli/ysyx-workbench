@@ -29,10 +29,6 @@ GUEST_ISA ?= $(call remove_quote,$(CONFIG_ISA))
 ENGINE ?= $(call remove_quote,$(CONFIG_ENGINE))
 NAME    = $(GUEST_ISA)-nemu-$(ENGINE)
 
-# Compile mini-gdbstub
-$(NEMU_HOME)/mini-gdbstub/build/libgdbstub.a: $(shell find -L $(NEMU_HOME)/mini-gdbstub -name "*.c")
-	$(MAKE) -C $(NEMU_HOME)/mini-gdbstub
-
 # Include all filelist.mk to merge file lists
 FILELIST_MK = $(shell find -L ./src -name "filelist.mk")
 include $(FILELIST_MK)
