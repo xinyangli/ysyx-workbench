@@ -28,7 +28,7 @@ typedef struct {
 } breakpoint_t;
 
 void cpu_exec(uint64_t n);
-void cpu_exec_with_bp(uint64_t n, breakpoint_t *bp, size_t len);
+breakpoint_t *cpu_exec_with_bp(uint64_t n, breakpoint_t *bp, size_t len);
 
 void set_nemu_state(int state, vaddr_t pc, int halt_ret);
 void invalid_inst(vaddr_t thispc);

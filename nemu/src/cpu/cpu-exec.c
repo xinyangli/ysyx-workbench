@@ -13,6 +13,7 @@
 * See the Mulan PSL v2 for more details.
 ***************************************************************************************/
 
+#include "gdbstub.h"
 #include <utils.h>
 #include <cpu/cpu.h>
 #include <cpu/decode.h>
@@ -134,7 +135,7 @@ void cpu_exec(uint64_t n) {
   }
 }
 
-void cpu_exec_with_bp(uint64_t n, breakpoint_t *bp, size_t len) {
+breakpoint_t *cpu_exec_with_bp(uint64_t n, breakpoint_t *bp, size_t len) {
   static Decode s;
   nemu_state.state = NEMU_RUNNING;
   do {
@@ -142,13 +143,19 @@ void cpu_exec_with_bp(uint64_t n, breakpoint_t *bp, size_t len) {
     g_nr_guest_inst++;
     for(int i = 0; i < len; i++) {
       size_t addr = bp[i].addr;
-      if(cpu.pc == addr) return;
-      if(s.inst_type == INST_MEM_READ && s.inst_value.rmem == addr) {
-        return;
-      } else if(s.inst_type == INST_MEM_WRITE && s.inst_value.wmem == addr) {
-        return;
+      bp_type_t bptype = bp[i].type;
+      if(bptype == BP_SOFTWARE && cpu.pc == addr) {
+        return bp + i;
+      }
+      bool is_write = (bptype == BP_WRITE) || (bptype == BP_ACCESS);
+      bool is_read = (bptype == BP_READ) || (bptype == BP_ACCESS);
+      if(s.inst_type == INST_MEM_READ && s.inst_value.rmem == addr && is_write) {
+        return bp + i;
+      } else if(s.inst_type == INST_MEM_WRITE && s.inst_value.wmem == addr && is_read) {
+        return bp + i;
       }
     }
-    if(nemu_state.state != NEMU_RUNNING) return;
+    if(nemu_state.state != NEMU_RUNNING) return NULL;
   } while(--n);
+  return NULL;
 }

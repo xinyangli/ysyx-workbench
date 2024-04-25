@@ -32,11 +32,25 @@ static int nemu_write_mem(void *args, size_t addr, size_t len, void *val) {
   return 0;
 }
 
-static void nemu_is_stopped(gdb_action_t *act) {
+static void nemu_is_stopped(gdb_action_t *act, breakpoint_t *stopped_at) {
   switch (nemu_state.state) {
   case NEMU_RUNNING:
     nemu_state.state = NEMU_STOP;
-    act->reason = gdb_action_t::ACT_BREAKPOINT;
+    switch(stopped_at->type) {
+      case BP_SOFTWARE: 
+        act->reason = gdb_action_t::ACT_BREAKPOINT;
+        break;
+      case BP_ACCESS:
+        act->reason = gdb_action_t::ACT_WATCH;
+        break;
+      case BP_WRITE:
+        act->reason = gdb_action_t::ACT_WWATCH;
+        break;
+      case BP_READ:
+        act->reason = gdb_action_t::ACT_RWATCH;
+        break;
+    }
+    act->data = stopped_at->addr;
     break;
 
   default:
@@ -47,14 +61,14 @@ static void nemu_is_stopped(gdb_action_t *act) {
 
 static void nemu_cont(void *args, gdb_action_t *res) {
   DbgState *dbg_state = (DbgState *)args;
-  cpu_exec_with_bp(-1, dbg_state->bp->data(), dbg_state->bp->size());
-  nemu_is_stopped(res);
+  breakpoint_t *stopped_at = cpu_exec_with_bp(-1, dbg_state->bp->data(), dbg_state->bp->size());
+  nemu_is_stopped(res, stopped_at);
 }
 
 static void nemu_stepi(void *args, gdb_action_t *res) {
   DbgState *dbg_state = (DbgState *)args;
-  cpu_exec_with_bp(1, dbg_state->bp->data(), dbg_state->bp->size());
-  nemu_is_stopped(res);
+  breakpoint_t *stopped_at = cpu_exec_with_bp(1, dbg_state->bp->data(), dbg_state->bp->size());
+  nemu_is_stopped(res, stopped_at);
 }
 
 static bool nemu_set_bp(void *args, size_t addr, bp_type_t type) {
