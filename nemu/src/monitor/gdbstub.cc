@@ -108,6 +108,6 @@ int nemu_gdbstub_init() {
 int nemu_gdbstub_run() {
   bool success = gdbstub_run(&dbg.gdbstub, &dbg);
   gdbstub_close(&dbg.gdbstub);
-  return success;
+  return !success;
 }
 }
