@@ -77,7 +77,7 @@ static uint32_t key_dequeue() {
   AM_INPUT_KEYBRD_T ev = io_read(AM_INPUT_KEYBRD);
   uint32_t am_scancode = ev.keycode | (ev.keydown ? KEYDOWN_MASK : 0);
   return am_scancode;
-}
+}基于
 #endif
 
 static uint32_t *i8042_data_port_base = NULL;
