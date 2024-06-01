@@ -95,7 +95,7 @@
             mini-gdbstub
           ];
           inputsFrom = [
-            # self.packages.${system}.nemu
+            self.packages.${system}.nemu
           ];
           NEMU_HOME = "/home/xin/repo/ysyx-workbench/nemu";
         };
