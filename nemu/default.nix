@@ -43,7 +43,7 @@ stdenv.mkDerivation rec {
 
   doCheck = (defconfig == "alldefconfig");
   checkPhase = if doCheck then ''
-    export IMAGES_PATH=${am-kernels}/share/binary
+    export IMAGES_PATH=${am-kernels}/share/am-kernels
     make test
   '' else "";
 

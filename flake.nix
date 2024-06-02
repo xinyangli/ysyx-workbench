@@ -77,6 +77,9 @@
             # SDL2
             self.packages.${system}.abstract-machine
           ];
+
+          cmakeBuildType = "RelWithDebInfo";
+          dontStrip = true;
         };
 
         devShells.nemu = pkgs.mkShell {
@@ -98,6 +101,7 @@
             self.packages.${system}.nemu
           ];
           NEMU_HOME = "/home/xin/repo/ysyx-workbench/nemu";
+          IMAGES_PATH = self.packages.${system}.am-kernels + "/share/am-kernels";
         };
 
         devShells.npc = with pkgs; mkShell.override { stdenv = ccacheStdenv; } {
