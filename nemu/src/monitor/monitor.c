@@ -59,6 +59,7 @@ static long load_img() {
 
   char *search_paths = getenv("NEMU_IMAEGS_PATH");
   if(search_paths == NULL) search_paths = "./";
+  puts(search_paths);
   search_paths = strdup(search_paths);
 
   char *paths_end = strchr(search_paths, '\0');
@@ -79,7 +80,6 @@ static long load_img() {
       Log("Found '%s' in '%s'", img_file, path_start);
       break;
     }
-    perror("Error open");
 
     Assert(fp != NULL || errno == ENOENT, "Cannot open '%s'", img_file);
     path_start = p + 1;
