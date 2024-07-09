@@ -68,12 +68,12 @@ static long load_img() {
     if (p != NULL) *p = '\0';
 
     char *file_path = malloc(p - path_start + img_filename_len + 1);
-    puts("Yes");
     strcat(file_path, path_start);
     strcat(file_path, img_file);
 
 
     fp = fopen(file_path, "rb");
+    puts("Yes");
     Assert(fp != NULL || errno == ENOENT, "Cannot open '%s'", img_file);
     if(fp) { 
       Log("Found '%s' in '%s'", img_file, path_start);
