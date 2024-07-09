@@ -59,9 +59,9 @@ static long load_img() {
 
   char *search_paths = getenv("NEMU_IMAEGS_PATH");
   if(search_paths == NULL) search_paths = "";
-  puts("Yes");
   search_paths = strdup(search_paths);
 
+  puts("Yes");
   char *path_start = search_paths, *path_end;
   do {
     path_end = strchrnul(path_start, ':');
