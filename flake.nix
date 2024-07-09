@@ -101,7 +101,7 @@
             self.packages.${system}.nemu
           ];
           NEMU_HOME = "/home/xin/repo/ysyx-workbench/nemu";
-          IMAGES_PATH = self.packages.${system}.am-kernels + "/share/am-kernels";
+          NEMU_IMAGES_PATH = self.packages.${system}.am-kernels + "/share/am-kernels";
         };
 
         devShells.npc = with pkgs; mkShell.override { stdenv = ccacheStdenv; } {
