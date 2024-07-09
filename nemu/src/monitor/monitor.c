@@ -58,7 +58,7 @@ static long load_img() {
   }
 
   // Image file is searched from paths in environment variable NEMU_IMAGES_PATH if it's a relative path
-  if (img_file[0] == '/') {
+  if (img_file[0] != '/') {
     char *search_paths = getenv("NEMU_IMAGES_PATH");
     if(search_paths == NULL) search_paths = "./";
     search_paths = strdup(search_paths);
