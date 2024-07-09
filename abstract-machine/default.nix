@@ -7,7 +7,7 @@
 }:
 stdenv.mkDerivation {
   pname = "abstract-machine";
-  version = "2024.02.18";
+  version = "2024.06.01";
 
   src = ./.;
 

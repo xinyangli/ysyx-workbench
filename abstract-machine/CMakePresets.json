@@ -7,7 +7,7 @@
             "generator": "Unix Makefiles",
             "binaryDir": "${sourceDir}/out/build/${presetName}",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo",
                 "ISA": "native",
                 "__PLATFORM_NATIVE__": true,
                 "NATIVE_USE_KLIB": true
@@ -19,7 +19,7 @@
             "generator": "Unix Makefiles",
             "binaryDir": "${sourceDir}/out/build/${presetName}",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo",
                 "ISA": "riscv",
                 "__PLATFORM_NPC__": true,
                 "__PLATFORM_NEMU__": true
