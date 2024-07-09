@@ -55,6 +55,7 @@ stdenv.mkDerivation rec {
 
   shellHook = ''
     export NEMU_HOME=$(pwd)
+    export IMAGES_PATH=${am-kernels}/share/am-kernels
   '';
 
   meta = with lib; {
