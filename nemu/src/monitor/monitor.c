@@ -59,6 +59,7 @@ static long load_img() {
 
   char *search_paths = getenv("NEMU_IMAEGS_PATH");
   if(search_paths == NULL) search_paths = "";
+  puts("Yes");
   search_paths = strdup(search_paths);
 
   char *path_start = search_paths, *path_end;
@@ -72,7 +73,6 @@ static long load_img() {
     char *file_path = malloc(path_end - path_start + img_filename_len);
     strcat(file_path, path_start);
     strcat(file_path, img_file);
-    puts("Yes");
 
 
     fp = fopen(file_path, "rb");
