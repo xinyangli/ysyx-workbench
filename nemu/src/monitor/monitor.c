@@ -50,7 +50,7 @@ static char *img_file = NULL;
 static int difftest_port = 1234;
 
 static long load_img() {
-  FILE *fp;
+  FILE *fp = NULL;
   size_t img_filename_len = strlen(img_file);
   if (img_file == NULL) {
     Log("No image is given. Use the default build-in image.");
@@ -74,12 +74,14 @@ static long load_img() {
 
     puts(file_path);
     fp = fopen(file_path, "rb");
-    Assert(fp != NULL || errno == ENOENT, "Cannot open '%s'", img_file);
     free(file_path);
-    if(fp) { 
+
+    if (fp) {
       Log("Found '%s' in '%s'", img_file, path_start);
       break;
     }
+
+    Assert(fp != NULL || errno == ENOENT, "Cannot open '%s'", img_file);
     path_start = p + 1;
   } while(path_start < paths_end);
   free(search_paths);
