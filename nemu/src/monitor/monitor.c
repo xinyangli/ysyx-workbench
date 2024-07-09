@@ -57,37 +57,43 @@ static long load_img() {
     return 4096; // built-in image size
   }
 
-  char *search_paths = getenv("NEMU_IMAGES_PATH");
-  if(search_paths == NULL) search_paths = "./";
-  search_paths = strdup(search_paths);
-  Trace("NEMU_IMAGES_PATH=%s", search_paths);
+  // Image file is searched from paths in environment variable NEMU_IMAGES_PATH if it's a relative path
+  if (img_file[0] == '/') {
+    char *search_paths = getenv("NEMU_IMAGES_PATH");
+    if(search_paths == NULL) search_paths = "./";
+    search_paths = strdup(search_paths);
+    Trace("NEMU_IMAGES_PATH=%s", search_paths);
 
-  char *paths_end = strchr(search_paths, '\0');
-  char *path_start = search_paths;
-  do {
-    char *p = strchr(path_start, ':');
-    if (p != NULL) *p = '\0';
-    else p = paths_end;
+    char *paths_end = strchr(search_paths, '\0');
+    char *path_start = search_paths;
+    do {
+      char *p = strchr(path_start, ':');
+      if (p != NULL) *p = '\0';
+      else p = paths_end;
 
-    char *file_path = malloc(p - path_start + img_filename_len + 2);
-    strcpy(file_path, path_start);
-    strcat(file_path, "/");
-    strcat(file_path, img_file);
+      char *file_path = malloc(p - path_start + img_filename_len + 2);
+      strcpy(file_path, path_start);
+      strcat(file_path, "/");
+      strcat(file_path, img_file);
 
-    fp = fopen(file_path, "rb");
-    free(file_path);
+      fp = fopen(file_path, "rb");
+      free(file_path);
 
-    if (fp) {
-      Log("Found '%s' in '%s'", img_file, path_start);
-      break;
-    }
+      if (fp) {
+        Log("Found '%s' in '%s'", img_file, path_start);
+        break;
+      }
 
-    Assert(fp != NULL || errno == ENOENT, "Cannot open '%s'", img_file);
-    path_start = p + 1;
-  } while(path_start < paths_end);
-  free(search_paths);
+      Assert(fp != NULL || errno == ENOENT, "Cannot open '%s'", img_file);
+      path_start = p + 1;
+    } while(path_start < paths_end);
+    free(search_paths);
 
-  Assert(fp, "Cannot find '%s'", img_file);
+    Assert(fp, "Cannot find '%s'", img_file);
+  } else {
+    fopen(img_file, "rb");
+    Assert(fp, "Cannot open '%s'", img_file);
+  }
 
   fseek(fp, 0, SEEK_END);
   long size = ftell(fp);
