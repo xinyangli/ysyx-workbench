@@ -86,7 +86,8 @@
           inputsFrom = [
             self.packages.${system}.nemu
           ];
-          IMAGES_PATH = "${self.packages.${system}.am-kernels}/share/binary";
+          NEMU_HOME = "/home/xin/repo/ysyx-workbench/nemu";
+          NEMU_IMAGES_PATH = self.packages.${system}.am-kernels + "/share/am-kernels";
         };
 
         devShells.npc = with pkgs; mkShell.override { stdenv = ccacheStdenv; } {

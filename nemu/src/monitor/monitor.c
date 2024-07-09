@@ -13,8 +13,10 @@
 * See the Mulan PSL v2 for more details.
 ***************************************************************************************/
 
+#include <errno.h>
 #include <isa.h>
 #include <memory/paddr.h>
+#include <strings.h>
 #include <utils.h>
 
 void init_rand();
@@ -48,13 +50,50 @@ static char *img_file = NULL;
 static int difftest_port = 1234;
 
 static long load_img() {
+  FILE *fp = NULL;
+  size_t img_filename_len = strlen(img_file);
   if (img_file == NULL) {
     Log("No image is given. Use the default build-in image.");
     return 4096; // built-in image size
   }
 
-  FILE *fp = fopen(img_file, "rb");
-  Assert(fp, "Can not open '%s'", img_file);
+  // Image file is searched from paths in environment variable NEMU_IMAGES_PATH if it's a relative path
+  if (img_file[0] != '/') {
+    char *search_paths = getenv("NEMU_IMAGES_PATH");
+    if(search_paths == NULL) search_paths = "./";
+    search_paths = strdup(search_paths);
+    Trace("NEMU_IMAGES_PATH=%s", search_paths);
+
+    char *paths_end = strchr(search_paths, '\0');
+    char *p_start = search_paths;
+    do {
+      char *p = strchr(p_start, ':');
+      if (p != NULL) *p = '\0';
+      else p = paths_end;
+
+      char *file_path = malloc(p - p_start + img_filename_len + 2);
+      strcpy(file_path, p_start);
+      strcat(file_path, "/");
+      strcat(file_path, img_file);
+
+      fp = fopen(file_path, "rb");
+      free(file_path);
+
+      if (fp) {
+        Log("Found '%s' in '%s'", img_file, p_start);
+        break;
+      }
+
+      Assert(fp != NULL || errno == ENOENT, "Cannot open '%s'", img_file);
+      p_start = p + 1;
+    } while(p_start < paths_end);
+    free(search_paths);
+
+    Assert(fp, "Cannot find '%s'", img_file);
+  } else {
+    fp = fopen(img_file, "rb");
+    Assert(fp, "Cannot open '%s'", img_file);
+  }
 
   fseek(fp, 0, SEEK_END);
   long size = ftell(fp);

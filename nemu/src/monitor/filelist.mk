@@ -1,3 +1,3 @@
-DIRS-y += src/monitor/monitor.c
+DIRS-y += src/monitor
 
 CXXSRC += src/monitor/gdbstub.cc
