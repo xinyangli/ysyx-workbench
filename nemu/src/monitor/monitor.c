@@ -69,8 +69,9 @@ static long load_img() {
     if (p != NULL) *p = '\0';
     else p = paths_end;
 
-    char *file_path = malloc(p - path_start + img_filename_len + 1);
+    char *file_path = malloc(p - path_start + img_filename_len + 2);
     strcpy(file_path, path_start);
+    strcat(file_path, "/");
     strcat(file_path, img_file);
 
     fp = fopen(file_path, "rb");
