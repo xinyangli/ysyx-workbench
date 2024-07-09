@@ -58,15 +58,13 @@ static long load_img() {
   }
 
   char *search_paths = getenv("NEMU_IMAEGS_PATH");
-  if(search_paths == NULL) search_paths = "";
+  if(search_paths == NULL) search_paths = "./";
   search_paths = strdup(search_paths);
 
-  char *path_start = search_paths, *path_end;
+  char *path_start = search_paths, *path_end = strchr(path_start, ':');
   do {
-    path_end = strchrnul(path_start, ':');
-    *path_end = '\0';
-
-    Assert(*path_start == '/' || *path_start == '\0',
+    if (path_end != NULL) *path_end = '\0';
+    Assert(*path_start == '/',
            "NEMU_IMAGES_PATH must be absolute paths");
 
     char *file_path = malloc(path_end - path_start + img_filename_len + 1);
@@ -76,8 +74,10 @@ static long load_img() {
 
     fp = fopen(file_path, "rb");
     Assert(fp != NULL || errno == ENOENT, "Cannot open '%s'", img_file);
-    if(fp) Log("Found '%s' in '%s'", img_file, path_start);
-    // path_start = path_end + 1;
+    if(fp) { 
+      Log("Found '%s' in '%s'", img_file, path_start);
+      break;
+    }
   } while(path_end != NULL);
   free(search_paths);
 
