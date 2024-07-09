@@ -22,6 +22,7 @@
           overlays = [
             (self: super: {
               nvboard = nur-xin.legacyPackages.${system}.nvboard;
+              mini-gdbstub = nur-xin.legacyPackages.${system}.mini-gdbstub;
             })
           ];
         };
@@ -65,23 +66,36 @@
 
           nativeBuildInputs = [
             pkgs.cmake
+            pkgs.gcc # Generate expr tests
           ];
 
           cmakeFlags = [
-            (pkgs.lib.cmakeFeature "ISA" "riscv")
-            (pkgs.lib.cmakeFeature "PLATFORM" "nemu")
+            (pkgs.lib.cmakeFeature "ARCH" "riscv-nemu")
           ];
 
           buildInputs = [
             # SDL2
             self.packages.${system}.abstract-machine
           ];
+
+          cmakeBuildType = "RelWithDebInfo";
+          dontStrip = true;
         };
 
         devShells.nemu = pkgs.mkShell {
           packages = with pkgs; [
             clang-tools
             gdb
+            SDL2
+            gnumake
+            pkg-config
+            flex
+            bison
+            dtc
+
+            readline
+            libllvm
+            mini-gdbstub
           ];
           inputsFrom = [
             self.packages.${system}.nemu
