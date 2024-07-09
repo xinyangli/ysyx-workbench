@@ -65,14 +65,14 @@ static long load_img() {
     Trace("NEMU_IMAGES_PATH=%s", search_paths);
 
     char *paths_end = strchr(search_paths, '\0');
-    char *path_start = search_paths;
+    char *p_start = search_paths;
     do {
-      char *p = strchr(path_start, ':');
+      char *p = strchr(p_start, ':');
       if (p != NULL) *p = '\0';
       else p = paths_end;
 
-      char *file_path = malloc(p - path_start + img_filename_len + 2);
-      strcpy(file_path, path_start);
+      char *file_path = malloc(p - p_start + img_filename_len + 2);
+      strcpy(file_path, p_start);
       strcat(file_path, "/");
       strcat(file_path, img_file);
 
@@ -80,13 +80,13 @@ static long load_img() {
       free(file_path);
 
       if (fp) {
-        Log("Found '%s' in '%s'", img_file, path_start);
+        Log("Found '%s' in '%s'", img_file, p_start);
         break;
       }
 
       Assert(fp != NULL || errno == ENOENT, "Cannot open '%s'", img_file);
-      path_start = p + 1;
-    } while(path_start < paths_end);
+      p_start = p + 1;
+    } while(p_start < paths_end);
     free(search_paths);
 
     Assert(fp, "Cannot find '%s'", img_file);

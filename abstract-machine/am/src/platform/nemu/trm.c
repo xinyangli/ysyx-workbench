@@ -10,15 +10,14 @@ Area heap = RANGE(&_heap_start, PMEM_END);
 #endif
 static const char mainargs[] = MAINARGS;
 
-void putch(char ch) {
-  outb(SERIAL_PORT, ch);
-}
+void putch(char ch) { outb(SERIAL_PORT, ch); }
 
 void halt(int code) {
   nemu_trap(code);
 
   // should not reach here
-  while (1);
+  while (1)
+    ;
 }
 
 void _trm_init() {

@@ -1,6 +1,6 @@
 #include <am.h>
-#include <klib.h>
 #include <klib-macros.h>
+#include <klib.h>
 #include <stdarg.h>
 
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
@@ -96,97 +96,95 @@ int printf(const char *fmt, ...) {
   return 0;
 }
 
-void append_to_buffer(char **buf, int *pos, char c) {
-    (*buf)[(*pos)++] = c;
-}
+void append_to_buffer(char **buf, int *pos, char c) { (*buf)[(*pos)++] = c; }
 
 void print_int_to_buf(char **buf, int *pos, int num, int width, char pad) {
-    int reverse = 0, count = 0, neg = 0;
+  int reverse = 0, count = 0, neg = 0;
 
-    if (num == 0) {
-        reverse = 0;
-        count = 1;
-    } else {
-        if (num < 0) {
-            append_to_buffer(buf, pos, '-');
-            num = -num;
-            neg = 1;
-        }
-        while (num != 0) {
-            reverse = reverse * 10 + (num % 10);
-            num /= 10;
-            count++;
-        }
+  if (num == 0) {
+    reverse = 0;
+    count = 1;
+  } else {
+    if (num < 0) {
+      append_to_buffer(buf, pos, '-');
+      num = -num;
+      neg = 1;
     }
+    while (num != 0) {
+      reverse = reverse * 10 + (num % 10);
+      num /= 10;
+      count++;
+    }
+  }
 
-    width -= neg;
-    while (width > count) {
-        append_to_buffer(buf, pos, pad);
-        width--;
-    }
+  width -= neg;
+  while (width > count) {
+    append_to_buffer(buf, pos, pad);
+    width--;
+  }
 
-    if (reverse == 0) {
-        append_to_buffer(buf, pos, '0');
-    } else {
-        while (reverse != 0) {
-            append_to_buffer(buf, pos, '0' + (reverse % 10));
-            reverse /= 10;
-        }
+  if (reverse == 0) {
+    append_to_buffer(buf, pos, '0');
+  } else {
+    while (reverse != 0) {
+      append_to_buffer(buf, pos, '0' + (reverse % 10));
+      reverse /= 10;
     }
+  }
 }
 
 int vsprintf(char *buf, const char *format, va_list args) {
-    const char *p = format;
-    int pos = 0;  // Position in buf
+  const char *p = format;
+  int pos = 0; // Position in buf
 
-    while (*p) {
-        if (*p == '%') {
-            p++; // Skip the '%'
-            char pad = ' ';
-            int width = 0;
+  while (*p) {
+    if (*p == '%') {
+      p++; // Skip the '%'
+      char pad = ' ';
+      int width = 0;
 
-            if (*p == '0') {
-                pad = '0';
-                p++;
-            }
-
-            while (*p >= '0' && *p <= '9') {
-                width = width * 10 + (*p - '0');
-                p++;
-            }
-
-            switch (*p) {
-            case 'd': { // Integer
-                int ival = va_arg(args, int);
-                print_int_to_buf(&buf, &pos, ival, width, pad);
-                break;
-            }
-            case 'c': { // Character
-                char c = (char)va_arg(args, int);
-                append_to_buffer(&buf, &pos, c);
-                break;
-            }
-            case 's': { // String
-                char *s = va_arg(args, char *);
-                while (*s) {
-                    append_to_buffer(&buf, &pos, *s++);
-                }
-                break;
-            }
-            case '%': {
-                append_to_buffer(&buf, &pos, '%');
-                break;
-            }
-            default:
-                panic("Unsupported format specifier");
-            }
-        } else {
-            append_to_buffer(&buf, &pos, *p);
-        }
+      if (*p == '0') {
+        pad = '0';
         p++;
+      }
+
+      while (*p >= '0' && *p <= '9') {
+        width = width * 10 + (*p - '0');
+        p++;
+      }
+
+      switch (*p) {
+      case 'd': { // Integer
+        int ival = va_arg(args, int);
+        print_int_to_buf(&buf, &pos, ival, width, pad);
+        break;
+      }
+      case 'c': { // Character
+        char c = (char)va_arg(args, int);
+        append_to_buffer(&buf, &pos, c);
+        break;
+      }
+      case 's': { // String
+        char *s = va_arg(args, char *);
+        while (*s) {
+          append_to_buffer(&buf, &pos, *s++);
+        }
+        break;
+      }
+      case '%': {
+        append_to_buffer(&buf, &pos, '%');
+        break;
+      }
+      default:
+        panic("Unsupported format specifier");
+      }
+    } else {
+      append_to_buffer(&buf, &pos, *p);
     }
-    buf[pos] = '\0'; // Null-terminate the string
-    return pos;
+    p++;
+  }
+  buf[pos] = '\0'; // Null-terminate the string
+  return pos;
 }
 
 int sprintf(char *out, const char *fmt, ...) {
