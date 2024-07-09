@@ -57,9 +57,8 @@ static long load_img() {
     return 4096; // built-in image size
   }
 
-  char *search_paths = getenv("NEMU_IMAEGS_PATH");
+  char *search_paths = getenv("NEMU_IMAGES_PATH");
   if(search_paths == NULL) search_paths = "./";
-  puts(search_paths);
   search_paths = strdup(search_paths);
 
   char *paths_end = strchr(search_paths, '\0');
