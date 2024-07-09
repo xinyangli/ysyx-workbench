@@ -61,11 +61,13 @@ static long load_img() {
   if(search_paths == NULL) search_paths = "./";
   search_paths = strdup(search_paths);
 
-  char *path_start = search_paths, *path_end = strchr(path_start, ':');
+  char *paths_end = strchr(search_paths, '\0');
+  char *path_start = search_paths;
   do {
-    if (path_end != NULL) *path_end = '\0';
+    char *p = strchr(path_start, ':');
+    if (p != NULL) *p = '\0';
 
-    char *file_path = malloc(path_end - path_start + img_filename_len + 1);
+    char *file_path = malloc(p - path_start + img_filename_len + 1);
     strcat(file_path, path_start);
     strcat(file_path, img_file);
 
@@ -76,7 +78,8 @@ static long load_img() {
       Log("Found '%s' in '%s'", img_file, path_start);
       break;
     }
-  } while(path_end != NULL);
+    path_start = p + 1;
+  } while(path_start < paths_end);
   free(search_paths);
 
   Assert(fp, "Cannot find '%s'", img_file);
