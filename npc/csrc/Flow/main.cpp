@@ -1,11 +1,15 @@
 #include "VFlow___024root.h"
+#include "components.hpp"
 #include <VFlow.h>
+#include <array>
 #include <config.hpp>
 #include <cstdint>
 #include <cstdlib>
+#include <devices.hpp>
 #include <disasm.hpp>
 #include <filesystem>
 #include <fstream>
+#include <memory>
 #include <sdb.hpp>
 #include <trm_difftest.hpp>
 #include <trm_interface.hpp>
@@ -25,27 +29,38 @@ VlModule *top;
 Registers *regs;
 vpiHandle pc = nullptr;
 
+const size_t PMEM_START = 0x80000000;
+const size_t PMEM_END = 0x87ffffff;
+
 extern "C" {
+using MMap = MemoryMap<Memory<128 * 1024>, Devices::DeviceMap>;
 void *pmem_get() {
-  static auto pmem =
-      new Memory<int, 128 * 1024>(config.memory_file, config.memory_file_binary,
-                                  std::move(config.mtrace_ranges));
+  static Devices::DeviceMap devices{
+      new Devices::Serial(0x10000000, 0x1000),
+      new Devices::RTC(0x10001000, 0x1000),
+  };
+  static auto pmem = new MemoryMap<Memory<128 * 1024>, Devices::DeviceMap>(
+      std::make_unique<Memory<128 * 1024>>(
+          config.memory_file, config.memory_file_binary, PMEM_START, PMEM_END),
+      std::make_unique<Devices::DeviceMap>(devices), config.mtrace_ranges);
   return pmem;
 }
 
 int pmem_read(int raddr) {
   void *pmem = pmem_get();
-  auto mem = static_cast<Memory<int, 128 * 1024> *>(pmem);
+  auto mem = static_cast<MMap *>(pmem);
   // TODO: Do memory difftest at memory read and write to diagnose at a finer
   // granularity
   if (config.do_mtrace)
     mem->trace(raddr, true, regs->get_pc());
+  if (g_skip_memcheck)
+    return mem->read(PMEM_START);
   return mem->read(raddr);
 }
 
 void pmem_write(int waddr, int wdata, char wmask) {
   void *pmem = pmem_get();
-  auto mem = static_cast<Memory<int, 128 * 1024> *>(pmem);
+  auto mem = static_cast<MMap *>(pmem);
   if (config.do_mtrace)
     mem->trace((std::size_t)waddr, false, regs->get_pc(), wdata);
   return mem->write((std::size_t)waddr, wdata, wmask);
@@ -55,10 +70,7 @@ void pmem_write(int waddr, int wdata, char wmask) {
 namespace NPC {
 void npc_memcpy(paddr_t addr, void *buf, size_t sz, bool direction) {
   if (direction == TRM_FROM_MACHINE) {
-    memcpy(
-        buf,
-        static_cast<Memory<int, 128 * 1024> *>(pmem_get())->guest_to_host(addr),
-        sz);
+    static_cast<MMap *>(pmem_get())->copy_to(addr, (uint8_t *)buf, sz);
   }
 };
 
@@ -110,7 +122,10 @@ public:
     this->memcpy(addr, &buf, sizeof(word_t), TRM_FROM_MACHINE);
     return buf;
   }
-  void print(std::ostream &os) const override {}
+  void print(std::ostream &os) const override {
+    this->regcpy(cpu_state, TRM_FROM_MACHINE);
+    os << *(CPUState *)cpu_state << std::endl;
+  }
 };
 
 DutTrmInterface npc_interface =
@@ -126,18 +141,50 @@ word_t reg_str2val(const char *name, bool *success) {
 int main(int argc, char **argv, char **env) {
   config.cli_parse(argc, argv);
 
-  if (config.max_sim_time > 1) {
-    NPC::npc_interface.exec(config.max_sim_time / 2);
-  } else {
-    /* -- Difftest -- */
-    std::filesystem::path ref{config.lib_ref};
-    RefTrmInterface ref_interface{ref};
-    DifftestTrmInterface diff_interface{NPC::npc_interface, ref_interface,
-                                        pmem_get(), 128 * 1024};
-    SDB::SDB sdb_diff{diff_interface};
+  if (config.lib_ref.empty()) {
+    if (config.interactive) {
+      SDB::SDB sdb_npc{NPC::npc_interface};
+      sdb_npc.main_loop();
+      return 0;
+    } else {
+      NPC::npc_interface.init(0);
+      while (true) {
+        word_t inst = NPC::npc_interface.at(regs->get_pc());
+        if (inst == 1048691) {
+          return 0;
+        }
+        NPC::npc_interface.exec(1);
+      }
+    }
+  }
 
-    int t = 8;
+  /* -- Difftest -- */
+  std::filesystem::path ref{config.lib_ref};
+  RefTrmInterface ref_interface{ref};
+  DifftestTrmInterface diff_interface{
+      NPC::npc_interface, ref_interface,
+      static_cast<MMap *>(pmem_get())->get_pmem(), 128 * 1024};
+  if (config.interactive) {
+    SDB::SDB sdb_diff{diff_interface};
     sdb_diff.main_loop();
+    return 0;
+  }
+
+  try {
+    diff_interface.init(0);
+    diff_interface.exec(-1);
+  } catch (TrmRuntimeException &e) {
+    switch (e.error_code()) {
+    case TrmRuntimeException::EBREAK:
+      return 0;
+    case TrmRuntimeException::DIFFTEST_FAILED:
+      std::cout << "Difftest Failed" << std::endl;
+      diff_interface.print(std::cout);
+      return 1;
+    default:
+      std::cerr << "Unknown error happened" << std::endl;
+      return 1;
+    }
   }
 
   return 0;

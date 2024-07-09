@@ -37,6 +37,7 @@ template <typename R, size_t nr_reg> struct CPUStateBase {
 
   /* This does not update the register!!! */
   R at(std::string name) {
+    // FIXME: Using this to get pc seems broken
     return name == "pc" ? pc : reg[regs_by_name.at(name)];
   }
 

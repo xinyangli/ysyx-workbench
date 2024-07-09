@@ -14,7 +14,7 @@ module RamDpi (
   input reg [31:0] pc,
   output reg [31:0] inst
 );
-  always @(*) begin
+  always @(posedge clock) begin
     if (valid) begin // 有读写请求时
       readData = pmem_read(readAddr);
       if (writeEnable) begin // 有写请求时
@@ -22,8 +22,8 @@ module RamDpi (
       end
     end
     else begin
-      readData = 0;
+      readData = 32'h80000000;
     end
-    inst = pmem_read(pc);
   end
+  assign inst = pmem_read(pc);
 endmodule
