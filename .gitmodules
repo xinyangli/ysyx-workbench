@@ -1,3 +1,4 @@
 [submodule "am-kernels"]
 	path = am-kernels
 	url = https://git.xinyang.life/xin/am-kernels.git
+	branch = dev

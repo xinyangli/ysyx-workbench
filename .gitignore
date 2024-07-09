@@ -1,4 +1,5 @@
 !*/
+difftest/
 !/nemu/*
 !/nexus-am/*
 !/nanos-lite/*
@@ -13,3 +14,4 @@
 **/.cache
 **/result
 /.pre-commit-config.yaml
+**/.vscode/
