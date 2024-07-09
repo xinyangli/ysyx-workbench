@@ -91,7 +91,7 @@ static long load_img() {
 
     Assert(fp, "Cannot find '%s'", img_file);
   } else {
-    fopen(img_file, "rb");
+    fp = fopen(img_file, "rb");
     Assert(fp, "Cannot open '%s'", img_file);
   }
 
