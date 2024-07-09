@@ -66,12 +66,12 @@ static long load_img() {
     path_end = strchrnul(path_start, ':');
     *path_end = '\0';
 
-    puts("Yes");
     Assert(*path_start == '/' || *path_start == '\0',
            "NEMU_IMAGES_PATH must be absolute paths");
 
     char *file_path = malloc(path_end - path_start + img_filename_len);
     strcat(file_path, path_start);
+    puts("Yes");
     strcat(file_path, img_file);
 
 
