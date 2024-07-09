@@ -72,8 +72,8 @@ static long load_img() {
     strcpy(file_path, path_start);
     strcat(file_path, img_file);
 
-    puts(file_path);
     fp = fopen(file_path, "rb");
+    puts(file_path);
     free(file_path);
 
     if (fp) {
