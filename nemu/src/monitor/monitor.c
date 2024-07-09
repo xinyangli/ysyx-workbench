@@ -61,12 +61,12 @@ static long load_img() {
   if(search_paths == NULL) search_paths = "";
   search_paths = strdup(search_paths);
 
-  puts("Yes");
   char *path_start = search_paths, *path_end;
   do {
     path_end = strchrnul(path_start, ':');
     *path_end = '\0';
 
+    puts("Yes");
     Assert(*path_start == '/' || *path_start == '\0',
            "NEMU_IMAGES_PATH must be absolute paths");
 
