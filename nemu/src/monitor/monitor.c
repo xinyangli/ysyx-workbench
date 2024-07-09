@@ -73,13 +73,13 @@ static long load_img() {
     strcat(file_path, img_file);
 
     fp = fopen(file_path, "rb");
-    puts(file_path);
     free(file_path);
 
     if (fp) {
       Log("Found '%s' in '%s'", img_file, path_start);
       break;
     }
+    perror("Error open");
 
     Assert(fp != NULL || errno == ENOENT, "Cannot open '%s'", img_file);
     path_start = p + 1;
