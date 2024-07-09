@@ -71,8 +71,8 @@ static long load_img() {
 
     char *file_path = malloc(path_end - path_start + img_filename_len);
     strcat(file_path, path_start);
-    puts("Yes");
     strcat(file_path, img_file);
+    puts("Yes");
 
 
     fp = fopen(file_path, "rb");
