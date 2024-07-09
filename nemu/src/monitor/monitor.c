@@ -66,6 +66,7 @@ static long load_img() {
   do {
     char *p = strchr(path_start, ':');
     if (p != NULL) *p = '\0';
+    else p = paths_end;
 
     char *file_path = malloc(p - path_start + img_filename_len + 1);
     strcpy(file_path, path_start);
