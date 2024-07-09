@@ -76,6 +76,7 @@ static long load_img() {
 
     fp = fopen(file_path, "rb");
     Assert(fp != NULL || errno == ENOENT, "Cannot open '%s'", img_file);
+    path_start = path_end + 1;
   } while(path_end != NULL);
   free(search_paths);
 
