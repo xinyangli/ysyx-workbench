@@ -10,6 +10,7 @@
 #include <vl_wrapper.hpp>
 #include <vpi_user.h>
 #include <vpi_wrapper.hpp>
+#include <vector>
 
 using Registers = _RegistersVPI<uint32_t, 32>;
 using VlModule = VlModuleInterfaceCommon<VFlow, Registers>;

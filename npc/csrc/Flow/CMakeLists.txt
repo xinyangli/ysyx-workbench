@@ -1,6 +1,6 @@
 include(ChiselBuild)
 add_executable(V${TOPMODULE} config.cpp main.cpp)
-target_link_libraries(V${TOPMODULE} PRIVATE devices gdbstub)
+target_link_libraries(V${TOPMODULE} PRIVATE devices)
 target_include_directories(V${TOPMODULE} PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
 verilate(
@@ -14,7 +14,6 @@ verilate(
   SOURCES
   ${CHISEL_OUTPUT_TOPMODULE}
   ${CHISEL_OUTPUT_VERILATOR_CONF}
-  /nix/store/av5cmmhnfaq88k157kb62fw65ir58x4w-mini-gdbstub-2024-04-25/lib/libgdbstub.a
   INCLUDE_DIRS
   ${CHISEL_OUTPUT_DIR}
   VERILATOR_ARGS
