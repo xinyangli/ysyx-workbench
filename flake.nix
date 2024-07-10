@@ -138,6 +138,7 @@
             libllvm
             libxml2
             readline
+            mini-gdbstub
           ] ++ self.checks.${system}.pre-commit-check.enabledPackages;
 
           cmakeFlags = [

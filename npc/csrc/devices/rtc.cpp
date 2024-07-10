@@ -18,7 +18,8 @@ uint64_t RTC::get_time_internal() {
 }
 
 uint64_t RTC::get_time() {
-  if (boot_time == 0) boot_time = get_time_internal();
+  if (boot_time == 0)
+    boot_time = get_time_internal();
   uint64_t now = get_time_internal();
   return now - boot_time;
 }
@@ -45,4 +46,4 @@ void RTC::io_handler(uint32_t offset, size_t len, bool is_write) {
 //       src[i] = buf[i];
 //   }
 // }
-}
+} // namespace Devices

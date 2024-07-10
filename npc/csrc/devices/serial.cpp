@@ -1,12 +1,12 @@
-#include <iostream>
 #include <devices.hpp>
+#include <iostream>
 
 namespace Devices {
 Serial::Serial(uint64_t addr, size_t len) : Device(addr, len, buf) {
   buf[0] = 0;
 };
-void Serial::io_handler(uint32_t offset, size_t len, bool is_write)  {
-  if(is_write) {
+void Serial::io_handler(uint32_t offset, size_t len, bool is_write) {
+  if (is_write) {
     std::cout << (char)buf[0];
   }
 }
@@ -19,4 +19,4 @@ void Serial::io_handler(uint32_t offset, size_t len, bool is_write)  {
 //       src[i] = buf[i];
 //   }
 // }
-}
+} // namespace Devices
