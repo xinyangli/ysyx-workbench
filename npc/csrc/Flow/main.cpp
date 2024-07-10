@@ -1,3 +1,6 @@
+extern "C" {
+  #include <gdbstub.h>
+}
 #include "VFlow___024root.h"
 #include "components.hpp"
 #include <VFlow.h>
@@ -29,7 +32,6 @@ struct DbgState {
 };
 
 extern "C" {
-#include <gdbstub.h>
 
 /* === Memory Access === */
 using MMap = MemoryMap<Memory<128 * 1024>, Devices::DeviceMap>;
