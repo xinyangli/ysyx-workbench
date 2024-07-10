@@ -1,7 +1,10 @@
 #ifndef _NPC_TRACER_H_
 #define _NPC_TRACER_H_
 #include "components.hpp"
+#include "types.h"
 #include <filesystem>
+#include <gdbstub.h>
+#include <sys/types.h>
 #include <verilated_vcd_c.h>
 
 template <class T> class Tracer {
@@ -26,16 +29,24 @@ public:
   void update() { m_trace->dump(cycle++); }
 };
 
-template <typename T> class VlModuleInterfaceCommon : public T {
+template <typename T, typename R> class VlModuleInterfaceCommon : public T {
   uint64_t sim_time = 0;
   uint64_t posedge_cnt = 0;
   std::unique_ptr<Tracer<T>> tracer;
 
 public:
-  VlModuleInterfaceCommon<T>(std::filesystem::path wavefile) {
+  const R *registers;
+  VlModuleInterfaceCommon<T, R>() {
+    tracer = nullptr;
+    registers = nullptr;
+  }
+
+  void setup(std::filesystem::path wavefile, const R *r) {
     if (!wavefile.empty())
       tracer = std::make_unique<Tracer<T>>(this, wavefile);
+    registers = r;
   }
+
   void eval() {
     if (this->is_posedge()) {
       posedge_cnt++;
@@ -51,6 +62,25 @@ public:
       this->eval();
     }
   }
+
+  gdb_action_t eval(const std::vector<Breakpoint> &breakpoints) {
+    gdb_action_t res;
+    do {
+      this->eval();
+      size_t pc = registers->get_pc();
+      for (const auto &bp : breakpoints) {
+        if (pc == bp.addr) {
+          res.data = bp.addr;
+          switch (bp.type) {
+          default:
+            res.reason = gdb_action_t::ACT_BREAKPOINT;
+          }
+          return res;
+        }
+      }
+    } while (true);
+  }
+
   void reset_eval(int n) {
     extern bool g_skip_memcheck;
     g_skip_memcheck = true;

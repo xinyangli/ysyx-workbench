@@ -1,30 +1,25 @@
+extern "C" {
+#include <gdbstub.h>
+}
 #include "VFlow___024root.h"
 #include "components.hpp"
 #include <VFlow.h>
-#include <array>
 #include <config.hpp>
 #include <cstdint>
 #include <cstdlib>
 #include <devices.hpp>
-#include <disasm.hpp>
-#include <filesystem>
-#include <fstream>
 #include <memory>
-#include <sdb.hpp>
-#include <trm_difftest.hpp>
-#include <trm_interface.hpp>
 #include <types.h>
+#include <vector>
 #include <vl_wrapper.hpp>
 #include <vpi_user.h>
 #include <vpi_wrapper.hpp>
 
-using VlModule = VlModuleInterfaceCommon<VFlow>;
 using Registers = _RegistersVPI<uint32_t, 32>;
+using VlModule = VlModuleInterfaceCommon<VFlow, Registers>;
 
 // SDB::SDB<NPC::npc_interface> sdb_dut;
-using CPUState = CPUStateBase<uint32_t, 32>;
 bool g_skip_memcheck = false;
-CPUState npc_cpu;
 VlModule *top;
 Registers *regs;
 vpiHandle pc = nullptr;
@@ -32,7 +27,13 @@ vpiHandle pc = nullptr;
 const size_t PMEM_START = 0x80000000;
 const size_t PMEM_END = 0x87ffffff;
 
+struct DbgState {
+  std::vector<Breakpoint> bp;
+};
+
 extern "C" {
+
+/* === Memory Access === */
 using MMap = MemoryMap<Memory<128 * 1024>, Devices::DeviceMap>;
 void *pmem_get() {
   static Devices::DeviceMap devices{
@@ -65,127 +66,99 @@ void pmem_write(int waddr, int wdata, char wmask) {
     mem->trace((std::size_t)waddr, false, regs->get_pc(), wdata);
   return mem->write((std::size_t)waddr, wdata, wmask);
 }
+
+/* === For gdbstub === */
+
+int npc_read_mem(void *args, size_t addr, size_t len, void *val) {
+  void *pmem = pmem_get();
+  auto mmap = static_cast<MMap *>(pmem);
+  mmap->copy_to(addr, (uint8_t *)val, len);
+  return 0;
 }
 
-namespace NPC {
-void npc_memcpy(paddr_t addr, void *buf, size_t sz, bool direction) {
-  if (direction == TRM_FROM_MACHINE) {
-    static_cast<MMap *>(pmem_get())->copy_to(addr, (uint8_t *)buf, sz);
-  }
-};
+int npc_write_mem(void *args, size_t addr, size_t len, void *val) {
+  void *pmem = pmem_get();
+  auto mmap = static_cast<MMap *>(pmem);
+  mmap->copy_from(addr, (uint8_t *)val, len);
+  return 0;
+}
 
-void npc_regcpy(void *p, bool direction) {
+int npc_read_reg(void *args, int regno, size_t *value) {
+  if (regno == 32)
+    *value = regs->get_pc();
+  else
+    *value = (*regs)[regno];
+  return 0;
+}
 
-  if (direction == TRM_FROM_MACHINE) {
-    ((CPUState *)p)->pc = regs->get_pc();
-    for (int i = 0; i < 32; i++) {
-      ((CPUState *)p)->reg[i] = (*regs)[i];
+int npc_write_reg(void *args, int regno, size_t value) { return 1; }
+
+void npc_cont(void *args, gdb_action_t *res) {
+  DbgState *dbg = (DbgState *)args;
+  *res = top->eval(dbg->bp);
+}
+
+void npc_stepi(void *args, gdb_action_t *res) {
+  DbgState *dbg = (DbgState *)args;
+  *res = top->eval(dbg->bp);
+}
+
+bool npc_set_bp(void *args, size_t addr, bp_type_t type) {
+  DbgState *dbg = (DbgState *)args;
+  for (const auto &bp : dbg->bp) {
+    if (bp.addr == addr && bp.type == type) {
+      return true;
     }
   }
+  dbg->bp.push_back({.addr = addr, .type = type});
+  return true;
 }
 
-void npc_exec(uint64_t n) {
-  while (n--) {
-    for (int i = 0; i < 2; i++) {
-      if (top->is_posedge()) {
-        // Posedge
-        regs->update();
-      }
-      top->eval();
+bool npc_del_bp(void *args, size_t addr, bp_type_t type) {
+  DbgState *dbg = (DbgState *)args;
+  for (auto it = dbg->bp.begin(); it != dbg->bp.end(); it++) {
+    if (it->addr == addr && it->type == type) {
+      std::swap(*it, *dbg->bp.rbegin());
+      dbg->bp.pop_back();
+      return true;
     }
   }
+  return false;
 }
 
-void npc_atexit(void) {
-  delete top;
-  delete regs;
-}
+static target_ops npc_gdbstub_ops = {.cont = npc_cont,
+                                     .stepi = npc_stepi,
+                                     .read_reg = npc_read_reg,
+                                     .write_reg = npc_write_reg,
+                                     .read_mem = npc_read_mem,
+                                     .write_mem = npc_write_mem,
+                                     .set_bp = npc_set_bp,
+                                     .del_bp = npc_del_bp,
+                                     .on_interrupt = NULL};
 
-void npc_init(int port) {
-  top = new VlModule{config.wavefile};
-  regs = new Registers("TOP.Flow.reg_0.regFile_", "TOP.Flow.pc.out");
-  atexit(npc_atexit);
-  top->reset_eval(10);
-}
+static gdbstub_t gdbstub_priv;
+static DbgState dbg;
+arch_info_t isa_arch_info = {
+    .target_desc = strdup(TARGET_RV32), .reg_num = 33, .reg_byte = 4};
 
-class DutTrmInterface : public TrmInterface {
-public:
-  DutTrmInterface(memcpy_t f_memcpy, regcpy_t f_regcpy, exec_t f_exec,
-                  init_t f_init, void *cpu_state)
-      : TrmInterface{f_memcpy, f_regcpy, f_exec, f_init, cpu_state} {}
-  word_t at(std::string name) const override {
-    return ((CPUState *)cpu_state)->at(name);
+int gdbstub_loop() {
+  if (!gdbstub_init(&gdbstub_priv, &npc_gdbstub_ops, (arch_info_t)isa_arch_info,
+                    strdup("127.0.0.1:1234"))) {
+    return EINVAL;
   }
-
-  word_t at(paddr_t addr) const override {
-    word_t buf;
-    this->memcpy(addr, &buf, sizeof(word_t), TRM_FROM_MACHINE);
-    return buf;
-  }
-  void print(std::ostream &os) const override {
-    this->regcpy(cpu_state, TRM_FROM_MACHINE);
-    os << *(CPUState *)cpu_state << std::endl;
-  }
-};
-
-DutTrmInterface npc_interface =
-    DutTrmInterface{&npc_memcpy, &npc_regcpy, &npc_exec, &npc_init, &npc_cpu};
-}; // namespace NPC
-
-extern "C" {
-word_t reg_str2val(const char *name, bool *success) {
-  return npc_cpu.reg_str2val(name, success);
+  bool success = gdbstub_run(&gdbstub_priv, &dbg);
+  gdbstub_close(&gdbstub_priv);
+  return !success;
 }
-}
+} // extern "C"
 
 int main(int argc, char **argv, char **env) {
   config.cli_parse(argc, argv);
 
-  if (config.lib_ref.empty()) {
-    if (config.interactive) {
-      SDB::SDB sdb_npc{NPC::npc_interface};
-      sdb_npc.main_loop();
-      return 0;
-    } else {
-      NPC::npc_interface.init(0);
-      while (true) {
-        word_t inst = NPC::npc_interface.at(regs->get_pc());
-        if (inst == 1048691) {
-          return 0;
-        }
-        NPC::npc_interface.exec(1);
-      }
-    }
-  }
+  top = new VlModule;
+  regs = new Registers("TOP.Flow.reg_0.regFile_", "TOP.Flow.pc.out");
+  top->setup(config.wavefile, regs);
+  top->reset_eval(10);
 
-  /* -- Difftest -- */
-  std::filesystem::path ref{config.lib_ref};
-  RefTrmInterface ref_interface{ref};
-  DifftestTrmInterface diff_interface{
-      NPC::npc_interface, ref_interface,
-      static_cast<MMap *>(pmem_get())->get_pmem(), 128 * 1024};
-  if (config.interactive) {
-    SDB::SDB sdb_diff{diff_interface};
-    sdb_diff.main_loop();
-    return 0;
-  }
-
-  try {
-    diff_interface.init(0);
-    diff_interface.exec(-1);
-  } catch (TrmRuntimeException &e) {
-    switch (e.error_code()) {
-    case TrmRuntimeException::EBREAK:
-      return 0;
-    case TrmRuntimeException::DIFFTEST_FAILED:
-      std::cout << "Difftest Failed" << std::endl;
-      diff_interface.print(std::cout);
-      return 1;
-    default:
-      std::cerr << "Unknown error happened" << std::endl;
-      return 1;
-    }
-  }
-
-  return 0;
+  return gdbstub_loop();
 }

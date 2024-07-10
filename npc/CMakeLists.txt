@@ -42,7 +42,7 @@ if(BUILD_SIM_NVBOARD_TARGET)
 endif()
 find_package(CLI11 CONFIG REQUIRED)
 
-option(ENABLE_SDB "Enable simple debugger" ON)
+option(ENABLE_SDB "Enable simple debugger" OFF)
 
 find_library(NVBOARD_LIBRARY NAMES nvboard)
 find_path(NVBOARD_INCLUDE_DIR NAMES nvboard.h)
