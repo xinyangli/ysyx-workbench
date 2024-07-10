@@ -14,6 +14,7 @@ verilate(
   SOURCES
   ${CHISEL_OUTPUT_TOPMODULE}
   ${CHISEL_OUTPUT_VERILATOR_CONF}
+  /nix/store/av5cmmhnfaq88k157kb62fw65ir58x4w-mini-gdbstub-2024-04-25/lib/libgdbstub.a
   INCLUDE_DIRS
   ${CHISEL_OUTPUT_DIR}
   VERILATOR_ARGS
