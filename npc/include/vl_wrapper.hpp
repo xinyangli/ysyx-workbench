@@ -35,7 +35,7 @@ template <typename T, typename R> class VlModuleInterfaceCommon : public T {
   R &registers;
 
 public:
-  VlModuleInterfaceCommon<T>(std::filesystem::path wavefile) {
+  VlModuleInterfaceCommon<T, R>(std::filesystem::path wavefile) {
     if (!wavefile.empty())
       tracer = std::make_unique<Tracer<T>>(this, wavefile);
   }
@@ -59,7 +59,7 @@ public:
     gdb_action_t res;
     do {
       this->eval();
-      size_t pc = registers->get_pc();
+      size_t pc = registers.get_pc();
       for (const auto &bp: breakpoints) {
         if(pc == bp.addr) {
           res.data = bp.addr;

@@ -115,7 +115,7 @@ public:
       std::cerr << "Not in pmem" << std::endl;
     }
   }
-  void copy_from(paddr_t addr, const uint8_t *buf, size_t len) {
+  void copy_from(paddr_t addr, uint8_t *buf, size_t len) {
     if (ram->in_pmem(addr)) {
       ram->transfer(addr, buf, len, true);
     } else {
