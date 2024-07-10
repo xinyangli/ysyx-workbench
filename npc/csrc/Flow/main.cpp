@@ -131,16 +131,19 @@ static DbgState dbg;
 arch_info_t isa_arch_info = {
     .target_desc = strdup(TARGET_RV32), .reg_num = 33, .reg_byte = 4};
 
-int main(int argc, char **argv, char **env) {
-  config.cli_parse(argc, argv);
+int init() {
   if (!gdbstub_init(&gdbstub_priv, &npc_gdbstub_ops,
                   (arch_info_t)isa_arch_info, strdup("127.0.0.1:1234"))) {
     return EINVAL;
   }
+  return 0;
+}
+}
+
+int main(int argc, char **argv, char **env) {
+  config.cli_parse(argc, argv);
   // bool success = gdbstub_run(&gdbstub_priv, &dbg);
   // gdbstub_close(&gdbstub_priv);
   // return !success;
-  return 0;
-}
-
+  return init();
 }
