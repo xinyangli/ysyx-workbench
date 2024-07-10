@@ -1,6 +1,6 @@
 include(ChiselBuild)
 add_executable(V${TOPMODULE} config.cpp main.cpp)
-target_link_libraries(V${TOPMODULE} PRIVATE sdb devices)
+target_link_libraries(V${TOPMODULE} PRIVATE devices)
 target_include_directories(V${TOPMODULE} PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
 verilate(
