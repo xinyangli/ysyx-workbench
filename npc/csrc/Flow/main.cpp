@@ -130,7 +130,6 @@ static gdbstub_t gdbstub_priv;
 static DbgState dbg;
 arch_info_t isa_arch_info = {
     .target_desc = strdup(TARGET_RV32), .reg_num = 33, .reg_byte = 4};
-}
 
 int main(int argc, char **argv, char **env) {
   config.cli_parse(argc, argv);
@@ -142,4 +141,6 @@ int main(int argc, char **argv, char **env) {
   // gdbstub_close(&gdbstub_priv);
   // return !success;
   return 0;
+}
+
 }
