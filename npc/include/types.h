@@ -29,4 +29,11 @@ const std::map<std::string, int> riscv32_regs_by_name{
     {"t5", 30}, {"t6", 31}};
 #endif
 
+#include <gdbstub.h>
+struct Breakpoint {
+  size_t addr;
+  bp_type_t type;
+};
+
+
 #endif

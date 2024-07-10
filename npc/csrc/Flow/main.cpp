@@ -12,8 +12,8 @@
 #include <vpi_user.h>
 #include <vpi_wrapper.hpp>
 
-using VlModule = VlModuleInterfaceCommon<VFlow>;
 using Registers = _RegistersVPI<uint32_t, 32>;
+using VlModule = VlModuleInterfaceCommon<VFlow, Registers>;
 
 // SDB::SDB<NPC::npc_interface> sdb_dut;
 bool g_skip_memcheck = false;
@@ -24,7 +24,13 @@ vpiHandle pc = nullptr;
 const size_t PMEM_START = 0x80000000;
 const size_t PMEM_END = 0x87ffffff;
 
+struct DbgState {
+  std::vector<Breakpoint> bp;
+};
+
 extern "C" {
+
+/* === Memory Access === */
 using MMap = MemoryMap<Memory<128 * 1024>, Devices::DeviceMap>;
 void *pmem_get() {
   static Devices::DeviceMap devices{
@@ -58,9 +64,71 @@ void pmem_write(int waddr, int wdata, char wmask) {
   return mem->write((std::size_t)waddr, wdata, wmask);
 }
 
+/* === For gdbstub === */
+
+int npc_read_mem(void *args, size_t addr, size_t len, void *val) {
+  void *pmem = pmem_get();
+  auto mmap = static_cast<MMap *>(pmem);
+  mmap->copy_to(addr, (uint8_t*) val, len);
+  return 0;
+}
+
+int npc_write_mem(void *args, size_t addr, size_t len, void *val) {
+  void *pmem = pmem_get();
+  auto mmap = static_cast<MMap *>(pmem);
+  mmap->copy_from(addr, (uint8_t*) val, len);
+  return 0;
+}
+
+void npc_cont(void *args, gdb_action_t *res) {
+  DbgState *dbg = (DbgState *)args;
+  *res = top->eval(dbg->bp);
+}
+
+void npc_stepi(void *args, gdb_action_t *res) {
+  DbgState *dbg = (DbgState *)args;
+  *res = top->eval(dbg->bp);
+}
+
+bool npc_set_bp(void *args, size_t addr, bp_type_t type) {
+  DbgState *dbg = (DbgState *)args;
+  for (const auto &bp : dbg->bp) {
+    if (bp.addr == addr && bp.type == type) {
+      return true;
+    }
+  }
+  dbg->bp.push_back({.addr = addr, .type = type});
+  return true;
+}
+
+bool npc_del_bp(void *args, size_t addr, bp_type_t type) {
+  DbgState *dbg = (DbgState *)args;
+  for (auto it = dbg->bp.begin(); it != dbg->bp.end(); it++) {
+    if (it->addr == addr && it->type == type) {
+      std::swap(*it, *dbg->bp.rbegin());
+      dbg->bp.pop_back();
+      return true;
+    }
+  }
+  return false;
+}
+
+static target_ops npc_gdbstub_ops = {.cont = npc_cont,
+                                     .stepi = npc_stepi,
+                                     .read_reg = NULL,
+                                     .write_reg = NULL,
+                                     .read_mem = npc_read_mem,
+                                     .write_mem = npc_write_mem,
+                                     .set_bp = npc_set_bp,
+                                     .del_bp = npc_del_bp,
+                                     .on_interrupt = NULL};
+
+static gdbstub_t gdbstub_priv;
+static DbgState dbg;
 int main(int argc, char **argv, char **env) {
   config.cli_parse(argc, argv);
-
-  return 0;
+  bool success = gdbstub_run(&gdbstub_priv, &dbg);
+  gdbstub_close(&gdbstub_priv);
+  return !success;
 }
 }
