@@ -125,10 +125,16 @@ static target_ops npc_gdbstub_ops = {.cont = npc_cont,
 
 static gdbstub_t gdbstub_priv;
 static DbgState dbg;
+arch_info_t isa_arch_info = ;
 int main(int argc, char **argv, char **env) {
   config.cli_parse(argc, argv);
-  bool success = gdbstub_run(&gdbstub_priv, &dbg);
-  gdbstub_close(&gdbstub_priv);
-  return !success;
+  if (!gdbstub_init(&gdbstub_priv, &npc_gdbstub_ops,
+                    {.reg_num = 33, .reg_byte = 4, .target_desc = TARGET_RV32},
+                    "127.0.0.1:1234")) {
+    return EINVAL;
+  }
+  // bool success = gdbstub_run(&gdbstub_priv, &dbg);
+  // gdbstub_close(&gdbstub_priv);
+  return 0;
 }
 }
