@@ -5,7 +5,6 @@
 #include <cstdint>
 #include <cstdlib>
 #include <devices.hpp>
-#include <gdbstub.h>
 #include <memory>
 #include <types.h>
 #include <vl_wrapper.hpp>
@@ -29,6 +28,7 @@ struct DbgState {
 };
 
 extern "C" {
+#include <gdbstub.h>
 
 /* === Memory Access === */
 using MMap = MemoryMap<Memory<128 * 1024>, Devices::DeviceMap>;
