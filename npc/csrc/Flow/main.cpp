@@ -83,6 +83,15 @@ int npc_write_mem(void *args, size_t addr, size_t len, void *val) {
   return 0;
 }
 
+int npc_read_reg(void *args, int regno, size_t *value) {
+  *value = 0;
+  return 0;
+}
+
+int npc_write_reg(void *args, int regno, size_t value) {
+  return 0;
+}
+
 void npc_cont(void *args, gdb_action_t *res) {
   DbgState *dbg = (DbgState *)args;
   *res = top->eval(dbg->bp);
@@ -118,8 +127,8 @@ bool npc_del_bp(void *args, size_t addr, bp_type_t type) {
 
 static target_ops npc_gdbstub_ops = {.cont = npc_cont,
                                      .stepi = npc_stepi,
-                                     .read_reg = NULL,
-                                     .write_reg = NULL,
+                                     .read_reg = npc_read_reg,
+                                     .write_reg = npc_write_reg,
                                      .read_mem = npc_read_mem,
                                      .write_mem = npc_write_mem,
                                      .set_bp = npc_set_bp,
@@ -131,19 +140,18 @@ static DbgState dbg;
 arch_info_t isa_arch_info = {
     .target_desc = strdup(TARGET_RV32), .reg_num = 33, .reg_byte = 4};
 
-int init() {
+int gdbstub_loop() {
   if (!gdbstub_init(&gdbstub_priv, &npc_gdbstub_ops,
                   (arch_info_t)isa_arch_info, strdup("127.0.0.1:1234"))) {
     return EINVAL;
   }
-  return 0;
+  bool success = gdbstub_run(&gdbstub_priv, &dbg);
+  gdbstub_close(&gdbstub_priv);
+  return !success;
 }
-}
+} // extern "C"
 
 int main(int argc, char **argv, char **env) {
   config.cli_parse(argc, argv);
-  // bool success = gdbstub_run(&gdbstub_priv, &dbg);
-  // gdbstub_close(&gdbstub_priv);
-  // return !success;
-  return init();
+  return gdbstub_loop();
 }

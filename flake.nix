@@ -53,13 +53,13 @@
           };
         };
 
-        packages.nemu = pkgs.callPackage ./nemu { am-kernels = self.packages.${system}.am-kernels; };
-        packages.nemu-lib = pkgs.callPackage ./nemu { am-kernels = self.packages.${system}.am-kernels; defconfig = "riscv32-lib_defconfig"; };
+        packages.nemu = pkgs.callPackage ./nemu { am-kernels = self.packages.${system}.am-kernels-nemu; };
+        packages.nemu-lib = pkgs.callPackage ./nemu { am-kernels = self.packages.${system}.am-kernels-nemu; defconfig = "riscv32-lib_defconfig"; };
         packages.abstract-machine = crossPkgs.callPackage ./abstract-machine { isa = "riscv"; platform = [ "nemu" "npc" ]; };
         packages.abstract-machine-native = pkgs.callPackage ./abstract-machine { isa = "native"; };
 
-        packages.am-kernels = crossPkgs.stdenv.mkDerivation rec {
-          pname = "am-kernels-cmake";
+        packages.am-kernels-nemu = crossPkgs.stdenv.mkDerivation rec {
+          pname = "am-kernels-nemu";
           version = "2024.02.18";
 
           src = ./am-kernels;
@@ -71,6 +71,30 @@
 
           cmakeFlags = [
             (pkgs.lib.cmakeFeature "ARCH" "riscv-nemu")
+          ];
+
+          buildInputs = [
+            # SDL2
+            self.packages.${system}.abstract-machine
+          ];
+
+          cmakeBuildType = "RelWithDebInfo";
+          dontStrip = true;
+        };
+
+        packages.am-kernels-npc = crossPkgs.stdenv.mkDerivation rec {
+          pname = "am-kernels-npc";
+          version = "2024.02.18";
+
+          src = ./am-kernels;
+
+          nativeBuildInputs = [
+            pkgs.cmake
+            pkgs.gcc # Generate expr tests
+          ];
+
+          cmakeFlags = [
+            (pkgs.lib.cmakeFeature "ARCH" "riscv-npc")
           ];
 
           buildInputs = [
@@ -130,6 +154,7 @@
             flex
             bison
             verilator
+            self.packages.${system}.am-kernels-npc
           ];
 
           buildInputs = [
