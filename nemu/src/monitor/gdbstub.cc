@@ -113,7 +113,9 @@ extern "C" {
 static gdbstub_t gdbstub_priv;
 #define SOCKET_ADDR "127.0.0.1:1234"
 
-void nemu_init(void *args) {
+#define __EXPORT __attribute__((visibility("default")))
+
+__EXPORT void nemu_init(void *args) {
   DbgState *dbg_state = (DbgState *)args;
   dbg_state->bp = new std::vector<breakpoint_t>();
 
@@ -123,7 +125,6 @@ void nemu_init(void *args) {
   init_isa();
 }
 
-#ifndef CONFIG_TARGET_SHARE
 int nemu_gdbstub_init() {
   dbg.bp = new std::vector<breakpoint_t>();
   assert(dbg.bp);
@@ -140,5 +141,4 @@ int nemu_gdbstub_run() {
   gdbstub_close(&gdbstub_priv);
   return !success;
 }
-#endif
 }
