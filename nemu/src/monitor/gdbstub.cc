@@ -124,6 +124,7 @@ void nemu_init(void *args) {
   dbg.bp = new std::vector<breakpoint_t>();
 }
 
+#ifndef CONFIG_TARGET_SHARE
 int nemu_gdbstub_init() {
   dbg.bp = new std::vector<breakpoint_t>();
   assert(dbg.bp);
@@ -140,4 +141,5 @@ int nemu_gdbstub_run() {
   gdbstub_close(&gdbstub_priv);
   return !success;
 }
+#endif
 }
