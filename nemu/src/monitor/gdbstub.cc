@@ -112,6 +112,18 @@ static DbgState dbg;
 extern "C" {
 static gdbstub_t gdbstub_priv;
 #define SOCKET_ADDR "127.0.0.1:1234"
+
+void nemu_init(void *args) {
+  DbgState *dbg_state = (DbgState *)args;
+
+  void init_mem();
+  init_mem();
+  /* Perform ISA dependent initialization. */
+  init_isa();
+
+  dbg.bp = new std::vector<breakpoint_t>();
+}
+
 int nemu_gdbstub_init() {
   dbg.bp = new std::vector<breakpoint_t>();
   assert(dbg.bp);
@@ -121,6 +133,7 @@ int nemu_gdbstub_init() {
   }
   return 0;
 }
+
 int nemu_gdbstub_run() {
   puts("Waiting for gdb connection at " SOCKET_ADDR);
   bool success = gdbstub_run(&gdbstub_priv, &dbg);
