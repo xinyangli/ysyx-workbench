@@ -2,3 +2,6 @@
 	path = am-kernels
 	url = https://git.xinyang.life/xin/am-kernels.git
 	branch = dev
+[submodule "diffu"]
+	path = diffu
+	url = https://git.xinyang.life/xin/diffu.git

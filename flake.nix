@@ -58,53 +58,11 @@
         packages.abstract-machine = crossPkgs.callPackage ./abstract-machine { isa = "riscv"; platform = [ "nemu" "npc" ]; };
         packages.abstract-machine-native = pkgs.callPackage ./abstract-machine { isa = "native"; };
 
-        packages.am-kernels-nemu = crossPkgs.stdenv.mkDerivation rec {
-          pname = "am-kernels-nemu";
-          version = "2024.02.18";
+        packages.am-kernels-npc = crossPkgs.callPackage ./am-kernels { abstract-machine = self.packages.${system}.abstract-machine; arch = "riscv-npc"; };
+        packages.am-kernels-nemu = crossPkgs.callPackage ./am-kernels { abstract-machine = self.packages.${system}.abstract-machine; arch = "riscv-nemu"; };
 
-          src = ./am-kernels;
-
-          nativeBuildInputs = [
-            pkgs.cmake
-            pkgs.gcc # Generate expr tests
-          ];
-
-          cmakeFlags = [
-            (pkgs.lib.cmakeFeature "ARCH" "riscv-nemu")
-          ];
-
-          buildInputs = [
-            # SDL2
-            self.packages.${system}.abstract-machine
-          ];
-
-          cmakeBuildType = "RelWithDebInfo";
-          dontStrip = true;
-        };
-
-        packages.am-kernels-npc = crossPkgs.stdenv.mkDerivation rec {
-          pname = "am-kernels-npc";
-          version = "2024.02.18";
-
-          src = ./am-kernels;
-
-          nativeBuildInputs = [
-            pkgs.cmake
-            pkgs.gcc # Generate expr tests
-          ];
-
-          cmakeFlags = [
-            (pkgs.lib.cmakeFeature "ARCH" "riscv-npc")
-          ];
-
-          buildInputs = [
-            # SDL2
-            self.packages.${system}.abstract-machine
-          ];
-
-          cmakeBuildType = "RelWithDebInfo";
-          dontStrip = true;
-        };
+        # FIXME: native cannot compile due to abstract machine
+        packages.am-kernels-native = crossPkgs.callPackage ./am-kernels { abstract-machine = self.packages.${system}.abstract-machine-native; arch = "native"; };
 
         devShells.nemu = pkgs.mkShell {
           packages = with pkgs; [
@@ -125,12 +83,13 @@
             self.packages.${system}.nemu
           ];
           NEMU_HOME = "/home/xin/repo/ysyx-workbench/nemu";
-          NEMU_IMAGES_PATH = self.packages.${system}.am-kernels + "/share/am-kernels";
+          NEMU_IMAGES_PATH = self.packages.${system}.am-kernels-nemu + "/share/am-kernels";
         };
 
         devShells.npc = with pkgs; mkShell.override { stdenv = ccacheStdenv; } {
           inherit (self.checks.${system}.pre-commit-check) shellHook;
           CHISEL_FIRTOOL_PATH = "${nixpkgs-circt162.legacyPackages.${system}.circt}/bin";
+          NPC_IMAGES_DIR="${self.packages.${system}.am-kernels-npc}/share/am-kernels";
           packages = [
             clang-tools
             cmake

@@ -35,5 +35,4 @@ struct Breakpoint {
   bp_type_t type;
 };
 
-
 #endif

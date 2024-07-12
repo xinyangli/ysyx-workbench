@@ -20,12 +20,12 @@
 template <typename T, std::size_t nr> class _RegistersBase {
   std::array<T, nr> regs;
   T pc;
-  virtual T fetch_pc();
-  virtual T fetch_reg(std::size_t id);
+  virtual T fetch_pc() const;
+  virtual T fetch_reg(std::size_t id) const;
 
 public:
-  T operator[](size_t id) { return fetch_reg(id); }
-  T get_pc() { return fetch_pc(); }
+  T operator[](size_t id) const { return fetch_reg(id); }
+  T get_pc() const { return fetch_pc(); }
   void update() {
     for (int i = 0; i < regs.size(); i++) {
       regs[i] = fetch_reg(i);
@@ -112,14 +112,14 @@ public:
     if (ram->in_pmem(addr)) {
       ram->transfer(addr, buf, len, false);
     } else {
-      std::cerr << "Not in pmem" << std::endl;
+      std::cerr << "0x" << std::hex << addr << " not in pmem" << std::endl;
     }
   }
   void copy_from(paddr_t addr, uint8_t *buf, size_t len) {
     if (ram->in_pmem(addr)) {
       ram->transfer(addr, buf, len, true);
     } else {
-      std::cerr << "Not in pmem" << std::endl;
+      std::cerr << "0x" << std::hex << addr << " not in pmem" << std::endl;
     }
   }
   void *get_pmem() { return ram->mem.data(); }

@@ -1,5 +1,5 @@
 extern "C" {
-  #include <gdbstub.h>
+#include <gdbstub.h>
 }
 #include "VFlow___024root.h"
 #include "components.hpp"
@@ -10,10 +10,10 @@ extern "C" {
 #include <devices.hpp>
 #include <memory>
 #include <types.h>
+#include <vector>
 #include <vl_wrapper.hpp>
 #include <vpi_user.h>
 #include <vpi_wrapper.hpp>
-#include <vector>
 
 using Registers = _RegistersVPI<uint32_t, 32>;
 using VlModule = VlModuleInterfaceCommon<VFlow, Registers>;
@@ -72,25 +72,26 @@ void pmem_write(int waddr, int wdata, char wmask) {
 int npc_read_mem(void *args, size_t addr, size_t len, void *val) {
   void *pmem = pmem_get();
   auto mmap = static_cast<MMap *>(pmem);
-  mmap->copy_to(addr, (uint8_t*) val, len);
+  mmap->copy_to(addr, (uint8_t *)val, len);
   return 0;
 }
 
 int npc_write_mem(void *args, size_t addr, size_t len, void *val) {
   void *pmem = pmem_get();
   auto mmap = static_cast<MMap *>(pmem);
-  mmap->copy_from(addr, (uint8_t*) val, len);
+  mmap->copy_from(addr, (uint8_t *)val, len);
   return 0;
 }
 
 int npc_read_reg(void *args, int regno, size_t *value) {
-  *value = 0;
+  if (regno == 32)
+    *value = regs->get_pc();
+  else
+    *value = (*regs)[regno];
   return 0;
 }
 
-int npc_write_reg(void *args, int regno, size_t value) {
-  return 0;
-}
+int npc_write_reg(void *args, int regno, size_t value) { return 1; }
 
 void npc_cont(void *args, gdb_action_t *res) {
   DbgState *dbg = (DbgState *)args;
@@ -141,8 +142,8 @@ arch_info_t isa_arch_info = {
     .target_desc = strdup(TARGET_RV32), .reg_num = 33, .reg_byte = 4};
 
 int gdbstub_loop() {
-  if (!gdbstub_init(&gdbstub_priv, &npc_gdbstub_ops,
-                  (arch_info_t)isa_arch_info, strdup("127.0.0.1:1234"))) {
+  if (!gdbstub_init(&gdbstub_priv, &npc_gdbstub_ops, (arch_info_t)isa_arch_info,
+                    strdup("127.0.0.1:1234"))) {
     return EINVAL;
   }
   bool success = gdbstub_run(&gdbstub_priv, &dbg);
@@ -153,5 +154,11 @@ int gdbstub_loop() {
 
 int main(int argc, char **argv, char **env) {
   config.cli_parse(argc, argv);
+
+  top = new VlModule;
+  regs = new Registers("TOP.Flow.reg_0.regFile_", "TOP.Flow.pc.out");
+  top->setup(config.wavefile, regs);
+  top->reset_eval(10);
+
   return gdbstub_loop();
 }
