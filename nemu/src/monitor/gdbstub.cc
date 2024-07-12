@@ -115,13 +115,12 @@ static gdbstub_t gdbstub_priv;
 
 void nemu_init(void *args) {
   DbgState *dbg_state = (DbgState *)args;
+  dbg_state->bp = new std::vector<breakpoint_t>();
 
   void init_mem();
   init_mem();
   /* Perform ISA dependent initialization. */
   init_isa();
-
-  dbg.bp = new std::vector<breakpoint_t>();
 }
 
 #ifndef CONFIG_TARGET_SHARE
