@@ -67,6 +67,7 @@ __EXPORT void nemu_cont(void *args, gdb_action_t *res) {
 
 __EXPORT void nemu_stepi(void *args, gdb_action_t *res) {
   DbgState *dbg_state = (DbgState *)args;
+  printf("%lu, halt: %d", dbg_state->bp->size(), dbg_state->halt);
   breakpoint_t *stopped_at =
       cpu_exec_with_bp(1, dbg_state->bp->data(), dbg_state->bp->size());
   nemu_is_stopped(res, stopped_at);
@@ -101,7 +102,7 @@ __EXPORT void nemu_on_interrupt(void *args) {
 
 __EXPORT typeof(target_ops::read_reg) nemu_read_reg = isa_read_reg;
 __EXPORT typeof(target_ops::write_reg) nemu_write_reg = isa_write_reg;
-__EXPORT size_t argsize = sizeof(DbgState);
+__EXPORT const size_t argsize = sizeof(DbgState);
 
 static struct target_ops nemu_gdbstub_ops = {.cont = nemu_cont,
                                              .stepi = nemu_stepi,
