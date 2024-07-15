@@ -74,7 +74,6 @@ __EXPORT void nemu_stepi(void *args, gdb_action_t *res) {
   breakpoint_t *stopped_at =
       cpu_exec_with_bp(1, dbg_state->bp->data(), dbg_state->bp->size());
   nemu_is_stopped(res, stopped_at);
-  printf("is_stopped done.\n");
 }
 
 __EXPORT bool nemu_set_bp(void *args, size_t addr, bp_type_t type) {
@@ -124,8 +123,6 @@ static gdbstub_t gdbstub_priv;
 __EXPORT void nemu_init(void *args) {
   DbgState *dbg_state = (DbgState *)args;
   dbg_state->bp = new std::vector<breakpoint_t>();
-  // dbg_state->bp->emplace_back(breakpoint_t{0, BP_READ});
-  printf("bp: %p, bp alloc: %p, bp data: %p\n", dbg_state, dbg_state->bp, dbg_state->bp->data());
   Assert(dbg_state->bp != NULL, "Failed to allocate breakpoint");
 
   void init_mem();
