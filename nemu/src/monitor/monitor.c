@@ -25,7 +25,7 @@ void init_mem();
 void init_difftest(char *ref_so_file, long img_size, int port);
 void init_device();
 void init_disasm(const char *triple);
-int nemu_init();
+void nemu_init();
 
 static void welcome() {
   Log("Trace: %s", MUXDEF(CONFIG_TRACE, ANSI_FMT("ON", ANSI_FG_GREEN),
@@ -178,10 +178,11 @@ void init_monitor(int argc, char *argv[]) {
   init_difftest(diff_so_file, img_size, difftest_port);
 
   /* Initialize debugger */
-  if (nemu_init()) {
-    Error("Failed to init");
-    exit(1);
-  }
+  // if (nemu_init()) {
+  //   Error("Failed to init");
+  //   exit(1);
+  // }
+  nemu_init();
 
   // printf("elf_file: %s\n", elf_file);
   if (elf_file != NULL) {
