@@ -35,19 +35,23 @@ static void nemu_is_stopped(gdb_action_t *act, breakpoint_t *stopped_at) {
   switch (nemu_state.state) {
   case NEMU_RUNNING:
     nemu_state.state = NEMU_STOP;
-    switch (stopped_at->type) {
-    case BP_SOFTWARE:
-      act->reason = gdb_action_t::ACT_BREAKPOINT;
-      break;
-    case BP_ACCESS:
-      act->reason = gdb_action_t::ACT_WATCH;
-      break;
-    case BP_WRITE:
-      act->reason = gdb_action_t::ACT_WWATCH;
-      break;
-    case BP_READ:
-      act->reason = gdb_action_t::ACT_RWATCH;
-      break;
+    if (stopped_at == NULL) {
+      act->reason = gdb_action_t::ACT_NONE;
+    } else {
+      switch (stopped_at->type) {
+      case BP_SOFTWARE:
+        act->reason = gdb_action_t::ACT_BREAKPOINT;
+        break;
+      case BP_ACCESS:
+        act->reason = gdb_action_t::ACT_WATCH;
+        break;
+      case BP_WRITE:
+        act->reason = gdb_action_t::ACT_WWATCH;
+        break;
+      case BP_READ:
+        act->reason = gdb_action_t::ACT_RWATCH;
+        break;
+      }
     }
     act->data = stopped_at->addr;
     break;
