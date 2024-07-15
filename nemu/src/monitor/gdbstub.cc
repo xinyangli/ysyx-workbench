@@ -125,7 +125,7 @@ __EXPORT void nemu_init(void *args) {
   DbgState *dbg_state = (DbgState *)args;
   dbg_state->bp = new std::vector<breakpoint_t>();
   dbg_state->bp->emplace_back(breakpoint_t{0, BP_READ});
-  printf("bp: %p, bp alloc: %p, bp data: %lu\n", dbg_state, dbg_state->bp, dbg_state->bp->size());
+  printf("bp: %p, bp alloc: %p, bp data: %p\n", dbg_state, dbg_state->bp, dbg_state->bp->data());
   Assert(dbg_state->bp != NULL, "Failed to allocate breakpoint");
 
   void init_mem();
