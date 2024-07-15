@@ -61,7 +61,7 @@
         packages.am-kernels-npc = crossPkgs.callPackage ./am-kernels { abstract-machine = self.packages.${system}.abstract-machine; arch = "riscv-npc"; };
         packages.am-kernels-nemu = crossPkgs.callPackage ./am-kernels { abstract-machine = self.packages.${system}.abstract-machine; arch = "riscv-nemu"; };
 
-        # FIXME: native cannot compile due to abstract machine
+        # FIXME: native cannot compile due to abstract-machine-native failed to build
         packages.am-kernels-native = crossPkgs.callPackage ./am-kernels { abstract-machine = self.packages.${system}.abstract-machine-native; arch = "native"; };
 
         devShells.nemu = pkgs.mkShell {
