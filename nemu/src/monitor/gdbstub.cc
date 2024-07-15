@@ -109,8 +109,8 @@ __EXPORT size_t argsize = sizeof(DbgState);
 
 static struct target_ops nemu_gdbstub_ops = {.cont = nemu_cont,
                                              .stepi = nemu_stepi,
-                                             .read_reg = nemu_read_reg,
-                                             .write_reg = nemu_write_reg,
+                                             .read_reg = *nemu_read_reg,
+                                             .write_reg = *nemu_write_reg,
                                              .read_mem = nemu_read_mem,
                                              .write_mem = nemu_write_mem,
                                              .set_bp = nemu_set_bp,
