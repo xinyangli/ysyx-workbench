@@ -10,6 +10,7 @@ extern "C" {
 #include <memory/paddr.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <difftest-def.h>
 }
 
 typedef struct {
@@ -17,14 +18,14 @@ typedef struct {
   bool halt;
 } DbgState;
 
-int nemu_read_mem(void *args, size_t addr, size_t len, void *val) {
+__EXPORT int nemu_read_mem(void *args, size_t addr, size_t len, void *val) {
   if (!in_pmem(addr))
     return EINVAL;
   memcpy(val, guest_to_host(addr), len);
   return 0;
 }
 
-int nemu_write_mem(void *args, size_t addr, size_t len, void *val) {
+__EXPORT int nemu_write_mem(void *args, size_t addr, size_t len, void *val) {
   if (!in_pmem(addr))
     return EINVAL;
   memcpy(guest_to_host(addr), val, len);
@@ -58,21 +59,21 @@ static void nemu_is_stopped(gdb_action_t *act, breakpoint_t *stopped_at) {
   }
 }
 
-void nemu_cont(void *args, gdb_action_t *res) {
+__EXPORT void nemu_cont(void *args, gdb_action_t *res) {
   DbgState *dbg_state = (DbgState *)args;
   breakpoint_t *stopped_at =
       cpu_exec_with_bp(-1, dbg_state->bp->data(), dbg_state->bp->size());
   nemu_is_stopped(res, stopped_at);
 }
 
-void nemu_stepi(void *args, gdb_action_t *res) {
+__EXPORT void nemu_stepi(void *args, gdb_action_t *res) {
   DbgState *dbg_state = (DbgState *)args;
   breakpoint_t *stopped_at =
       cpu_exec_with_bp(1, dbg_state->bp->data(), dbg_state->bp->size());
   nemu_is_stopped(res, stopped_at);
 }
 
-bool nemu_set_bp(void *args, size_t addr, bp_type_t type) {
+__EXPORT bool nemu_set_bp(void *args, size_t addr, bp_type_t type) {
   DbgState *dbg_state = (DbgState *)args;
   for (const auto &bp : *dbg_state->bp) {
     if (bp.addr == addr && bp.type == type) {
@@ -83,7 +84,7 @@ bool nemu_set_bp(void *args, size_t addr, bp_type_t type) {
   return true;
 }
 
-bool nemu_del_bp(void *args, size_t addr, bp_type_t type) {
+__EXPORT bool nemu_del_bp(void *args, size_t addr, bp_type_t type) {
   DbgState *dbg_state = (DbgState *)args;
   for (auto it = dbg_state->bp->begin(); it != dbg_state->bp->end(); it++) {
     if (it->addr == addr && it->type == type) {
@@ -95,7 +96,7 @@ bool nemu_del_bp(void *args, size_t addr, bp_type_t type) {
   return false;
 }
 
-void nemu_on_interrupt(void *args) {
+__EXPORT void nemu_on_interrupt(void *args) {
   // fputs("Not implemented", stderr);
 }
 
@@ -113,8 +114,6 @@ extern "C" {
 static gdbstub_t gdbstub_priv;
 #define SOCKET_ADDR "127.0.0.1:1234"
 
-#define __EXPORT __attribute__((visibility("default")))
-
 __EXPORT void nemu_init(void *args) {
   DbgState *dbg_state = (DbgState *)args;
   dbg_state->bp = new std::vector<breakpoint_t>();
@@ -125,7 +124,7 @@ __EXPORT void nemu_init(void *args) {
   init_isa();
 }
 
-int nemu_gdbstub_init() {
+__EXPORT int nemu_gdbstub_init() {
   dbg.bp = new std::vector<breakpoint_t>();
   assert(dbg.bp);
   if (!gdbstub_init(&gdbstub_priv, &nemu_gdbstub_ops,
@@ -135,7 +134,7 @@ int nemu_gdbstub_init() {
   return 0;
 }
 
-int nemu_gdbstub_run() {
+__EXPORT int nemu_gdbstub_run() {
   puts("Waiting for gdb connection at " SOCKET_ADDR);
   bool success = gdbstub_run(&gdbstub_priv, &dbg);
   gdbstub_close(&gdbstub_priv);
