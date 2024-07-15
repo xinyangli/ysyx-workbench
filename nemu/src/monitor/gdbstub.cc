@@ -11,7 +11,6 @@ extern "C" {
 #include <stddef.h>
 #include <stdlib.h>
 #include <difftest-def.h>
-}
 
 typedef struct {
   std::vector<breakpoint_t> *bp;
@@ -110,7 +109,6 @@ static struct target_ops nemu_gdbstub_ops = {.cont = nemu_cont,
                                              .del_bp = nemu_del_bp,
                                              .on_interrupt = NULL};
 static DbgState dbg;
-extern "C" {
 static gdbstub_t gdbstub_priv;
 #define SOCKET_ADDR "127.0.0.1:1234"
 
