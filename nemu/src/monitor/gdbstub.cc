@@ -32,6 +32,7 @@ __EXPORT int nemu_write_mem(void *args, size_t addr, size_t len, void *val) {
 }
 
 static void nemu_is_stopped(gdb_action_t *act, breakpoint_t *stopped_at) {
+  printf("Yes0\n");
   switch (nemu_state.state) {
   case NEMU_RUNNING:
     nemu_state.state = NEMU_STOP;
