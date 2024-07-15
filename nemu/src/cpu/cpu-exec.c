@@ -158,6 +158,7 @@ void cpu_exec(uint64_t n) {
 breakpoint_t *cpu_exec_with_bp(uint64_t n, breakpoint_t *bp, size_t len) {
   static Decode s;
   nemu_state.state = NEMU_RUNNING;
+  Assert(bp != NULL, "Memory not allocated for breakpoints");
   do {
     exec_once(&s, cpu.pc);
     g_nr_guest_inst++;
