@@ -123,7 +123,7 @@ static gdbstub_t gdbstub_priv;
 
 __EXPORT void nemu_init(void *args) {
   DbgState *dbg_state = (DbgState *)args;
-  dbg_state->bp = new std::vector<breakpoint_t>(128);
+  dbg_state->bp = new std::vector<breakpoint_t>(10 * sizeof(breakpoint_t));
   printf("bp: %p, bp alloc: %p, bp data: %p\n", dbg_state, dbg_state->bp, dbg_state->bp->data());
   Assert(dbg_state->bp != NULL, "Failed to allocate breakpoint");
 
