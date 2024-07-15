@@ -36,6 +36,7 @@ static void nemu_is_stopped(gdb_action_t *act, breakpoint_t *stopped_at) {
   case NEMU_RUNNING:
     nemu_state.state = NEMU_STOP;
     if (stopped_at == NULL) {
+      printf("Yes0\n");
       act->reason = gdb_action_t::ACT_NONE;
     } else {
       switch (stopped_at->type) {
@@ -60,7 +61,6 @@ static void nemu_is_stopped(gdb_action_t *act, breakpoint_t *stopped_at) {
     act->reason = gdb_action_t::ACT_SHUTDOWN;
     act->data = nemu_state.halt_ret;
   }
-  printf("Yes0\n");
 }
 
 __EXPORT void nemu_cont(void *args, gdb_action_t *res) {
