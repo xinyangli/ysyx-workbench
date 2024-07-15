@@ -72,6 +72,7 @@ __EXPORT void nemu_stepi(void *args, gdb_action_t *res) {
   breakpoint_t *stopped_at =
       cpu_exec_with_bp(1, dbg_state->bp->data(), dbg_state->bp->size());
   printf("exec done.\n");
+  printf("stopped at (r): %d.\n", stopped_at->type);
   nemu_is_stopped(res, stopped_at);
   printf("is_stopped done.\n");
 }
