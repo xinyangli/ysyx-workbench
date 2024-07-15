@@ -161,7 +161,6 @@ breakpoint_t *cpu_exec_with_bp(uint64_t n, breakpoint_t *bp, size_t len) {
   // Assert(bp != NULL, "Memory not allocated for breakpoints");
   do {
     exec_once(&s, cpu.pc);
-    printf("exec_once done\n");
     g_nr_guest_inst++;
     for (int i = 0; i < len; i++) {
       size_t addr = bp[i].addr;
