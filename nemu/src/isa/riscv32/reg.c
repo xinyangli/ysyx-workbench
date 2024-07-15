@@ -51,6 +51,7 @@ word_t isa_reg_str2val(const char *s, bool *success) {
 }
 
 int isa_read_reg(void *args, int regno, size_t *reg_value) {
+  puts("Yes");
   printf("%p %d %p\n", args, regno, reg_value);
   if (regno > 32) {
     return EFAULT;
