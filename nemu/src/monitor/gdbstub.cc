@@ -99,8 +99,8 @@ __EXPORT void nemu_on_interrupt(void *args) {
   // fputs("Not implemented", stderr);
 }
 
-typeof(target_ops::read_reg) nemu_read_reg = isa_read_reg;
-typeof(target_ops::write_reg) nemu_write_reg = isa_write_reg;
+__EXPORT typeof(target_ops::read_reg) nemu_read_reg = isa_read_reg;
+__EXPORT typeof(target_ops::write_reg) nemu_write_reg = isa_write_reg;
 
 static struct target_ops nemu_gdbstub_ops = {.cont = nemu_cont,
                                              .stepi = nemu_stepi,
