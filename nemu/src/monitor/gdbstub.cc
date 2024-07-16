@@ -78,7 +78,7 @@ __EXPORT void nemu_stepi(void *args, gdb_action_t *res) {
 
 __EXPORT bool nemu_set_bp(void *args, size_t addr, bp_type_t type) {
   DbgState *dbg_state = (DbgState *)args;
-  printf("[nemu] set_bp: %lx\n", addr);
+  printf("[nemu] set_bp: %lx, bp: %p\n", addr, dbg_state->bp);
   for (const auto &bp : *dbg_state->bp) {
     if (bp.addr == addr && bp.type == type) {
       return true;
