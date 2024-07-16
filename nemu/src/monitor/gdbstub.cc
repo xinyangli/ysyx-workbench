@@ -32,7 +32,6 @@ __EXPORT int nemu_write_mem(void *args, size_t addr, size_t len, void *val) {
 }
 
 static void nemu_is_stopped(gdb_action_t *act, breakpoint_t *stopped_at) {
-  printf("nemu_state: %d\n", nemu_state.state);
   switch (nemu_state.state) {
   case NEMU_RUNNING:
     nemu_state.state = NEMU_STOP;
@@ -79,14 +78,12 @@ __EXPORT void nemu_stepi(void *args, gdb_action_t *res) {
 
 __EXPORT bool nemu_set_bp(void *args, size_t addr, bp_type_t type) {
   DbgState *dbg_state = (DbgState *)args;
-  printf("[nemu] set_bp: %lx, bp: %p\n", addr, dbg_state->bp);
   for (const auto &bp : *dbg_state->bp) {
     if (bp.addr == addr && bp.type == type) {
       return true;
     }
   }
   dbg_state->bp->push_back({.addr = addr, .type = type});
-  printf("bp size: %lu\n",dbg_state->bp->size());
   return true;
 }
 
