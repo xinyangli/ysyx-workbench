@@ -128,11 +128,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1714032877,
-        "narHash": "sha256-6KKe4xdHPQbGtM5icLHKxgcYyFKF47a98csTQG7vkvU=",
+        "lastModified": 1721118743,
+        "narHash": "sha256-shzZpYghkjO0dsca67wjBwJPU81dGTUFGbmMY2asAvI=",
         "ref": "refs/heads/master",
-        "rev": "f6acae14927a6df78ce2304007369095e140da9c",
-        "revCount": 149,
+        "rev": "99cdf9d2717cee236652bebd5459ec6dfb168ba2",
+        "revCount": 150,
         "type": "git",
         "url": "https://git.xinyang.life/xin/nur.git"
       },
