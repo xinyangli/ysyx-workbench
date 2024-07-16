@@ -38,6 +38,7 @@ static void nemu_is_stopped(gdb_action_t *act, breakpoint_t *stopped_at) {
     nemu_state.state = NEMU_STOP;
     if (stopped_at == NULL) {
       act->reason = gdb_action_t::ACT_NONE;
+      break;
     } else {
       switch (stopped_at->type) {
       case BP_SOFTWARE:
