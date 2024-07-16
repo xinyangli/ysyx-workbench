@@ -4,13 +4,13 @@
 extern "C" {
 #include <cpu/cpu.h>
 #include <debug.h>
+#include <difftest-def.h>
 #include <errno.h>
 #include <gdbstub.h>
 #include <isa.h>
 #include <memory/paddr.h>
 #include <stddef.h>
 #include <stdlib.h>
-#include <difftest-def.h>
 
 typedef struct {
   std::vector<breakpoint_t> *bp;
