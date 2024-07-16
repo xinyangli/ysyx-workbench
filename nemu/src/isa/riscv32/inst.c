@@ -229,7 +229,7 @@ static int decode_exec(Decode *s) {
           R(rd) = src1 & src2);
 
   INSTPAT("0000000 00001 00000 000 00000 11100 11", ebreak, N,
-          do { puts("Hit ebreak"); NEMUTRAP(s->pc, R(10)); printf("state: %d\n", nemu_state.state);} while (0);); // R(10) is $a0
+          do { puts("Hit ebreak"); NEMUTRAP(s->pc, R(10));} while (0);); // R(10) is $a0
 
   // "M"
   INSTPAT("0000001 ????? ????? 000 ????? 01100 11", mul, R,
