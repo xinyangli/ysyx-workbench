@@ -25,7 +25,7 @@ void init_mem();
 void init_difftest(char *ref_so_file, long img_size, int port);
 void init_device();
 void init_disasm(const char *triple);
-int nemu_gdbstub_init();
+void nemu_init();
 
 static void welcome() {
   Log("Trace: %s", MUXDEF(CONFIG_TRACE, ANSI_FMT("ON", ANSI_FG_GREEN),
@@ -60,7 +60,8 @@ static long load_img() {
   // Image file is searched from paths in environment variable NEMU_IMAGES_PATH if it's a relative path
   if (img_file[0] != '/') {
     char *search_paths = getenv("NEMU_IMAGES_PATH");
-    if(search_paths == NULL) search_paths = "./";
+    if (search_paths == NULL)
+      search_paths = "./";
     search_paths = strdup(search_paths);
     Trace("NEMU_IMAGES_PATH=%s", search_paths);
 
@@ -68,8 +69,10 @@ static long load_img() {
     char *p_start = search_paths;
     do {
       char *p = strchr(p_start, ':');
-      if (p != NULL) *p = '\0';
-      else p = paths_end;
+      if (p != NULL)
+        *p = '\0';
+      else
+        p = paths_end;
 
       char *file_path = malloc(p - p_start + img_filename_len + 2);
       strcpy(file_path, p_start);
@@ -86,7 +89,7 @@ static long load_img() {
 
       Assert(fp != NULL || errno == ENOENT, "Cannot open '%s'", img_file);
       p_start = p + 1;
-    } while(p_start < paths_end);
+    } while (p_start < paths_end);
     free(search_paths);
 
     Assert(fp, "Cannot find '%s'", img_file);
@@ -178,10 +181,11 @@ void init_monitor(int argc, char *argv[]) {
   init_difftest(diff_so_file, img_size, difftest_port);
 
   /* Initialize debugger */
-  if (nemu_gdbstub_init()) {
-    Error("Failed to init");
-    exit(1);
-  }
+  // if (nemu_init()) {
+  //   Error("Failed to init");
+  //   exit(1);
+  // }
+  nemu_init();
 
   // printf("elf_file: %s\n", elf_file);
   if (elf_file != NULL) {

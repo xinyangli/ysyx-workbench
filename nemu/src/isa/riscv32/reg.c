@@ -14,9 +14,10 @@
 ***************************************************************************************/
 
 #include "local-include/reg.h"
-#include "gdbstub.h"
 #include "macro.h"
+#include <difftest-def.h>
 #include <errno.h>
+#include <gdbstub.h>
 #include <isa.h>
 
 const char *regs[] = {"$0", "ra", "sp",  "gp",  "tp", "t0", "t1", "t2",
@@ -76,6 +77,6 @@ int isa_write_reg(void *args, int regno, size_t data) {
   return 0;
 }
 
-arch_info_t isa_arch_info = {.reg_num = 33,
-                             .reg_byte = MUXDEF(CONFIG_RV64, 8, 4),
-                             .target_desc = TARGET_RV32};
+__EXPORT arch_info_t isa_arch_info = {.reg_num = 32,
+                                      .reg_byte = MUXDEF(CONFIG_RV64, 8, 4),
+                                      .target_desc = TARGET_RV32};
