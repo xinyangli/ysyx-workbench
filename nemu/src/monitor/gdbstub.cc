@@ -58,6 +58,7 @@ static void nemu_is_stopped(gdb_action_t *act, breakpoint_t *stopped_at) {
     break;
 
   default:
+    puts("Hit default");
     act->reason = gdb_action_t::ACT_SHUTDOWN;
     act->data = nemu_state.halt_ret;
   }
