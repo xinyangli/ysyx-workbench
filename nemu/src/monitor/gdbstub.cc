@@ -86,6 +86,7 @@ __EXPORT bool nemu_set_bp(void *args, size_t addr, bp_type_t type) {
     }
   }
   dbg_state->bp->push_back({.addr = addr, .type = type});
+  printf("bp size: %lu\n",dbg_state->bp->size());
   return true;
 }
 
