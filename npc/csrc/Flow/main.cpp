@@ -42,7 +42,10 @@ void *pmem_get() {
   };
   static auto pmem = new MemoryMap<Memory<128 * 1024>, Devices::DeviceMap>(
       std::make_unique<Memory<128 * 1024>>(
-          "/nix/store/nv2c00y24qwz1jihfbaip9n1lskbzyb3-am-kernel-riscv32-none-elf-2024-07-10/share/am-kernels/add.bin", config.memory_file_binary, PMEM_START, PMEM_END),
+          "/nix/store/"
+          "nv2c00y24qwz1jihfbaip9n1lskbzyb3-am-kernel-riscv32-none-elf-2024-07-"
+          "10/share/am-kernels/add.bin",
+          config.memory_file_binary, PMEM_START, PMEM_END),
       std::make_unique<Devices::DeviceMap>(devices), config.mtrace_ranges);
   return pmem;
 }
@@ -126,11 +129,9 @@ bool npc_del_bp(void *args, size_t addr, bp_type_t type) {
   return false;
 }
 
-void npc_on_interrupt(void *args) {
-  ;
-}
+void npc_on_interrupt(void *args) { ; }
 
-void npc_init(void * args) {
+void npc_init(void *args) {
   DbgState *dbg = (DbgState *)args;
   dbg->bp = new std::vector<Breakpoint>;
 

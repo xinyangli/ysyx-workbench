@@ -122,7 +122,7 @@ static struct target_ops nemu_gdbstub_ops = {.cont = nemu_cont,
                                              .on_interrupt = NULL};
 static DbgState dbg;
 static gdbstub_t gdbstub_priv;
-const char SOCKET_ADDR[] =  "127.0.0.1:1234";
+const char SOCKET_ADDR[] =  "/tmp/gdbstub-nemu.sock";
 
 __EXPORT void nemu_init(void *args) {
   DbgState *dbg_state = (DbgState *)args;
