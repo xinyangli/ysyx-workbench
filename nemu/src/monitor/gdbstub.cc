@@ -122,7 +122,7 @@ static struct target_ops nemu_gdbstub_ops = {.cont = nemu_cont,
                                              .on_interrupt = NULL};
 static DbgState dbg;
 static gdbstub_t gdbstub_priv;
-#define SOCKET_ADDR "127.0.0.1:1234"
+const char SOCKET_ADDR[] = "/tmp/gdbstub-nemu.sock";
 
 __EXPORT void nemu_init(void *args) {
   DbgState *dbg_state = (DbgState *)args;
@@ -140,16 +140,16 @@ __EXPORT int nemu_gdbstub_init() {
   dbg.bp = new std::vector<breakpoint_t>();
   assert(dbg.bp);
   if (!gdbstub_init(&gdbstub_priv, &nemu_gdbstub_ops,
-                    (arch_info_t)isa_arch_info, SOCKET_ADDR)) {
+                    (arch_info_t)isa_arch_info, strdup(SOCKET_ADDR))) {
     return EINVAL;
   }
   return 0;
 }
 
 __EXPORT int nemu_gdbstub_run() {
-  puts("Waiting for gdb connection at " SOCKET_ADDR);
+  printf("Waiting for gdb connection at %s", SOCKET_ADDR);
   bool success = gdbstub_run(&gdbstub_priv, &dbg);
-  gdbstub_close(&gdbstub_priv);
+  // gdbstub_close(&gdbstub_priv);
   return !success;
 }
 }
