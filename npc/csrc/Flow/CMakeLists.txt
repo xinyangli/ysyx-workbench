@@ -27,3 +27,23 @@ foreach(DIFFTEST_BINARY_FILE IN LISTS DIFFTEST_BINARY_FILES)
                    ${DIFFTEST_LIB})
   unset(FILENAME)
 endforeach()
+
+add_library(${VTOPMODULE} STATIC config.cpp main.cpp)
+target_link_libraries(${TOPMODULE} PRIVATE devices gdbstub)
+target_include_directories(${TOPMODULE} PRIVATE ${CMAKE_SOURCE_DIR}/include)
+
+verilate(
+  ${TOPMODULE}
+  THREADS
+  TOP_MODULE
+  ${TOPMODULE}
+  PREFIX
+  V${TOPMODULE}
+  SOURCES
+  ${CHISEL_OUTPUT_TOPMODULE}
+  ${CHISEL_OUTPUT_VERILATOR_CONF}
+  INCLUDE_DIRS
+  ${CHISEL_OUTPUT_DIR}
+  VERILATOR_ARGS
+  "--vpi" # Enable VPI
+  "-Wno-UNOPTFLAT")
