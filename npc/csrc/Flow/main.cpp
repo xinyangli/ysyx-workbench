@@ -42,7 +42,7 @@ void *pmem_get() {
   };
   static auto pmem = new MemoryMap<Memory<128 * 1024>, Devices::DeviceMap>(
       std::make_unique<Memory<128 * 1024>>(
-          config.memory_file, config.memory_file_binary, PMEM_START, PMEM_END),
+          "/nix/store/nv2c00y24qwz1jihfbaip9n1lskbzyb3-am-kernel-riscv32-none-elf-2024-07-10/share/am-kernels/add.bin", config.memory_file_binary, PMEM_START, PMEM_END),
       std::make_unique<Devices::DeviceMap>(devices), config.mtrace_ranges);
   return pmem;
 }
@@ -136,7 +136,7 @@ void npc_init(void * args) {
 
   top = new VlModule;
   regs = new Registers("TOP.Flow.reg_0.regFile_", "TOP.Flow.pc.out");
-  top->setup("/nix/store/nv2c00y24qwz1jihfbaip9n1lskbzyb3-am-kernel-riscv32-none-elf-2024-07-10/share/am-kernels/add.bin", regs);
+  top->setup(config.wavefile, regs);
   top->reset_eval(10);
 }
 
