@@ -136,16 +136,6 @@ void npc_init(void * args) {
   top->reset_eval(10);
 }
 
-static target_ops npc_gdbstub_ops = {.cont = npc_cont,
-                                     .stepi = npc_stepi,
-                                     .read_reg = npc_read_reg,
-                                     .write_reg = npc_write_reg,
-                                     .read_mem = npc_read_mem,
-                                     .write_mem = npc_write_mem,
-                                     .set_bp = npc_set_bp,
-                                     .del_bp = npc_del_bp,
-                                     .on_interrupt = NULL};
-
 static gdbstub_t gdbstub_priv;
 arch_info_t isa_arch_info = {
     .target_desc = strdup(TARGET_RV32), .reg_num = 32, .reg_byte = 4};
@@ -154,6 +144,16 @@ size_t argsize = sizeof(DbgState);
 
 int gdbstub_loop() {
   DbgState dbg;
+
+  target_ops npc_gdbstub_ops = {.cont = npc_cont,
+                                .stepi = npc_stepi,
+                                .read_reg = npc_read_reg,
+                                .write_reg = npc_write_reg,
+                                .read_mem = npc_read_mem,
+                                .write_mem = npc_write_mem,
+                                .set_bp = npc_set_bp,
+                                .del_bp = npc_del_bp,
+                                .on_interrupt = NULL};
 
   if (!gdbstub_init(&gdbstub_priv, &npc_gdbstub_ops, (arch_info_t)isa_arch_info,
                     strdup("/tmp/gdbstub-npc.sock"))) {
