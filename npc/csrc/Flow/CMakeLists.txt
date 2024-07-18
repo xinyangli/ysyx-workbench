@@ -37,7 +37,8 @@ target_include_directories(${TOPMODULE} PRIVATE ${CMAKE_SOURCE_DIR}/include)
 target_link_options(${TOPMODULE} PRIVATE -Wl,-E)
 
 verilate(
-  ${TOPMODULE}
+  V${TOPMODULE}
+  TRACE
   THREADS
   TOP_MODULE
   ${TOPMODULE}
