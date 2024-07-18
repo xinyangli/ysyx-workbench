@@ -136,7 +136,7 @@ void npc_init(void * args) {
 
   top = new VlModule;
   regs = new Registers("TOP.Flow.reg_0.regFile_", "TOP.Flow.pc.out");
-  top->setup(config.wavefile, regs);
+  top->setup("/nix/store/nv2c00y24qwz1jihfbaip9n1lskbzyb3-am-kernel-riscv32-none-elf-2024-07-10/share/am-kernels/add.bin", regs);
   top->reset_eval(10);
 }
 
