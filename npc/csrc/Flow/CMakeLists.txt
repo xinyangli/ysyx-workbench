@@ -32,7 +32,7 @@ add_library(${TOPMODULE} SHARED config.cpp main.cpp)
 set_property(TARGET PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_link_libraries(${TOPMODULE} PRIVATE devices gdbstub)
 target_include_directories(${TOPMODULE} PRIVATE ${CMAKE_SOURCE_DIR}/include)
-target_link_options(${TOPMODULE} PRIVATE "-E")
+target_link_options(${TOPMODULE} PRIVATE -Wl,-E)
 
 verilate(
   ${TOPMODULE}
