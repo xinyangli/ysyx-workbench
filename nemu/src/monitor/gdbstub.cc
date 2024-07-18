@@ -149,8 +149,7 @@ __EXPORT int nemu_gdbstub_init() {
 __EXPORT int nemu_gdbstub_run() {
   puts("Waiting for gdb connection at " SOCKET_ADDR);
   bool success = gdbstub_run(&gdbstub_priv, &dbg);
-
-  gdbstub_close(&gdbstub_priv);
+  // gdbstub_close(&gdbstub_priv);
   return !success;
 }
 }
