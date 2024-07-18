@@ -129,6 +129,11 @@ bool npc_del_bp(void *args, size_t addr, bp_type_t type) {
 void npc_init(void * args) {
   DbgState *dbg = (DbgState *)args;
   dbg->bp = new std::vector<Breakpoint>;
+
+  top = new VlModule;
+  regs = new Registers("TOP.Flow.reg_0.regFile_", "TOP.Flow.pc.out");
+  top->setup(config.wavefile, regs);
+  top->reset_eval(10);
 }
 
 static target_ops npc_gdbstub_ops = {.cont = npc_cont,
@@ -147,24 +152,21 @@ arch_info_t isa_arch_info = {
 
 int gdbstub_loop() {
   DbgState dbg;
+
   if (!gdbstub_init(&gdbstub_priv, &npc_gdbstub_ops, (arch_info_t)isa_arch_info,
                     strdup("/tmp/gdbstub-npc.sock"))) {
     return EINVAL;
   }
+  npc_init(&dbg);
 
   bool success = gdbstub_run(&gdbstub_priv, &dbg);
-  gdbstub_close(&gdbstub_priv);
+  // gdbstub_close(&gdbstub_priv);
   return !success;
 }
 } // extern "C"
 
 int main(int argc, char **argv, char **env) {
   config.cli_parse(argc, argv);
-
-  top = new VlModule;
-  regs = new Registers("TOP.Flow.reg_0.regFile_", "TOP.Flow.pc.out");
-  top->setup(config.wavefile, regs);
-  top->reset_eval(10);
 
   return gdbstub_loop();
 }
