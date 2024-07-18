@@ -28,7 +28,7 @@ foreach(DIFFTEST_BINARY_FILE IN LISTS DIFFTEST_BINARY_FILES)
   unset(FILENAME)
 endforeach()
 
-add_library(${VTOPMODULE} STATIC config.cpp main.cpp)
+add_library(${TOPMODULE} STATIC config.cpp main.cpp)
 target_link_libraries(${TOPMODULE} PRIVATE devices gdbstub)
 target_include_directories(${TOPMODULE} PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
