@@ -150,6 +150,8 @@ static gdbstub_t gdbstub_priv;
 arch_info_t isa_arch_info = {
     .target_desc = strdup(TARGET_RV32), .reg_num = 32, .reg_byte = 4};
 
+size_t argsize = sizeof(DbgState);
+
 int gdbstub_loop() {
   DbgState dbg;
 
