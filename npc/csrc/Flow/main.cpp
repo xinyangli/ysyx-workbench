@@ -28,7 +28,7 @@ const size_t PMEM_START = 0x80000000;
 const size_t PMEM_END = 0x87ffffff;
 
 struct DbgState {
-  std::vector<Breakpoint> bp;
+  std::vector<Breakpoint> *bp;
 };
 
 extern "C" {
@@ -95,35 +95,40 @@ int npc_write_reg(void *args, int regno, size_t value) { return 1; }
 
 void npc_cont(void *args, gdb_action_t *res) {
   DbgState *dbg = (DbgState *)args;
-  *res = top->eval(dbg->bp);
+  *res = top->eval(*dbg->bp);
 }
 
 void npc_stepi(void *args, gdb_action_t *res) {
   DbgState *dbg = (DbgState *)args;
-  *res = top->eval(dbg->bp);
+  *res = top->eval(*dbg->bp);
 }
 
 bool npc_set_bp(void *args, size_t addr, bp_type_t type) {
   DbgState *dbg = (DbgState *)args;
-  for (const auto &bp : dbg->bp) {
+  for (const auto &bp : *dbg->bp) {
     if (bp.addr == addr && bp.type == type) {
       return true;
     }
   }
-  dbg->bp.push_back({.addr = addr, .type = type});
+  dbg->bp->push_back({.addr = addr, .type = type});
   return true;
 }
 
 bool npc_del_bp(void *args, size_t addr, bp_type_t type) {
   DbgState *dbg = (DbgState *)args;
-  for (auto it = dbg->bp.begin(); it != dbg->bp.end(); it++) {
+  for (auto it = dbg->bp->begin(); it != dbg->bp->end(); it++) {
     if (it->addr == addr && it->type == type) {
-      std::swap(*it, *dbg->bp.rbegin());
-      dbg->bp.pop_back();
+      std::swap(*it, *dbg->bp->rbegin());
+      dbg->bp->pop_back();
       return true;
     }
   }
   return false;
+}
+
+void npc_init(void * args) {
+  DbgState *dbg = (DbgState *)args;
+  dbg->bp = new std::vector<Breakpoint>;
 }
 
 static target_ops npc_gdbstub_ops = {.cont = npc_cont,
@@ -137,15 +142,16 @@ static target_ops npc_gdbstub_ops = {.cont = npc_cont,
                                      .on_interrupt = NULL};
 
 static gdbstub_t gdbstub_priv;
-static DbgState dbg;
 arch_info_t isa_arch_info = {
-    .target_desc = strdup(TARGET_RV32), .reg_num = 33, .reg_byte = 4};
+    .target_desc = strdup(TARGET_RV32), .reg_num = 32, .reg_byte = 4};
 
 int gdbstub_loop() {
+  DbgState dbg;
   if (!gdbstub_init(&gdbstub_priv, &npc_gdbstub_ops, (arch_info_t)isa_arch_info,
                     strdup("/tmp/gdbstub-npc.sock"))) {
     return EINVAL;
   }
+
   bool success = gdbstub_run(&gdbstub_priv, &dbg);
   gdbstub_close(&gdbstub_priv);
   return !success;
