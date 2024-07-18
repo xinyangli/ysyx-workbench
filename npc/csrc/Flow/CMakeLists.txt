@@ -29,6 +29,8 @@ foreach(DIFFTEST_BINARY_FILE IN LISTS DIFFTEST_BINARY_FILES)
 endforeach()
 
 add_library(${TOPMODULE} SHARED config.cpp main.cpp)
+target_link_libraries(${TOPMODULE} PRIVATE devices gdbstub)
+target_include_directories(V${TOPMODULE} PRIVATE ${CMAKE_SOURCE_DIR}/include)
 set_property(TARGET PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_link_libraries(${TOPMODULE} PRIVATE devices gdbstub)
 target_include_directories(${TOPMODULE} PRIVATE ${CMAKE_SOURCE_DIR}/include)
