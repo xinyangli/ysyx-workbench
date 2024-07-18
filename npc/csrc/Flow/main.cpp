@@ -1,7 +1,7 @@
 extern "C" {
 #include <gdbstub.h>
 }
-// #include "VFlow___024root.h"
+#include "VFlow___024root.h"
 #include "components.hpp"
 #include <VFlow.h>
 #include <config.hpp>
