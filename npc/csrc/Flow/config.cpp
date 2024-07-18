@@ -1,4 +1,4 @@
-#include "config.hpp"
+#include <config.hpp>
 
 void Config::cli_parse(int argc, char **argv) {
   CLI::App app;
