@@ -143,7 +143,7 @@ arch_info_t isa_arch_info = {
 
 int gdbstub_loop() {
   if (!gdbstub_init(&gdbstub_priv, &npc_gdbstub_ops, (arch_info_t)isa_arch_info,
-                    strdup("127.0.0.1:1234"))) {
+                    strdup("/tmp/gdbstub-npc.sock"))) {
     return EINVAL;
   }
   bool success = gdbstub_run(&gdbstub_priv, &dbg);
