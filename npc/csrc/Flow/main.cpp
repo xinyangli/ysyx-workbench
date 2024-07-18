@@ -142,6 +142,8 @@ arch_info_t isa_arch_info = {
 
 size_t argsize = sizeof(DbgState);
 
+} // extern "C"
+
 int gdbstub_loop() {
   DbgState dbg;
 
@@ -165,7 +167,6 @@ int gdbstub_loop() {
   // gdbstub_close(&gdbstub_priv);
   return !success;
 }
-} // extern "C"
 
 int main(int argc, char **argv, char **env) {
   config.cli_parse(argc, argv);
