@@ -126,6 +126,10 @@ bool npc_del_bp(void *args, size_t addr, bp_type_t type) {
   return false;
 }
 
+void npc_on_interrupt(void *args) {
+  ;
+}
+
 void npc_init(void * args) {
   DbgState *dbg = (DbgState *)args;
   dbg->bp = new std::vector<Breakpoint>;
