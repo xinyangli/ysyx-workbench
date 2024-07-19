@@ -97,6 +97,9 @@ int npc_read_reg(void *args, int regno, size_t *value) {
 int npc_write_reg(void *args, int regno, size_t value) { return 1; }
 
 inline void breakpoint_to_action(const Breakpoint *bp, gdb_action_t *res) {
+  if(bp == nullptr) {
+      res->reason = gdb_action_t::ACT_NONE;
+  }
   switch (bp->type) {
   case BP_SOFTWARE:
     res->reason = gdb_action_t::ACT_BREAKPOINT;
@@ -111,18 +114,21 @@ inline void breakpoint_to_action(const Breakpoint *bp, gdb_action_t *res) {
     res->reason = gdb_action_t::ACT_RWATCH;
     break;
   }
+  res->data = bp->addr;
 }
 
 void npc_cont(void *args, gdb_action_t *res) {
   DbgState *dbg = (DbgState *)args;
   const Breakpoint *stopped_at = nullptr;
   stopped_at = top->cont(*dbg->bp);
+  breakpoint_to_action(stopped_at, res);
 }
 
 void npc_stepi(void *args, gdb_action_t *res) {
   DbgState *dbg = (DbgState *)args;
   const Breakpoint *stopped_at = nullptr;
   stopped_at = top->stepi(*dbg->bp);
+  breakpoint_to_action(stopped_at, res);
 }
 
 bool npc_set_bp(void *args, size_t addr, bp_type_t type) {
