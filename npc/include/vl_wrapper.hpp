@@ -61,6 +61,7 @@ public:
 
   const Breakpoint *stepi(const std::vector<Breakpoint> &breakpoints) {
     this->eval();
+    this->eval();
     size_t pc = registers->get_pc();
     for (const auto &bp : breakpoints) {
       if (pc == bp.addr) {
