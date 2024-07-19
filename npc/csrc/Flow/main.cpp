@@ -96,17 +96,33 @@ int npc_read_reg(void *args, int regno, size_t *value) {
 
 int npc_write_reg(void *args, int regno, size_t value) { return 1; }
 
+inline void breakpoint_to_action(const Breakpoint *bp, gdb_action_t *res) {
+  switch (bp->type) {
+  case BP_SOFTWARE:
+    res->reason = gdb_action_t::ACT_BREAKPOINT;
+    break;
+  case BP_ACCESS:
+    res->reason = gdb_action_t::ACT_WATCH;
+    break;
+  case BP_WRITE:
+    res->reason = gdb_action_t::ACT_WWATCH;
+    break;
+  case BP_READ:
+    res->reason = gdb_action_t::ACT_RWATCH;
+    break;
+  }
+}
+
 void npc_cont(void *args, gdb_action_t *res) {
   DbgState *dbg = (DbgState *)args;
   const Breakpoint *stopped_at = nullptr;
-  stopped_at = top->eval(*dbg->bp);
-  // res->data = stopped_at.
+  stopped_at = top->cont(*dbg->bp);
 }
 
 void npc_stepi(void *args, gdb_action_t *res) {
   DbgState *dbg = (DbgState *)args;
   const Breakpoint *stopped_at = nullptr;
-  stopped_at = top->eval(*dbg->bp);
+  stopped_at = top->stepi(*dbg->bp);
 }
 
 bool npc_set_bp(void *args, size_t addr, bp_type_t type) {

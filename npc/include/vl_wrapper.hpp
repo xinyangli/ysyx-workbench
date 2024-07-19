@@ -48,7 +48,18 @@ public:
     registers = r;
   }
 
-  const Breakpoint *eval_once(const std::vector<Breakpoint> &breakpoints) {
+  void eval(void) {
+    if (this->is_posedge()) {
+      posedge_cnt++;
+    }
+    T::clock = !T::clock;
+    sim_time++;
+    T::eval();
+    if (tracer)
+      tracer->update();
+  }
+
+  const Breakpoint *stepi(const std::vector<Breakpoint> &breakpoints) {
     this->eval();
     size_t pc = registers->get_pc();
     for (const auto &bp : breakpoints) {
@@ -59,10 +70,10 @@ public:
     return nullptr;
   }
 
-  const Breakpoint *eval(const std::vector<Breakpoint> &breakpoints) {
+  const Breakpoint *cont(const std::vector<Breakpoint> &breakpoints) {
     const Breakpoint *res = nullptr;
     do {
-        res = eval_once(breakpoints);
+        res = stepi(breakpoints);
     } while (res == nullptr);
     return res;
   }
