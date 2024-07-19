@@ -82,7 +82,9 @@ public:
     extern bool g_skip_memcheck;
     g_skip_memcheck = true;
     this->reset = 1;
-    this->eval(n);
+    do {
+      this->eval();
+    } while(--n);
     this->reset = 0;
     g_skip_memcheck = false;
   }
