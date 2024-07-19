@@ -98,12 +98,15 @@ int npc_write_reg(void *args, int regno, size_t value) { return 1; }
 
 void npc_cont(void *args, gdb_action_t *res) {
   DbgState *dbg = (DbgState *)args;
-  *res = top->eval(*dbg->bp);
+  const Breakpoint *stopped_at = nullptr;
+  stopped_at = top->eval(*dbg->bp);
+  // res->data = stopped_at.
 }
 
 void npc_stepi(void *args, gdb_action_t *res) {
   DbgState *dbg = (DbgState *)args;
-  *res = top->eval(*dbg->bp);
+  const Breakpoint *stopped_at = nullptr;
+  stopped_at = top->eval(*dbg->bp);
 }
 
 bool npc_set_bp(void *args, size_t addr, bp_type_t type) {

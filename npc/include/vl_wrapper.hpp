@@ -2,6 +2,7 @@
 #define _NPC_TRACER_H_
 #include "components.hpp"
 #include "types.h"
+#include "verilated.h"
 #include <filesystem>
 #include <gdbstub.h>
 #include <sys/types.h>
@@ -47,38 +48,23 @@ public:
     registers = r;
   }
 
-  void eval() {
-    if (this->is_posedge()) {
-      posedge_cnt++;
+  const Breakpoint *eval_once(const std::vector<Breakpoint> &breakpoints) {
+    this->eval();
+    size_t pc = registers->get_pc();
+    for (const auto &bp : breakpoints) {
+      if (pc == bp.addr) {
+          return &bp;
+      }
     }
-    T::clock = !T::clock;
-    sim_time++;
-    T::eval();
-    if (tracer)
-      tracer->update();
-  }
-  void eval(int n) {
-    for (int i = 0; i < n; i++) {
-      this->eval();
-    }
+    return nullptr;
   }
 
-  gdb_action_t eval(const std::vector<Breakpoint> &breakpoints) {
-    gdb_action_t res;
+  const Breakpoint *eval(const std::vector<Breakpoint> &breakpoints) {
+    const Breakpoint *res = nullptr;
     do {
-      this->eval();
-      size_t pc = registers->get_pc();
-      for (const auto &bp : breakpoints) {
-        if (pc == bp.addr) {
-          res.data = bp.addr;
-          switch (bp.type) {
-          default:
-            res.reason = gdb_action_t::ACT_BREAKPOINT;
-          }
-          return res;
-        }
-      }
-    } while (true);
+        res = eval_once(breakpoints);
+    } while (res == nullptr);
+    return res;
   }
 
   void reset_eval(int n) {
