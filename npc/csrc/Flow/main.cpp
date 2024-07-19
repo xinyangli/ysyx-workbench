@@ -159,6 +159,7 @@ void npc_on_interrupt(void *args) { ; }
 
 void npc_init(void *args) {
   DbgState *dbg = (DbgState *)args;
+  void *mem = pmem_get();
   dbg->bp = new std::vector<Breakpoint>;
 
   top = new VlModule;
