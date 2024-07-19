@@ -45,7 +45,7 @@ void *pmem_get() {
           "/nix/store/"
           "nv2c00y24qwz1jihfbaip9n1lskbzyb3-am-kernel-riscv32-none-elf-2024-07-"
           "10/share/am-kernels/add.bin",
-          config.memory_file_binary, PMEM_START, PMEM_END),
+          true, PMEM_START, PMEM_END),
       std::make_unique<Devices::DeviceMap>(devices), config.mtrace_ranges);
   return pmem;
 }
