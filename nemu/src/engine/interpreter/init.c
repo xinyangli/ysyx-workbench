@@ -17,15 +17,13 @@
 #include <cpu/cpu.h>
 #include <gdbstub.h>
 
-void sdb_mainloop();
-
 void engine_start() {
 #ifdef CONFIG_TARGET_AM
   cpu_exec(-1);
 #else
   /* Receive commands from user. */
-  int nemu_gdbstub_run();
-  if (nemu_gdbstub_run()) {
+  int gdbstub_loop();
+  if (gdbstub_loop()) {
     Error("gdbstub exited abnormally");
     exit(1);
   }
