@@ -115,7 +115,7 @@ static int parse_args(int argc, char *argv[]) {
   const struct option table[] = {
       {"batch", no_argument, NULL, 'b'},
       {"log", required_argument, NULL, 'l'},
-      {"diff", required_argument, NULL, 'd'},
+      {"debug", no_argument, NULL, 'g'},
       {"elf", required_argument, NULL, 'f'},
       {"help", no_argument, NULL, 'h'},
       {0, 0, NULL, 0},
@@ -129,12 +129,16 @@ static int parse_args(int argc, char *argv[]) {
     case 'f':
       elf_file = optarg;
       break;
+    case 'g':
+      enable_gdbstub = true;
+      break;
     case 1:
       img_file = optarg;
       return 0;
     default:
       printf("Usage: %s [OPTION...] IMAGE [args]\n\n", argv[0]);
       printf("\t-b,--batch              run with batch mode\n");
+      printf("\t-g,--debug              enable gdb remote server\n");
       printf("\t-l,--log=FILE           output log to FILE\n");
       printf("\t-f,--elf=FILE           elf file with debug info\n");
       printf("\n");
