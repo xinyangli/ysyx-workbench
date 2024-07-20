@@ -154,38 +154,17 @@ static int parse_args(int argc, char *argv[]) {
 }
 
 void init_monitor(int argc, char *argv[]) {
-  /* Perform some global initialization. */
-
   /* Parse arguments. */
   parse_args(argc, argv);
 
-  /* Set random seed. */
-  init_rand();
+  /* Perform some global initialization. */
+  nemu_init();
 
   /* Open the log file. */
   init_log(log_file);
 
-  /* Initialize memory. */
-  init_mem();
-
-  /* Initialize devices. */
-  IFDEF(CONFIG_DEVICE, init_device());
-
-  /* Perform ISA dependent initialization. */
-  init_isa();
-
   /* Load the image to memory. This will overwrite the built-in image. */
   long img_size = load_img();
-
-  /* Initialize differential testing. */
-  init_difftest(diff_so_file, img_size, difftest_port);
-
-  /* Initialize debugger */
-  // if (nemu_init()) {
-  //   Error("Failed to init");
-  //   exit(1);
-  // }
-  nemu_init();
 
   // printf("elf_file: %s\n", elf_file);
   if (elf_file != NULL) {

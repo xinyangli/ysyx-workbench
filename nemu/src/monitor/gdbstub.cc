@@ -129,8 +129,15 @@ __EXPORT void nemu_init(void *args) {
   dbg_state->halt = 0;
   Assert(dbg_state->bp != NULL, "Failed to allocate breakpoint");
 
+  void init_rand();
+  // void init_log(const char *log_file);
   void init_mem();
+  IFDEF(CONFIG_DEVICE, void init_device());
+
+  init_rand();
   init_mem();
+  IFDEF(CONFIG_DEVICE, init_device());
+
   /* Perform ISA dependent initialization. */
   init_isa();
 }
