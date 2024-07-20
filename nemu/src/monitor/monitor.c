@@ -149,7 +149,7 @@ void init_monitor(int argc, char *argv[]) {
   parse_args(argc, argv);
 
   /* Perform some global initialization. */
-  nemu_init();
+  nemu_init(NULL);
 
   /* Open the log file. */
   init_log(log_file);
