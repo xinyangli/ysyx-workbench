@@ -164,7 +164,7 @@ void init_monitor(int argc, char *argv[]) {
   init_log(log_file);
 
   /* Load the image to memory. This will overwrite the built-in image. */
-  long img_size = load_img();
+  load_img();
 
   // printf("elf_file: %s\n", elf_file);
   if (elf_file != NULL) {
