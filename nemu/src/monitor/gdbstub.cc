@@ -4,7 +4,6 @@
 extern "C" {
 #include <cpu/cpu.h>
 #include <debug.h>
-#include <difftest-def.h>
 #include <errno.h>
 #include <gdbstub.h>
 #include <isa.h>

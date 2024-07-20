@@ -99,6 +99,8 @@
 #define unlikely(cond) __builtin_expect(cond, 0)
 #endif
 
+#define __EXPORT __attribute__((visibility("default")))
+
 // for AM IOE
 #define io_read(reg) \
   ({ reg##_T __io_param; \
