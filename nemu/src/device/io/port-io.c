@@ -14,6 +14,8 @@
 ***************************************************************************************/
 
 #include <device/map.h>
+#include <assert.h>
+#include <debug.h>
 
 #define PORT_IO_SPACE_MAX 65535
 
