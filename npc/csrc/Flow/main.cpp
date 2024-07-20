@@ -75,15 +75,13 @@ void pmem_write(int waddr, int wdata, char wmask) {
 int npc_read_mem(void *args, size_t addr, size_t len, void *val) {
   void *pmem = pmem_get();
   auto mmap = static_cast<MMap *>(pmem);
-  mmap->copy_to(addr, (uint8_t *)val, len);
-  return 0;
+  return mmap->copy_to(addr, (uint8_t *)val, len);
 }
 
 int npc_write_mem(void *args, size_t addr, size_t len, void *val) {
   void *pmem = pmem_get();
   auto mmap = static_cast<MMap *>(pmem);
-  mmap->copy_from(addr, (uint8_t *)val, len);
-  return 0;
+  return mmap->copy_from(addr, (uint8_t *)val, len);
 }
 
 int npc_read_reg(void *args, int regno, size_t *value) {

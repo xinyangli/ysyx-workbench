@@ -108,18 +108,20 @@ public:
     }
     return res;
   }
-  void copy_to(paddr_t addr, uint8_t *buf, size_t len) const {
+  int copy_to(paddr_t addr, uint8_t *buf, size_t len) const {
     if (ram->in_pmem(addr)) {
       ram->transfer(addr, buf, len, false);
+      return 0;
     } else {
-      std::cerr << "0x" << std::hex << addr << " not in pmem" << std::endl;
+      return EINVAL;
     }
   }
-  void copy_from(paddr_t addr, uint8_t *buf, size_t len) {
+  int copy_from(paddr_t addr, uint8_t *buf, size_t len) {
     if (ram->in_pmem(addr)) {
       ram->transfer(addr, buf, len, true);
+      return 0;
     } else {
-      std::cerr << "0x" << std::hex << addr << " not in pmem" << std::endl;
+      return EINVAL;
     }
   }
   void *get_pmem() { return ram->mem.data(); }
