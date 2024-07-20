@@ -149,11 +149,12 @@ void init_monitor(int argc, char *argv[]) {
   /* Parse arguments. */
   parse_args(argc, argv);
 
-  /* Perform some global initialization. */
-  nemu_init(NULL);
-
+  void init_log(const char *log_file);
   /* Open the log file. */
   init_log(log_file);
+
+  /* Perform some global initialization. */
+  nemu_init(NULL);
 
   /* Load the image to memory. This will overwrite the built-in image. */
   load_img();

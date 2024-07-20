@@ -135,8 +135,8 @@ __EXPORT void nemu_init(void *args) {
     init_remote_gdbstub(args);
 
   void init_rand();
-  // void init_log(const char *log_file);
   void init_mem();
+
   IFDEF(CONFIG_DEVICE, void init_device());
 
   init_rand();
