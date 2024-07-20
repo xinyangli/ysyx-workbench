@@ -13,10 +13,11 @@
 * See the Mulan PSL v2 for more details.
 ***************************************************************************************/
 
-#include "cpu/cpu.h"
+#include <cpu/cpu.h>
 #include <errno.h>
 #include <isa.h>
 #include <memory/paddr.h>
+#include <nemu.h>
 #include <strings.h>
 #include <utils.h>
 
@@ -113,12 +114,9 @@ static long load_img() {
 
 static int parse_args(int argc, char *argv[]) {
   const struct option table[] = {
-      {"batch", no_argument, NULL, 'b'},
-      {"log", required_argument, NULL, 'l'},
-      {"debug", no_argument, NULL, 'g'},
-      {"elf", required_argument, NULL, 'f'},
-      {"help", no_argument, NULL, 'h'},
-      {0, 0, NULL, 0},
+      {"batch", no_argument, NULL, 'b'}, {"log", required_argument, NULL, 'l'},
+      {"debug", no_argument, NULL, 'g'}, {"elf", required_argument, NULL, 'f'},
+      {"help", no_argument, NULL, 'h'},  {0, 0, NULL, 0},
   };
   int o;
   while ((o = getopt_long(argc, argv, "-bhl:d:p:", table, NULL)) != -1) {
