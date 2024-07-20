@@ -3,9 +3,6 @@
 
 #include <stdbool.h>
 
-extern bool do_difftest;
-static void difftest_skip_ref(void) {
-  do_difftest = false;
-}
+extern bool nemu_do_difftest;
 
 #endif // __NEMU_DIFFTEST_H__

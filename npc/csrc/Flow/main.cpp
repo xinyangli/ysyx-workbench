@@ -166,6 +166,8 @@ void npc_init(void *args) {
   top->reset_eval(10);
 }
 
+bool npc_do_difftest = true;
+
 static gdbstub_t gdbstub_priv;
 arch_info_t isa_arch_info = {
     .target_desc = strdup(TARGET_RV32), .reg_num = 32, .reg_byte = 4};
