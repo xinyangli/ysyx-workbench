@@ -97,6 +97,9 @@ int npc_read_reg(void *args, int regno, size_t *value) {
 int npc_write_reg(void *args, int regno, size_t value) { return 1; }
 
 inline void breakpoint_to_action(const Breakpoint *bp, gdb_action_t *res) {
+  if (bp == nullptr) {
+    res->reason = gdb_action_t::ACT_NONE;
+  }
   switch (bp->type) {
   case BP_SOFTWARE:
     res->reason = gdb_action_t::ACT_BREAKPOINT;
@@ -186,7 +189,7 @@ int gdbstub_loop() {
                                 .on_interrupt = NULL};
 
   if (!gdbstub_init(&gdbstub_priv, &npc_gdbstub_ops, (arch_info_t)isa_arch_info,
-                    strdup("/tmp/gdbstub-npc.sock"))) {
+                    "/tmp/gdbstub-npc.sock")) {
     return EINVAL;
   }
   npc_init(&dbg);
