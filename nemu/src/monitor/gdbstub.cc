@@ -119,20 +119,20 @@ static struct target_ops nemu_gdbstub_ops = {.cont = nemu_cont,
                                              .set_bp = nemu_set_bp,
                                              .del_bp = nemu_del_bp,
                                              .on_interrupt = NULL};
-static DbgState dbg;
+static DbgState *pdbg;
 static gdbstub_t gdbstub_priv;
 const char SOCKET_ADDR[] = "/tmp/gdbstub-nemu.sock";
 
 static void init_remote_gdbstub(void *args) {
   DbgState *dbg_state = (DbgState *)args;
+  pdbg = (DbgState *)args;
   dbg_state->bp = new std::vector<breakpoint_t>();
   dbg_state->halt = 0;
   Assert(dbg_state->bp != NULL, "Failed to allocate breakpoint");
 }
 
 __EXPORT void nemu_init(void *args) {
-  if (args)
-    init_remote_gdbstub(args);
+  init_remote_gdbstub(args);
 
   void init_rand();
   void init_mem();
@@ -153,7 +153,7 @@ int gdbstub_loop() {
     return EINVAL;
   }
   printf("Waiting for gdb connection at %s", SOCKET_ADDR);
-  bool success = gdbstub_run(&gdbstub_priv, &dbg);
+  bool success = gdbstub_run(&gdbstub_priv, pdbg);
   // gdbstub_close(&gdbstub_priv);
   return !success;
 }
