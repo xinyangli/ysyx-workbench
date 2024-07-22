@@ -169,10 +169,10 @@ void npc_init(void *args) {
 bool npc_do_difftest = true;
 
 static gdbstub_t gdbstub_priv;
-arch_info_t isa_arch_info = {
+arch_info_t npc_isa_arch_info = {
     .target_desc = strdup(TARGET_RV32), .reg_num = 32, .reg_byte = 4};
 
-size_t argsize = sizeof(DbgState);
+size_t npc_dbg_state_size = sizeof(DbgState);
 
 } // extern "C"
 
@@ -189,7 +189,7 @@ int gdbstub_loop() {
                                 .del_bp = npc_del_bp,
                                 .on_interrupt = NULL};
 
-  if (!gdbstub_init(&gdbstub_priv, &npc_gdbstub_ops, (arch_info_t)isa_arch_info,
+  if (!gdbstub_init(&gdbstub_priv, &npc_gdbstub_ops, (arch_info_t)npc_isa_arch_info,
                     "/tmp/gdbstub-npc.sock")) {
     return EINVAL;
   }
