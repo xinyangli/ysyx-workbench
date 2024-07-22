@@ -5,7 +5,7 @@ import chisel3.util.HasBlackBoxResource
 
 // class DiffTester extends BlackBox with HasBlackBoxResource {
 //     val io = IO(new Bundle {
-//         val regs = 
+//         val regs =
 //     })
 //     addResource("difftest.v");
 // }

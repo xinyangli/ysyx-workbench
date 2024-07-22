@@ -38,15 +38,15 @@
 @@ -983,6 +983,7 @@ static int card_busy_detect(struct mmc_card *card, unsigned int timeout_ms,
  	int err = 0;
  	u32 status;
- 
+
 +  return err;
  	do {
  		bool done = time_after(jiffies, timeout);
- 
+
 --- linux/drivers/mmc/core/core.h
 +++ linux/drivers/mmc/core/core.h
 @@ -64,6 +64,7 @@ void mmc_set_initial_state(struct mmc_host *host);
- 
+
  static inline void mmc_delay(unsigned int ms)
  {
 +  return;

@@ -4,4 +4,4 @@
 	branch = dev
 [submodule "diffu"]
 	path = diffu
-	url = https://git.xinyang.life/xin/diffu.git
+	url = git@github.com:xinyangli/diffu.git
