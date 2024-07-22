@@ -149,7 +149,7 @@ __EXPORT void nemu_init(void *args) {
 
 int gdbstub_loop() {
   if (!gdbstub_init(&gdbstub_priv, &nemu_gdbstub_ops,
-                    (arch_info_t)isa_arch_info, strdup(SOCKET_ADDR))) {
+                    (arch_info_t)isa_arch_info, SOCKET_ADDR)) {
     return EINVAL;
   }
   printf("Waiting for gdb connection at %s", SOCKET_ADDR);
