@@ -27,12 +27,12 @@ void engine_start() {
   /* Receive commands from user. */
   int ret = 0;
   if (enable_gdbstub) {
-    cpu_exec(-1);
-  } else {
     if ((ret = gdbstub_loop())) {
       Error("gdbstub exited abnormally");
       exit(ret);
     }
+  } else {
+    cpu_exec(-1);
   }
 #endif
 }
