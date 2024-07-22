@@ -55,25 +55,25 @@ __am_iret:
   popl  %edi
   popl  %ebp
   iret
- 
+
 .kernel_iret:
   popl  %eax
   popl  %ebx
   popl  %ecx
   popl  %edx
   addl  $4, %esp
- 
+
   /* stack frame:
      28  ss
      24  esp  (not popped by iret when returning to ring0)
      20  eflags ---> move to new-esp
      16  cs
      12  eip
-      8  ebp 
-      4  edi 
+      8  ebp
+      4  edi
       0  esi <--- %esp
       */
- 
+
   movl  %esp, %ebp
   movl  24(%ebp), %edi   // %edi is new-esp
 

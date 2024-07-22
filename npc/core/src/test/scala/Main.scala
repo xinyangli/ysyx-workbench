@@ -13,7 +13,7 @@ class RV32CPUSpec extends AnyFreeSpec with ChiselScalatestTester {
       import chisel3.util.{SRAM, SRAMInterface, HexMemoryFile}
       class UserMem extends Module {
         val io = IO(new SRAMInterface(1024, UInt(32.W), 1, 1, 0))
-        val memoryFile = HexMemoryFile("../resource/addi.txt") 
+        val memoryFile = HexMemoryFile("../resource/addi.txt")
         io :<>= SRAM(
           size = 1024,
           tpe = UInt(32.W),
@@ -22,7 +22,7 @@ class RV32CPUSpec extends AnyFreeSpec with ChiselScalatestTester {
           numReadwritePorts = 0,
           memoryFile = memoryFile
         )
-        
+
         val read = io.readPorts(0).data
         printf(cf"memoryFile=$memoryFile, readPort=$read%x\n")
       }
