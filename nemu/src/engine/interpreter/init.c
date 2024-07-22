@@ -17,15 +17,22 @@
 #include <cpu/cpu.h>
 #include <gdbstub.h>
 
+int gdbstub_loop();
+extern bool enable_gdbstub;
+
 void engine_start() {
 #ifdef CONFIG_TARGET_AM
   cpu_exec(-1);
 #else
   /* Receive commands from user. */
-  int gdbstub_loop();
-  if (gdbstub_loop()) {
-    Error("gdbstub exited abnormally");
-    exit(1);
+  int ret = 0;
+  if (enable_gdbstub) {
+    cpu_exec(-1);
+  } else {
+    if ((ret = gdbstub_loop())) {
+      Error("gdbstub exited abnormally");
+      exit(ret);
+    }
   }
 #endif
 }
