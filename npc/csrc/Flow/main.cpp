@@ -169,7 +169,7 @@ void npc_init(void *args) {
 bool npc_do_difftest = true;
 
 static gdbstub_t gdbstub_priv;
-arch_info_t npc_isa_arch_info = {
+arch_info_t npc_isa_arch_info  {
     .target_desc = strdup(TARGET_RV32), .reg_num = 32, .reg_byte = 4};
 
 size_t npc_dbg_state_size = sizeof(DbgState);

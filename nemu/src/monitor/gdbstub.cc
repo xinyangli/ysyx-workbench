@@ -16,7 +16,7 @@ typedef struct {
   bool halt;
 } DbgState;
 
-__EXPORT size_t nemu_dbg_state_size = sizeof(DbgState);
+__EXPORT size_t nemu_dbgstate_size = sizeof(DbgState);
 __EXPORT bool nemu_do_difftest = true;
 __EXPORT arch_info_t nemu_isa_arch_info;
 
