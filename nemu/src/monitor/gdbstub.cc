@@ -16,6 +16,10 @@ typedef struct {
   bool halt;
 } DbgState;
 
+__EXPORT size_t nemu_dbgstate_size = sizeof(DbgState);
+__EXPORT bool nemu_do_difftest = true;
+__EXPORT arch_info_t nemu_isa_arch_info;
+
 __EXPORT int nemu_read_mem(void *args, size_t addr, size_t len, void *val) {
   if (!in_pmem(addr))
     return EINVAL;
@@ -108,7 +112,6 @@ __EXPORT int nemu_read_reg(void *args, int regno, size_t *data) {
 __EXPORT int nemu_write_reg(void *args, int regno, size_t data) {
   return isa_write_reg(args, regno, data);
 }
-__EXPORT size_t nemu_dbgstate_size = sizeof(DbgState);
 
 static struct target_ops nemu_gdbstub_ops = {.cont = nemu_cont,
                                              .stepi = nemu_stepi,
