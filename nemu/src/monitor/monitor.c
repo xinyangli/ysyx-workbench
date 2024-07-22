@@ -154,7 +154,7 @@ void init_monitor(int argc, char *argv[]) {
   init_log(log_file);
 
   /* Perform some global initialization. */
-  nemu_init(malloc(nemu_dbgstate_size));
+  nemu_init(malloc(nemu_dbg_state_size));
 
   /* Load the image to memory. This will overwrite the built-in image. */
   load_img();
