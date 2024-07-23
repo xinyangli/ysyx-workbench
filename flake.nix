@@ -13,7 +13,7 @@
     };
   };
 
-  outputs = { self, ... }@inputs: with inputs;
+  outputs = { self, flake-utils, nixpkgs, nixpkgs-circt162, pre-commit-hooks, nur-xin }@inputs:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs {
@@ -26,7 +26,8 @@
             })
           ];
         };
-        crossPkgs = import nixpkgs {
+
+        rv32CrossConfig = import nixpkgs {
           localSystem = system;
           crossSystem = {
             config = "riscv32-none-elf";
@@ -53,33 +54,17 @@
           };
         };
 
-        packages.nemu = pkgs.callPackage ./nemu { am-kernels = self.packages.${system}.am-kernels; };
-        packages.nemu-lib = pkgs.callPackage ./nemu { am-kernels = self.packages.${system}.am-kernels; defconfig = "riscv32-lib_defconfig"; };
-        packages.abstract-machine = crossPkgs.callPackage ./abstract-machine { isa = "riscv"; platform = [ "nemu" "npc" ]; };
-        packages.abstract-machine-native = pkgs.callPackage ./abstract-machine { isa = "native"; };
+        packages = rec {
+          abstract-machine = pkgs.callPackage ./abstract-machine { isa = "native"; };
+          nemu = pkgs.callPackage ./nemu { };
+          nemu-lib = pkgs.callPackage ./nemu { };
+          am-kernels = pkgs.callPackage ./am-kernels { abstract-machine = abstract-machine; arch = "native"; };
 
-        packages.am-kernels = crossPkgs.stdenv.mkDerivation rec {
-          pname = "am-kernels-cmake";
-          version = "2024.02.18";
-
-          src = ./am-kernels;
-
-          nativeBuildInputs = [
-            pkgs.cmake
-            pkgs.gcc # Generate expr tests
-          ];
-
-          cmakeFlags = [
-            (pkgs.lib.cmakeFeature "ARCH" "riscv-nemu")
-          ];
-
-          buildInputs = [
-            # SDL2
-            self.packages.${system}.abstract-machine
-          ];
-
-          cmakeBuildType = "RelWithDebInfo";
-          dontStrip = true;
+          rv32Cross = rec {
+            abstract-machine = rv32CrossConfig.callPackage ./abstract-machine { isa = "riscv"; platform = [ "nemu" "npc" ]; };
+            am-kernels-npc = rv32CrossConfig.callPackage ./am-kernels { inherit abstract-machine; arch = "riscv-npc"; };
+            am-kernels-nemu = rv32CrossConfig.callPackage ./am-kernels { inherit abstract-machine; arch = "riscv-nemu"; };
+          };
         };
 
         devShells.nemu = pkgs.mkShell {
@@ -101,13 +86,14 @@
             self.packages.${system}.nemu
           ];
           NEMU_HOME = "/home/xin/repo/ysyx-workbench/nemu";
-          NEMU_IMAGES_PATH = self.packages.${system}.am-kernels + "/share/am-kernels";
+          NEMU_IMAGES_PATH = self.packages.${system}.rv32Cross.am-kernels-nemu + "/share/am-kernels";
         };
 
-        devShells.npc = with pkgs; mkShell.override { stdenv = ccacheStdenv; } {
+        devShells.npc = pkgs.mkShell.override { stdenv = pkgs.ccacheStdenv; } {
           inherit (self.checks.${system}.pre-commit-check) shellHook;
           CHISEL_FIRTOOL_PATH = "${nixpkgs-circt162.legacyPackages.${system}.circt}/bin";
-          packages = [
+          NPC_IMAGES_DIR="${self.packages.${system}.am-kernels-npc}/share/am-kernels";
+          packages = with pkgs; [
             clang-tools
             cmake
             coursier
@@ -120,7 +106,7 @@
             gtkwave
           ];
 
-          nativeBuildInputs = [
+          nativeBuildInputs = with pkgs; [
             cmake
             sbt
             nvboard
@@ -130,14 +116,16 @@
             flex
             bison
             verilator
+            self.packages.${system}.am-kernels-npc
           ];
 
-          buildInputs = [
+          buildInputs = with pkgs; [
             nvboard
             openssl
             libllvm
             libxml2
             readline
+            mini-gdbstub
           ] ++ self.checks.${system}.pre-commit-check.enabledPackages;
 
           cmakeFlags = [
