@@ -4,7 +4,6 @@
 extern "C" {
 #include <cpu/cpu.h>
 #include <debug.h>
-#include <difftest-def.h>
 #include <errno.h>
 #include <gdbstub.h>
 #include <isa.h>
@@ -16,6 +15,10 @@ typedef struct {
   std::vector<breakpoint_t> *bp;
   bool halt;
 } DbgState;
+
+__EXPORT size_t nemu_dbg_state_size = sizeof(DbgState);
+__EXPORT bool nemu_do_difftest = true;
+__EXPORT arch_info_t nemu_isa_arch_info;
 
 __EXPORT int nemu_read_mem(void *args, size_t addr, size_t len, void *val) {
   if (!in_pmem(addr))
@@ -109,7 +112,6 @@ __EXPORT int nemu_read_reg(void *args, int regno, size_t *data) {
 __EXPORT int nemu_write_reg(void *args, int regno, size_t data) {
   return isa_write_reg(args, regno, data);
 }
-__EXPORT size_t argsize = sizeof(DbgState);
 
 static struct target_ops nemu_gdbstub_ops = {.cont = nemu_cont,
                                              .stepi = nemu_stepi,
@@ -120,35 +122,41 @@ static struct target_ops nemu_gdbstub_ops = {.cont = nemu_cont,
                                              .set_bp = nemu_set_bp,
                                              .del_bp = nemu_del_bp,
                                              .on_interrupt = NULL};
-static DbgState dbg;
+static DbgState *pdbg;
 static gdbstub_t gdbstub_priv;
 const char SOCKET_ADDR[] = "/tmp/gdbstub-nemu.sock";
 
-__EXPORT void nemu_init(void *args) {
+static void init_remote_gdbstub(void *args) {
   DbgState *dbg_state = (DbgState *)args;
+  pdbg = (DbgState *)args;
   dbg_state->bp = new std::vector<breakpoint_t>();
   dbg_state->halt = 0;
   Assert(dbg_state->bp != NULL, "Failed to allocate breakpoint");
+}
 
+__EXPORT void nemu_init(void *args) {
+  init_remote_gdbstub(args);
+
+  void init_rand();
   void init_mem();
+
+  IFDEF(CONFIG_DEVICE, void init_device());
+
+  init_rand();
   init_mem();
+  IFDEF(CONFIG_DEVICE, init_device());
+
   /* Perform ISA dependent initialization. */
   init_isa();
 }
 
-__EXPORT int nemu_gdbstub_init() {
-  dbg.bp = new std::vector<breakpoint_t>();
-  assert(dbg.bp);
+int gdbstub_loop() {
   if (!gdbstub_init(&gdbstub_priv, &nemu_gdbstub_ops,
-                    (arch_info_t)isa_arch_info, strdup(SOCKET_ADDR))) {
+                    (arch_info_t)isa_arch_info, SOCKET_ADDR)) {
     return EINVAL;
   }
-  return 0;
-}
-
-__EXPORT int nemu_gdbstub_run() {
   printf("Waiting for gdb connection at %s", SOCKET_ADDR);
-  bool success = gdbstub_run(&gdbstub_priv, &dbg);
+  bool success = gdbstub_run(&gdbstub_priv, pdbg);
   // gdbstub_close(&gdbstub_priv);
   return !success;
 }

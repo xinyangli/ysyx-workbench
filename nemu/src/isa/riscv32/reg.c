@@ -15,7 +15,6 @@
 
 #include "local-include/reg.h"
 #include "macro.h"
-#include <difftest-def.h>
 #include <errno.h>
 #include <gdbstub.h>
 #include <isa.h>

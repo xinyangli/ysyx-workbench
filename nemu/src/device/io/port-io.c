@@ -13,6 +13,8 @@
 * See the Mulan PSL v2 for more details.
 ***************************************************************************************/
 
+#include <assert.h>
+#include <debug.h>
 #include <device/map.h>
 
 #define PORT_IO_SPACE_MAX 65535
@@ -22,15 +24,19 @@ static IOMap maps[NR_MAP] = {};
 static int nr_map = 0;
 
 /* device interface */
-void add_pio_map(const char *name, ioaddr_t addr, void *space, uint32_t len, io_callback_t callback) {
+void add_pio_map(const char *name, ioaddr_t addr, void *space, uint32_t len,
+                 io_callback_t callback) {
   assert(nr_map < NR_MAP);
   assert(addr + len <= PORT_IO_SPACE_MAX);
-  maps[nr_map] = (IOMap){ .name = name, .low = addr, .high = addr + len - 1,
-    .space = space, .callback = callback };
+  maps[nr_map] = (IOMap){.name = name,
+                         .low = addr,
+                         .high = addr + len - 1,
+                         .space = space,
+                         .callback = callback};
   Log("Add port-io map '%s' at [" FMT_PADDR ", " FMT_PADDR "]",
       maps[nr_map].name, maps[nr_map].low, maps[nr_map].high);
 
-  nr_map ++;
+  nr_map++;
 }
 
 /* CPU interface */

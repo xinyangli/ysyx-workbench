@@ -17,17 +17,22 @@
 #include <cpu/cpu.h>
 #include <gdbstub.h>
 
-void sdb_mainloop();
+int gdbstub_loop();
+extern bool enable_gdbstub;
 
 void engine_start() {
 #ifdef CONFIG_TARGET_AM
   cpu_exec(-1);
 #else
   /* Receive commands from user. */
-  int nemu_gdbstub_run();
-  if (nemu_gdbstub_run()) {
-    Error("gdbstub exited abnormally");
-    exit(1);
+  int ret = 0;
+  if (enable_gdbstub) {
+    if ((ret = gdbstub_loop())) {
+      Error("gdbstub exited abnormally");
+      exit(ret);
+    }
+  } else {
+    cpu_exec(-1);
   }
 #endif
 }
