@@ -13,6 +13,7 @@
 * See the Mulan PSL v2 for more details.
 ***************************************************************************************/
 
+#include <generated/autoconf.h>
 #include <assert.h>
 #include <device/alarm.h>
 #include <device/map.h>

@@ -16,6 +16,7 @@
 #include <assert.h>
 #include <debug.h>
 #include <device/map.h>
+#include <generated/autoconf.h>
 #include <utils.h>
 
 /* http://en.wikibooks.org/wiki/Serial_Programming/8250_UART_Programming */
