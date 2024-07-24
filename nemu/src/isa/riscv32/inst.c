@@ -13,6 +13,7 @@
  * See the Mulan PSL v2 for more details.
  ***************************************************************************************/
 
+#include "isa.h"
 #include "local-include/reg.h"
 #include "macro.h"
 #include "types.h"
@@ -20,6 +21,7 @@
 #include <cpu/cpu.h>
 #include <cpu/decode.h>
 #include <cpu/ifetch.h>
+#include <csr.h>
 #include <ftrace.h>
 #include <utils.h>
 
@@ -248,6 +250,12 @@ static int decode_exec(Decode *s) {
           R(rd) = (sword_t)src1 % (sword_t)src2);
   INSTPAT("0000001 ????? ????? 111 ????? 01100 11", remu, R,
           R(rd) = src1 % src2);
+
+
+  // "Previledge"
+  // -- CSR instructions
+  // -- Machine level
+  INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall, N, isa_raise_intr(CauseEnvironmentCallFromMMode, cpu.pc));
 
   INSTPAT("??????? ????? ????? ??? ????? ????? ??", inv, N, INV(s->pc));
   INSTPAT_END();
