@@ -35,6 +35,8 @@ enum {
   TYPE_S,
   TYPE_B,
   TYPE_J,
+  TYPE_CSR,
+  TYPE_CSRI,
   TYPE_N, // none
 };
 
@@ -68,6 +70,14 @@ enum {
     *imm = SEXT(BITS(i, 31, 31), 1) << 20 | BITS(i, 30, 21) << 1 |             \
            BITS(i, 20, 20) << 11 | BITS(i, 19, 12) << 12;                      \
   } while (0)
+#define csr()                                                                  \
+  do {                                                                         \
+    *src2 = BITS(i, 31, 20);                                                   \
+  } while (0)
+#define uimm()                                                                 \
+  do {                                                                         \
+    *imm = BITS(i, 19, 15);                                                    \
+  } while (0)
 
 static void decode_operand(Decode *s, int *rd, word_t *src1, word_t *src2,
                            word_t *imm, int type) {
@@ -99,6 +109,14 @@ static void decode_operand(Decode *s, int *rd, word_t *src1, word_t *src2,
     src1R();
     src2R();
     immB();
+    break;
+  case TYPE_CSR:
+    src1R();
+    csr();
+    break;
+  case TYPE_CSRI:
+    csr();
+    uimm();
     break;
   }
 }
@@ -251,11 +269,41 @@ static int decode_exec(Decode *s) {
   INSTPAT("0000001 ????? ????? 111 ????? 01100 11", remu, R,
           R(rd) = src1 % src2);
 
-
   // "Previledge"
   // -- CSR instructions
+  INSTPAT(
+      "??????? ????? ????? 001 ????? 11100 11", csrrw, CSR, do {
+        rd = read_csr(cpu.csr, src2);
+        write_csr(cpu.csr, src2, src1);
+      } while (0););
+  INSTPAT(
+      "??????? ????? ????? 010 ????? 11100 11", csrrs, CSR, do {
+        rd = read_csr(cpu.csr, src2);
+        set_csr_bits(cpu.csr, src2, src1);
+      } while (0););
+  INSTPAT(
+      "??????? ????? ????? 011 ????? 11100 11", csrrc, CSR, do {
+        rd = read_csr(cpu.csr, src2);
+        clear_csr_bits(cpu.csr, src2, src1);
+      } while (0););
+  INSTPAT(
+      "??????? ????? ????? 101 ????? 11100 11", csrrwi, CSRI, do {
+        rd = read_csr(cpu.csr, src2);
+        write_csr(cpu.csr, src2, imm);
+      } while (0););
+  INSTPAT("??????? ????? ????? 110 ????? 11100 11", csrrsi, CSRI, do {
+          rd = read_csr(cpu.csr, src2);
+          set_csr_bits(cpu.csr, src2, imm);
+        } while (0););
+  INSTPAT("??????? ????? ????? 111 ????? 11100 11", csrrci, CSRI, do {
+          rd = read_csr(cpu.csr, src2);
+          clear_csr_bits(cpu.csr, src2, imm);
+        } while (0););
   // -- Machine level
-  INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall, N, isa_raise_intr(CauseEnvironmentCallFromMMode, cpu.pc));
+  INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall, N,
+          isa_raise_intr(CauseEnvironmentCallFromMMode, cpu.pc));
+  INSTPAT("0011000 00010 00000 000 00000 11100 11", mret, N,
+          s->pc = read_csr(cpu.csr, MEPC));
 
   INSTPAT("??????? ????? ????? ??? ????? ????? ??", inv, N, INV(s->pc));
   INSTPAT_END();

@@ -64,6 +64,7 @@
             abstract-machine = rv32CrossConfig.callPackage ./abstract-machine { isa = "riscv"; platform = [ "nemu" "npc" ]; };
             am-kernels-npc = rv32CrossConfig.callPackage ./am-kernels { inherit abstract-machine; arch = "riscv-npc"; };
             am-kernels-nemu = rv32CrossConfig.callPackage ./am-kernels { inherit abstract-machine; arch = "riscv-nemu"; };
+            am-kernels = pkgs.callPackage ./am-kernels { abstract-machine = abstract-machine; arch = "riscv"; };
           };
         };
 
