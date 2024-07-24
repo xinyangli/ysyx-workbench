@@ -25,5 +25,4 @@ extern arch_info_t nemu_isa_arch_info;
 extern bool nemu_do_difftest;
 extern bool nemu_dbg_state_size;
 
-
 #endif // __NEMU_HEADER__

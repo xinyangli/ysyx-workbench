@@ -1,9 +1,9 @@
 { pkgs,
   lib,
   stdenv,
-  am-kernels,
   dtc,
   mini-gdbstub,
+  am-kernels ? null,
   defconfig ? "alldefconfig",
 }:
 
@@ -41,7 +41,7 @@ stdenv.mkDerivation rec {
     make
   '';
 
-  doCheck = (defconfig == "alldefconfig");
+  doCheck = (am-kernels != null);
   checkPhase = if doCheck then ''
     export NEMU_IMAGES_PATH=${am-kernels}/share/am-kernels
     make test
