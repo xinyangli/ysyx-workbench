@@ -13,11 +13,11 @@
 * See the Mulan PSL v2 for more details.
 ***************************************************************************************/
 
+#include <assert.h>
+#include <debug.h>
 #include <device/map.h>
 #include <generated/autoconf.h>
 #include <utils.h>
-#include <debug.h>
-#include <assert.h>
 
 #define KEYDOWN_MASK 0x8000
 

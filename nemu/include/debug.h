@@ -64,7 +64,7 @@ IFDEF(CONFIG_ITRACE, void log_itrace_print());
       IFDEF(CONFIG_ITRACE, log_itrace_print());                                \
       extern void assert_fail_msg();                                           \
       assert_fail_msg();                                                       \
-      assert(cond);                                                            \
+      nemu_state.state = NEMU_ABORT;                                                 \
     }                                                                          \
   } while (0)
 

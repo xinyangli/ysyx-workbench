@@ -13,10 +13,10 @@
 * See the Mulan PSL v2 for more details.
 ***************************************************************************************/
 
-#include <generated/autoconf.h>
 #include <assert.h>
 #include <device/alarm.h>
 #include <device/map.h>
+#include <generated/autoconf.h>
 #include <utils.h>
 
 static uint32_t *rtc_port_base = NULL;
