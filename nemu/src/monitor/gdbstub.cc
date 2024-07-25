@@ -59,6 +59,11 @@ static void nemu_is_stopped(gdb_action_t *act, breakpoint_t *stopped_at) {
     }
     break;
 
+  case NEMU_GDB_INTERRUPT:
+    act->reason = gdb_action_t::ACT_BREAKPOINT;
+    act->data = cpu.pc;
+    break;
+
   default:
     act->reason = gdb_action_t::ACT_SHUTDOWN;
     act->data = nemu_state.halt_ret;
@@ -103,7 +108,7 @@ __EXPORT bool nemu_del_bp(void *args, size_t addr, bp_type_t type) {
 }
 
 __EXPORT void nemu_on_interrupt(void *args) {
-  // fputs("Not implemented", stderr);
+  nemu_state.state = NEMU_GDB_INTERRUPT;
 }
 
 __EXPORT int nemu_read_reg(void *args, int regno, size_t *data) {
@@ -121,7 +126,8 @@ static struct target_ops nemu_gdbstub_ops = {.cont = nemu_cont,
                                              .write_mem = nemu_write_mem,
                                              .set_bp = nemu_set_bp,
                                              .del_bp = nemu_del_bp,
-                                             .on_interrupt = NULL};
+                                             .on_interrupt = nemu_on_interrupt,
+                                             .monitor = NULL};
 static DbgState *pdbg;
 static gdbstub_t gdbstub_priv;
 const char SOCKET_ADDR[] = "/tmp/gdbstub-nemu.sock";
@@ -152,7 +158,7 @@ __EXPORT void nemu_init(void *args) {
 
 int gdbstub_loop() {
   if (!gdbstub_init(&gdbstub_priv, &nemu_gdbstub_ops,
-                    (arch_info_t)isa_arch_info, SOCKET_ADDR)) {
+                    (arch_info_t)isa_arch_info, NULL, SOCKET_ADDR)) {
     return EINVAL;
   }
   printf("Waiting for gdb connection at %s", SOCKET_ADDR);

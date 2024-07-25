@@ -18,9 +18,13 @@
 
 #include <common.h>
 
+#define CSR_SIZE (0x1000)
+
+typedef word_t csr_t[CSR_SIZE];
+
 typedef struct {
   word_t gpr[MUXDEF(CONFIG_RVE, 16, 32)];
-  // word_t csr[MUXDEF(CONFIG_RVE, )]
+  csr_t csr;
   vaddr_t pc;
 } MUXDEF(CONFIG_RV64, riscv64_CPU_state, riscv32_CPU_state);
 
