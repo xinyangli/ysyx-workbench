@@ -15,6 +15,9 @@ stdenv.mkDerivation {
     (lib.cmakeFeature "ISA" isa)
   ] ++ map (p: (lib.cmakeBool "__PLATFORM_${lib.strings.toUpper p}__" true)) platform;
 
+  cmakeBuildType = "Debug";
+  dontStrip = true;
+
   nativeBuildInputs = [
     cmake
   ];

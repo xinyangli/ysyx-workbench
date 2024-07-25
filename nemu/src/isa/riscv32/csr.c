@@ -3,7 +3,6 @@
 void init_csr(csr_t csr) { memset(csr, 0, sizeof(word_t)); }
 
 void write_csr(csr_t csr, csr_addr_t csrnum, word_t value) {
-  printf("write csr: 0x%hx %x\n", csrnum, value);
   switch (csrnum) {
   default:
     csr[csrnum] = value;
@@ -11,7 +10,6 @@ void write_csr(csr_t csr, csr_addr_t csrnum, word_t value) {
 }
 
 word_t read_csr(csr_t csr, csr_addr_t csrnum) {
-  printf("read csr: 0x%hx %x\n", csrnum, csr[csrnum]);
   switch (csrnum) {
   // TODO: Implement csr read checks
   default:

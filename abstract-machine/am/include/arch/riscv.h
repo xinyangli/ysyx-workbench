@@ -10,8 +10,9 @@
 
 struct Context {
   // TODO: fix the order of these members to match trap.S
-  uintptr_t mepc, mstatus, mcause, gpr[NR_REGS];
   void *pdir;
+  uintptr_t gpr[NR_REGS - 1];
+  uintptr_t mcause, mstatus, mepc;
 };
 
 enum Cause { CauseEnvironmentCallFromMMode = 11 };
