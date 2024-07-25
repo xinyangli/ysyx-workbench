@@ -273,32 +273,32 @@ static int decode_exec(Decode *s) {
   // -- CSR instructions
   INSTPAT(
       "??????? ????? ????? 001 ????? 11100 11", csrrw, CSR, do {
-        rd = read_csr(cpu.csr, src2);
+        R(rd) = read_csr(cpu.csr, src2);
         write_csr(cpu.csr, src2, src1);
       } while (0););
   INSTPAT(
       "??????? ????? ????? 010 ????? 11100 11", csrrs, CSR, do {
-        rd = read_csr(cpu.csr, src2);
+        R(rd) = read_csr(cpu.csr, src2);
         set_csr_bits(cpu.csr, src2, src1);
       } while (0););
   INSTPAT(
       "??????? ????? ????? 011 ????? 11100 11", csrrc, CSR, do {
-        rd = read_csr(cpu.csr, src2);
+        R(rd) = read_csr(cpu.csr, src2);
         clear_csr_bits(cpu.csr, src2, src1);
       } while (0););
   INSTPAT(
       "??????? ????? ????? 101 ????? 11100 11", csrrwi, CSRI, do {
-        rd = read_csr(cpu.csr, src2);
+        R(rd) = read_csr(cpu.csr, src2);
         write_csr(cpu.csr, src2, imm);
       } while (0););
   INSTPAT(
       "??????? ????? ????? 110 ????? 11100 11", csrrsi, CSRI, do {
-        rd = read_csr(cpu.csr, src2);
+        R(rd) = read_csr(cpu.csr, src2);
         set_csr_bits(cpu.csr, src2, imm);
       } while (0););
   INSTPAT(
       "??????? ????? ????? 111 ????? 11100 11", csrrci, CSRI, do {
-        rd = read_csr(cpu.csr, src2);
+        R(rd) = read_csr(cpu.csr, src2);
         clear_csr_bits(cpu.csr, src2, imm);
       } while (0););
   // -- Machine level
