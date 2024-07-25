@@ -72,7 +72,7 @@ enum {
   } while (0)
 #define csr()                                                                  \
   do {                                                                         \
-    *src2 = BITS(i, 27, 20);                                                   \
+    *src2 = BITS(i, 31, 20);                                                   \
   } while (0)
 #define uimm()                                                                 \
   do {                                                                         \
