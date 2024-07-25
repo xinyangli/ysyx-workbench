@@ -121,7 +121,7 @@ static struct target_ops nemu_gdbstub_ops = {.cont = nemu_cont,
                                              .write_mem = nemu_write_mem,
                                              .set_bp = nemu_set_bp,
                                              .del_bp = nemu_del_bp,
-                                             .on_interrupt = NULL,
+                                             .on_interrupt = nemu_on_interrupt,
                                              .monitor = NULL};
 static DbgState *pdbg;
 static gdbstub_t gdbstub_priv;
