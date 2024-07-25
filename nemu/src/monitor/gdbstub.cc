@@ -58,6 +58,10 @@ static void nemu_is_stopped(gdb_action_t *act, breakpoint_t *stopped_at) {
       act->data = stopped_at->addr;
     }
     break;
+  
+  case NEMU_GDB_INTERRUPT:
+    act->reason = gdb_action_t::ACT_BREAKPOINT;
+    act->data = cpu.pc;
 
   default:
     act->reason = gdb_action_t::ACT_SHUTDOWN;
