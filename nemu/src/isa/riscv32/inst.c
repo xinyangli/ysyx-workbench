@@ -72,7 +72,7 @@ enum {
   } while (0)
 #define csr()                                                                  \
   do {                                                                         \
-    *src2 = BITS(i, 31, 20);                                                   \
+    *src2 = BITS(i, 27, 20);                                                   \
   } while (0)
 #define uimm()                                                                 \
   do {                                                                         \
@@ -291,14 +291,16 @@ static int decode_exec(Decode *s) {
         rd = read_csr(cpu.csr, src2);
         write_csr(cpu.csr, src2, imm);
       } while (0););
-  INSTPAT("??????? ????? ????? 110 ????? 11100 11", csrrsi, CSRI, do {
-          rd = read_csr(cpu.csr, src2);
-          set_csr_bits(cpu.csr, src2, imm);
-        } while (0););
-  INSTPAT("??????? ????? ????? 111 ????? 11100 11", csrrci, CSRI, do {
-          rd = read_csr(cpu.csr, src2);
-          clear_csr_bits(cpu.csr, src2, imm);
-        } while (0););
+  INSTPAT(
+      "??????? ????? ????? 110 ????? 11100 11", csrrsi, CSRI, do {
+        rd = read_csr(cpu.csr, src2);
+        set_csr_bits(cpu.csr, src2, imm);
+      } while (0););
+  INSTPAT(
+      "??????? ????? ????? 111 ????? 11100 11", csrrci, CSRI, do {
+        rd = read_csr(cpu.csr, src2);
+        clear_csr_bits(cpu.csr, src2, imm);
+      } while (0););
   // -- Machine level
   INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall, N,
           s->dnpc = isa_raise_intr(CauseEnvironmentCallFromMMode, cpu.pc));
