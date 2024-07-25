@@ -1,7 +1,7 @@
 #ifndef ARCH_H__
 #define ARCH_H__
+#include <stdint.h>
 
-#include <wchar.h>
 #ifdef __riscv_e
 #define NR_REGS 16
 #else
@@ -13,6 +13,8 @@ struct Context {
   uintptr_t mepc, mstatus, mcause, gpr[NR_REGS];
   void *pdir;
 };
+
+enum Cause { CauseEnvironmentCallFromMMode = 11 };
 
 #ifdef __riscv_e
 #define GPR1 gpr[15] // a5

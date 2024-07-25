@@ -76,7 +76,7 @@ target_include_directories(
   INTERFACE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/am/include>
             $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/am/src>
             $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
-target_compile_definitions(am_interface INTERFACE ARCH_H=<arch/${ISA}.h>)
+target_compile_definitions(am_interface INTERFACE ARCH_H=<arch/${ISA}.h> "__ISA__=\"${ISA}\"")
 file(GLOB_RECURSE AM_HEADERS "${CMAKE_SOURCE_DIR}/am/include/*.h")
 target_sources(
   am_interface

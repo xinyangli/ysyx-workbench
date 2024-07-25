@@ -11,7 +11,7 @@
 #define MCAUSE 0x342
 
 enum {
-  CauseEnvironmentCallFromMMode
+  CauseEnvironmentCallFromMMode = 11
 };
 
 typedef uint16_t csr_addr_t;

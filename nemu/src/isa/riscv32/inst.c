@@ -301,9 +301,9 @@ static int decode_exec(Decode *s) {
         } while (0););
   // -- Machine level
   INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall, N,
-          isa_raise_intr(CauseEnvironmentCallFromMMode, cpu.pc));
+          s->dnpc = isa_raise_intr(CauseEnvironmentCallFromMMode, cpu.pc));
   INSTPAT("0011000 00010 00000 000 00000 11100 11", mret, N,
-          s->pc = read_csr(cpu.csr, MEPC));
+          s->dnpc = read_csr(cpu.csr, MEPC));
 
   INSTPAT("??????? ????? ????? ??? ????? ????? ??", inv, N, INV(s->pc));
   INSTPAT_END();
