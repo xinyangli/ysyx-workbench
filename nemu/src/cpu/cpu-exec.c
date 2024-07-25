@@ -158,8 +158,6 @@ breakpoint_t *cpu_exec_with_bp(uint64_t n, breakpoint_t *bp, size_t len) {
   static Decode s;
   nemu_state.state = NEMU_RUNNING;
   do {
-    exec_once(&s, cpu.pc);
-    g_nr_guest_inst++;
     for (int i = 0; i < len; i++) {
       size_t addr = bp[i].addr;
       bp_type_t bptype = bp[i].type;
@@ -176,6 +174,8 @@ breakpoint_t *cpu_exec_with_bp(uint64_t n, breakpoint_t *bp, size_t len) {
         return bp + i;
       }
     }
+    exec_once(&s, cpu.pc);
+    g_nr_guest_inst++;
     if (nemu_state.state != NEMU_RUNNING)
       return NULL;
   } while (--n);
