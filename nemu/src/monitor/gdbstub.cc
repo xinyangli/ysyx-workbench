@@ -107,7 +107,7 @@ __EXPORT bool nemu_del_bp(void *args, size_t addr, bp_type_t type) {
 }
 
 __EXPORT void nemu_on_interrupt(void *args) {
-  nemu_state.state = NEMU_STOP;
+  nemu_state.state = NEMU_GDB_INTERRUPT;
 }
 
 __EXPORT int nemu_read_reg(void *args, int regno, size_t *data) {
