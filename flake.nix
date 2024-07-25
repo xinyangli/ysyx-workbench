@@ -71,7 +71,7 @@
         devShells.nemu = pkgs.mkShell {
           packages = with pkgs; [
             clang-tools
-            gdb
+            gef
             SDL2
             gnumake
             pkg-config
