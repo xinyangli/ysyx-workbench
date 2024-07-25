@@ -103,7 +103,7 @@ __EXPORT bool nemu_del_bp(void *args, size_t addr, bp_type_t type) {
 }
 
 __EXPORT void nemu_on_interrupt(void *args) {
-  // fputs("Not implemented", stderr);
+  nemu_state.state = NEMU_STOP;
 }
 
 __EXPORT int nemu_read_reg(void *args, int regno, size_t *data) {
@@ -121,7 +121,8 @@ static struct target_ops nemu_gdbstub_ops = {.cont = nemu_cont,
                                              .write_mem = nemu_write_mem,
                                              .set_bp = nemu_set_bp,
                                              .del_bp = nemu_del_bp,
-                                             .on_interrupt = NULL};
+                                             .on_interrupt = NULL,
+                                             .monitor = NULL};
 static DbgState *pdbg;
 static gdbstub_t gdbstub_priv;
 const char SOCKET_ADDR[] = "/tmp/gdbstub-nemu.sock";
@@ -151,51 +152,8 @@ __EXPORT void nemu_init(void *args) {
 }
 
 int gdbstub_loop() {
-  const char *arch_xml = "l<target version=\"1.0\">"
-    // "<architecture>"
-    //   "riscv:rv32"
-    // "</architecture>"
-  "<feature name=\"org.gnu.gdb.riscv.cpu\">"
-  "<reg name=\"zero\" bitsize=\"32\" type=\"int\" regnum=\"0\"/>"
-  // "<reg name=\"ra\" bitsize=\"32\" type=\"code_ptr\"/>"
-  // "<reg name=\"sp\" bitsize=\"32\" type=\"data_ptr\"/>"
-  // "<reg name=\"gp\" bitsize=\"32\" type=\"data_ptr\"/>"
-  // "<reg name=\"tp\" bitsize=\"32\" type=\"data_ptr\"/>"
-  // "<reg name=\"t0\" bitsize=\"32\" type=\"int\"/>"
-  // "<reg name=\"t1\" bitsize=\"32\" type=\"int\"/>"
-  // "<reg name=\"t2\" bitsize=\"32\" type=\"int\"/>"
-  // "<reg name=\"fp\" bitsize=\"32\" type=\"data_ptr\"/>"
-  // "<reg name=\"s1\" bitsize=\"32\" type=\"int\"/>"
-  // "<reg name=\"a0\" bitsize=\"32\" type=\"int\"/>"
-  // "<reg name=\"a1\" bitsize=\"32\" type=\"int\"/>"
-  // "<reg name=\"a2\" bitsize=\"32\" type=\"int\"/>"
-  // "<reg name=\"a3\" bitsize=\"32\" type=\"int\"/>"
-  // "<reg name=\"a4\" bitsize=\"32\" type=\"int\"/>"
-  // "<reg name=\"a5\" bitsize=\"32\" type=\"int\"/>"
-  // "<reg name=\"a6\" bitsize=\"32\" type=\"int\"/>"
-  // "<reg name=\"a7\" bitsize=\"32\" type=\"int\"/>"
-  // "<reg name=\"s2\" bitsize=\"32\" type=\"int\"/>"
-  // "<reg name=\"s3\" bitsize=\"32\" type=\"int\"/>"
-  // "<reg name=\"s4\" bitsize=\"32\" type=\"int\"/>"
-  // "<reg name=\"s5\" bitsize=\"32\" type=\"int\"/>"
-  // "<reg name=\"s6\" bitsize=\"32\" type=\"int\"/>"
-  // "<reg name=\"s7\" bitsize=\"32\" type=\"int\"/>"
-  // "<reg name=\"s8\" bitsize=\"32\" type=\"int\"/>"
-  // "<reg name=\"s9\" bitsize=\"32\" type=\"int\"/>"
-  // "<reg name=\"s10\" bitsize=\"32\" type=\"int\"/>"
-  // "<reg name=\"s11\" bitsize=\"32\" type=\"int\"/>"
-  // "<reg name=\"t3\" bitsize=\"32\" type=\"int\"/>"
-  // "<reg name=\"t4\" bitsize=\"32\" type=\"int\"/>"
-  // "<reg name=\"t5\" bitsize=\"32\" type=\"int\"/>"
-  // "<reg name=\"t6\" bitsize=\"32\" type=\"int\"/>"
-  // "<reg name=\"pc\" bitsize=\"32\" type=\"code_ptr\"/>"
-  "</feature>"
-      "<feature name=\"org.gnu.gdb.riscv.csr\">"
-        "<reg name=\"mtvec\" bitsize=\"32\" type=\"code_ptr\" regnum=\"33\"/>"
-      "</feature>"
-    "</target>";
   if (!gdbstub_init(&gdbstub_priv, &nemu_gdbstub_ops,
-                    (arch_info_t)isa_arch_info, arch_xml, SOCKET_ADDR)) {
+                    (arch_info_t)isa_arch_info, NULL, SOCKET_ADDR)) {
     return EINVAL;
   }
   printf("Waiting for gdb connection at %s", SOCKET_ADDR);
