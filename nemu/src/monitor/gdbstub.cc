@@ -151,8 +151,11 @@ __EXPORT void nemu_init(void *args) {
 }
 
 int gdbstub_loop() {
+  const char *arch_xml = "l<target version=\"1.0\"><architecture>"
+    "riscv:rv32"
+    "</architecture></target>";
   if (!gdbstub_init(&gdbstub_priv, &nemu_gdbstub_ops,
-                    (arch_info_t)isa_arch_info, SOCKET_ADDR)) {
+                    (arch_info_t)isa_arch_info, arch_xml, SOCKET_ADDR)) {
     return EINVAL;
   }
   printf("Waiting for gdb connection at %s", SOCKET_ADDR);
