@@ -176,6 +176,7 @@ breakpoint_t *cpu_exec_with_bp(uint64_t n, breakpoint_t *bp, size_t len) {
     }
     exec_once(&s, cpu.pc);
     g_nr_guest_inst++;
+    IFDEF(CONFIG_DEVICE, device_update());
     if (nemu_state.state != NEMU_RUNNING)
       return NULL;
   } while (--n);
