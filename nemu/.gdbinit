@@ -6,6 +6,9 @@ def get_images_path():
 def set_debug_paths(prefix, proj):
   gdb.execute(f'set substitute-path /build/{proj} -kernels {os.path.join(prefix, proj)}')
 
+def ps():
+  gdb.execute('p/x *(uintptr_t *)$sp@20')
+
 gdb.execute(f'file {get_images_path()}/../../libexec/am-kernels/am-tests')
 end
 file /home/xin/repo/rt-thread-am/bsp/abstract-machine/build/rtthread.elf
